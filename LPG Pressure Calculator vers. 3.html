@@ -1,0 +1,1917 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор газопроводів | Gas Pipeline Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --text-color: #333;
+            --background-color: #f8f9fa;
+            --card-background: #ffffff;
+            --border-radius: 10px;
+            --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: var(--card-background);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            position: relative;
+        }
+
+        .developer {
+            position: absolute;
+            bottom: 10px;
+            right: 20px;
+            font-size: 0.9rem;
+            color: #777;
+        }
+
+        .copyright {
+            margin-top: 10px;
+            font-size: 0.8rem;
+            color: #777;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+
+        .description {
+            color: var(--dark-color);
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .language-switcher {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .language-btn {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background: var(--card-background);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+        }
+
+        .tab {
+            padding: 15px 20px;
+            flex: 1;
+            text-align: center;
+            cursor: pointer;
+            background: #e0e0e0;
+            transition: background 0.3s;
+        }
+
+        .tab.active {
+            background: var(--secondary-color);
+            color: white;
+            font-weight: bold;
+        }
+
+        .calculator-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .input-section, .results-section {
+            flex: 1;
+            min-width: 300px;
+            background: var(--card-background);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .unit {
+            font-size: 0.9rem;
+            color: #777;
+            font-weight: normal;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        .calculate-btn {
+            background: linear-gradient(to right, var(--secondary-color), var(--primary-color));
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            width: 100%;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-top: 20px;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .result-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--light-color);
+            border-radius: 6px;
+        }
+
+        .result-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .result-value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin: 10px 0;
+        }
+
+        .result-details {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        .formula {
+            background: #f8f9fa;
+            border-left: 4px solid var(--secondary-color);
+            padding: 10px 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+
+        .formula-reference {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        .pressure-units {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .pressure-unit {
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .unit-value {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .unit-label {
+            font-size: 0.9rem;
+            color: #777;
+        }
+
+        .recommendations {
+            background: var(--light-color);
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+        }
+
+        .recommendations h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .recommendations ul {
+            padding-left: 20px;
+        }
+
+        .recommendations li {
+            margin-bottom: 8px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+        }
+
+        .disclaimer {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .multi-pipeline {
+            margin-top: 20px;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+
+        .add-pipeline-btn {
+            background: var(--success-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .pipeline-item {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .remove-pipeline {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .status-good {
+            background-color: var(--success-color);
+        }
+
+        .status-warning {
+            background-color: var(--warning-color);
+        }
+
+        .status-bad {
+            background-color: var(--accent-color);
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .export-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .pipeline-results {
+            margin-top: 20px;
+        }
+
+        .pipeline-result-item {
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        @media (max-width: 768px) {
+            .calculator-container {
+                flex-direction: column;
+            }
+            
+            .pressure-units {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .language-switcher {
+                position: relative;
+                top: 0;
+                right: 0;
+                text-align: center;
+                margin-bottom: 15px;
+            }
+            
+            .export-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="language-switcher">
+                <button class="language-btn" id="language-toggle">EN/UA</button>
+            </div>
+            <h1 id="main-title">Gas Pipeline Calculator</h1>
+            <p class="description" id="main-description">Professional calculator for gas pipeline pressure drop calculations</p>
+            <div class="developer">Developed by Artem Zrazhevskyi</div>
+            <div class="copyright" id="copyright-notice">© 2023 Gas Pipeline Calculator | Forbidden for resale without owner's permission</div>
+        </header>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="pressure-drop" id="tab-pressure">Pressure Drop</div>
+            <div class="tab" data-tab="pipe-sizing" id="tab-sizing">Pipe Sizing</div>
+            <div class="tab" data-tab="calculations" id="tab-calculations">Calculation Process</div>
+            <div class="tab" data-tab="flow-calc" id="tab-flow">Flow Calculator</div>
+        </div>
+
+        <div class="disclaimer" id="disclaimer-text">
+            <strong>Important:</strong> Final calculations must be verified by a competent engineer. This tool provides preliminary results only.
+        </div>
+
+        <div class="calculator-container" id="pressure-drop-tab">
+            <div class="input-section">
+                <h2 class="section-title"><i class="fas fa-sliders-h"></i> <span id="input-params-title">Input Parameters</span></h2>
+                
+                <div class="input-group">
+                    <label for="gas-type">
+                        <span id="gas-type-label">Gas type</span>
+                        <span class="unit" id="gas-type-unit">Select gas type</span>
+                    </label>
+                    <select id="gas-type">
+                        <option value="natural" selected>Natural gas</option>
+                        <option value="propane">Propane</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="pipe-type">
+                        <span id="pipe-type-label">Pipe type</span>
+                        <span class="unit" id="pipe-type-unit">Select pipe type</span>
+                    </label>
+                    <select id="pipe-type">
+                        <option value="pe">Polyethylene (PE)</option>
+                        <option value="steel">Steel</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="pipe-size">
+                        <span id="pipe-size-label">Nominal pipe diameter</span>
+                        <span class="unit">DN</span>
+                    </label>
+                    <select id="pipe-size">
+                        <option value="20">DN20</option>
+                        <option value="25">DN25</option>
+                        <option value="32">DN32</option>
+                        <option value="40">DN40</option>
+                        <option value="50">DN50</option>
+                        <option value="63">DN63</option>
+                        <option value="75">DN75</option>
+                        <option value="90">DN90</option>
+                        <option value="110">DN110</option>
+                        <option value="125">DN125</option>
+                        <option value="140">DN140</option>
+                        <option value="160">DN160</option>
+                        <option value="180">DN180</option>
+                        <option value="200">DN200</option>
+                    </select>
+                    <div class="pipe-dimensions-info">
+                        <span id="inner-diameter-text">Inner diameter:</span> <span id="inner-diameter-value">16.6 mm</span>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="pipe-length">
+                        <span id="pipe-length-label">Pipe length</span>
+                        <span class="unit">m</span>
+                    </label>
+                    <input type="number" id="pipe-length" min="0" step="0.1" value="100" placeholder="e.g., 100">
+                </div>
+
+                <div class="input-group">
+                    <label for="fittings-factor">
+                        <span id="fittings-label">Fittings factor</span>
+                        <span class="unit" id="fittings-unit">% of length</span>
+                    </label>
+                    <input type="number" id="fittings-factor" min="0" max="100" step="5" value="10" placeholder="e.g., 10">
+                    <div class="pipe-dimensions-info">
+                        <span id="equivalent-length-text">Equivalent length with fittings:</span> <span id="equivalent-length-value">110 m</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="height-difference">
+                        <span id="height-label">Height difference</span>
+                        <span class="unit">m</span>
+                    </label>
+                    <input type="number" id="height-difference" step="0.1" value="0" placeholder="e.g., 5">
+                    <div class="pipe-dimensions-info">
+                        <span id="height-note">Positive for upward flow, negative for downward</span>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="flow-rate">
+                        <span id="flow-rate-label">Gas flow rate</span>
+                        <span class="unit">m³/h</span>
+                    </label>
+                    <input type="number" id="flow-rate" min="0" step="0.1" value="50" placeholder="e.g., 50">
+                </div>
+                
+                <div class="input-group">
+                    <label for="pressure">
+                        <span id="pressure-label">Initial pressure</span>
+                        <span class="unit">kPa</span>
+                    </label>
+                    <input type="number" id="pressure" min="0" step="0.1" value="300" placeholder="e.g., 300">
+                    <div class="pressure-conversion">
+                        <span id="pressure-bar">3.00 bar</span>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="temperature">
+                        <span id="temperature-label">Gas temperature</span>
+                        <span class="unit">°C</span>
+                    </label>
+                    <input type="number" id="temperature" value="15" step="0.1" placeholder="e.g., 15">
+                </div>
+                
+                <div class="gas-properties">
+                    <h3 id="gas-properties-title">Gas properties</h3>
+                    <div class="gas-property">
+                        <span id="density-label">Density at 15°C:</span>
+                        <span id="density-value">0.73 kg/m³</span>
+                    </div>
+                    <div class="gas-property">
+                        <span id="viscosity-label">Viscosity at 15°C:</span>
+                        <span id="viscosity-value">1.12 × 10⁻⁵ Pa·s</span>
+                    </div>
+                    <div class="gas-property">
+                        <span id="roughness-label">Pipe roughness:</span>
+                        <span id="roughness-value">0.002 mm</span>
+                    </div>
+                </div>
+
+                <div class="multi-pipeline">
+                    <h3 id="multi-pipeline-title">Additional Pipelines</h3>
+                    <div id="pipelines-container">
+                        <!-- Pipelines will be added here -->
+                    </div>
+                    <button type="button" class="add-pipeline-btn" id="add-pipeline">
+                        <i class="fas fa-plus"></i> Add Additional Pipeline
+                    </button>
+                </div>
+                
+                <button id="calculate-pressure" class="calculate-btn">
+                    <i class="fas fa-calculator"></i> <span id="calculate-button">CALCULATE PRESSURE DROP</span>
+                </button>
+            </div>
+            
+            <div class="results-section">
+                <h2 class="section-title"><i class="fas fa-chart-line"></i> <span id="results-title">Calculation Results</span></h2>
+                
+                <div class="result-item">
+                    <div class="result-title">
+                        <i class="fas fa-tachometer-alt"></i> <span id="pressure-drop-title">Pressure drop</span>
+                    </div>
+                    <div class="result-value" id="pressure-drop-value">—</div>
+                    
+                    <div class="pressure-units">
+                        <div class="pressure-unit">
+                            <div class="unit-value" id="pressure-drop-kpa">—</div>
+                            <div class="unit-label">kPa</div>
+                        </div>
+                        <div class="pressure-unit">
+                            <div class="unit-value" id="pressure-drop-bar">—</div>
+                            <div class="unit-label">bar</div>
+                        </div>
+                        <div class="pressure-unit">
+                            <div class="unit-value" id="pressure-drop-mbar">—</div>
+                            <div class="unit-label">millibar</div>
+                        </div>
+                    </div>
+                    
+                    <div class="result-details">
+                        <strong id="formula-used">Formula used:</strong>
+                        <div class="formula">ΔP = f * (L/D) * (ρ * v² / 2)</div>
+                        <div class="formula-reference">Darcy-Weisbach equation for pressure loss due to friction</div>
+                    </div>
+                </div>
+                
+                <div class="result-item">
+                    <div class="result-title">
+                        <i class="fas fa-water"></i> <span id="reynolds-title">Reynolds number</span>
+                    </div>
+                    <div class="result-value" id="reynolds">—</div>
+                    <div class="result-details">
+                        <strong id="formula-label">Formula:</strong>
+                        <div class="formula">Re = (ρ * v * D) / μ</div>
+                        <div class="formula-reference" id="reynolds-description">Determines fluid flow regime (laminar/turbulent)</div>
+                        <div><strong id="flow-type-label">Flow type:</strong> <span id="flow-type">—</span></div>
+                    </div>
+                </div>
+                
+                <div class="result-item">
+                    <div class="result-title">
+                        <i class="fas fa-bolt"></i> <span id="velocity-title">Flow velocity</span>
+                    </div>
+                    <div class="result-value" id="flow-velocity">—</div>
+                    <div class="result-details">
+                        <strong id="formula-velocity">Formula:</strong>
+                        <div class="formula">v = Q / (π * D²/4)</div>
+                        <div class="formula-reference" id="velocity-description">Basic formula for flow velocity calculation</div>
+                    </div>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-title">
+                        <i class="fas fa-check-circle"></i> <span id="validation-title">Validation</span>
+                    </div>
+                    <div class="result-details">
+                        <div>
+                            <span class="status-indicator" id="pressure-drop-status"></span>
+                            <strong id="pressure-drop-validation">Pressure drop:</strong> 
+                            <span id="pressure-drop-validation-value"></span>
+                        </div>
+                        <div>
+                            <span class="status-indicator" id="velocity-status"></span>
+                            <strong id="velocity-validation">Flow velocity:</strong> 
+                            <span id="velocity-validation-value"></span>
+                        </div>
+                        <div id="validation-summary"></div>
+                    </div>
+                </div>
+
+                <div class="pipeline-results" id="pipeline-results-container">
+                    <!-- Pipeline-specific results will be added here -->
+                </div>
+
+                <div class="recommendations">
+                    <h3 id="recommendations-title">Recommendations</h3>
+                    <ul id="recommendations-list">
+                        <li id="rec1">Consider increasing pipe diameter if pressure drop exceeds 10% of initial pressure</li>
+                        <li id="rec2">For natural gas, velocity should typically be between 5-20 m/s</li>
+                        <li id="rec3">Include safety factor of 10-20% for unforeseen pressure losses</li>
+                    </ul>
+                </div>
+                
+                <div class="result-item">
+                    <div class="result-title">
+                        <i class="fas fa-info-circle"></i> <span id="details-title">Calculation details</span>
+                    </div>
+                    <div class="result-details">
+                        <div><strong id="calc-pipe-type-label">Pipe type:</strong> <span id="calc-pipe-type">—</span></div>
+                        <div><strong id="calc-nominal-diameter-label">Nominal diameter:</strong> <span id="calc-nominal-diameter">—</span></div>
+                        <div><strong id="calc-inner-diameter-label">Inner diameter:</strong> <span id="calc-inner-diameter">—</span> mm</div>
+                        <div><strong id="calc-length-label">Pipe length:</strong> <span id="calc-length">—</span> m</div>
+                        <div><strong id="calc-fittings-label">Fittings factor:</strong> <span id="calc-fittings">—</span>%</div>
+                        <div><strong id="calc-height-label">Height difference:</strong> <span id="calc-height">—</span> m</div>
+                        <div><strong id="calc-flow-rate-label">Gas flow rate:</strong> <span id="calc-flow-rate">—</span> m³/h</div>
+                        <div><strong id="calc-pressure-label">Initial pressure:</strong> <span id="calc-pressure">—</span> kPa (<span id="calc-pressure-bar">—</span> bar)</div>
+                        <div><strong id="calc-temperature-label">Temperature:</strong> <span id="calc-temperature">—</span> °C</div>
+                        <div><strong id="calc-density-label">Gas density:</strong> <span id="calc-density">—</span> kg/m³</div>
+                        <div><strong id="calc-viscosity-label">Gas viscosity:</strong> <span id="calc-viscosity">—</span> Pa·s</div>
+                        <div><strong id="calc-roughness-label">Pipe roughness:</strong> <span id="calc-roughness">—</span> mm</div>
+                        <div><strong id="calc-friction-label">Friction factor (f):</strong> <span id="calc-friction">—</span></div>
+                    </div>
+                </div>
+
+                <div class="export-buttons">
+                    <button class="export-btn" id="export-pdf">
+                        <i class="fas fa-file-pdf"></i> Export to PDF
+                    </button>
+                    <button class="export-btn" id="export-excel">
+                        <i class="fas fa-file-excel"></i> Export to Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="calculator-container" id="pipe-sizing-tab" style="display: none;">
+            <div class="input-section">
+                <h2 class="section-title"><i class="fas fa-ruler"></i> <span id="sizing-input-title">Input Parameters for Pipe Sizing</span></h2>
+                
+                <div class="input-group">
+                    <label for="sizing-gas-type">
+                        <span id="sizing-gas-type-label">Gas type</span>
+                        <span class="unit" id="sizing-gas-type-unit">Select gas type</span>
+                    </label>
+                    <select id="sizing-gas-type">
+                        <option value="natural" selected>Natural gas</option>
+                        <option value="propane">Propane</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="sizing-pipe-type">
+                        <span id="sizing-pipe-type-label">Pipe type</span>
+                        <span class="unit" id="sizing-pipe-type-unit">Select pipe type</span>
+                    </label>
+                    <select id="sizing-pipe-type">
+                        <option value="pe">Polyethylene (PE)</option>
+                        <option value="steel">Steel</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="sizing-length">
+                        <span id="sizing-length-label">Pipe length</span>
+                        <span class="unit">m</span>
+                    </label>
+                    <input type="number" id="sizing-length" min="0" step="0.1" value="100" placeholder="e.g., 100">
+                </div>
+
+                <div class="input-group">
+                    <label for="sizing-flow-rate">
+                        <span id="sizing-flow-rate-label">Gas flow rate</span>
+                        <span class="unit">m³/h</span>
+                    </label>
+                    <input type="number" id="sizing-flow-rate" min="0" step="0.1" value="50" placeholder="e.g., 50">
+                </div>
+                
+                <div class="input-group">
+                    <label for="sizing-pressure">
+                        <span id="sizing-pressure-label">Initial pressure</span>
+                        <span class="unit">kPa</span>
+                    </label>
+                    <input type="number" id="sizing-pressure" min="0" step="0.1" value="300" placeholder="e.g., 300">
+                </div>
+                
+                <div class="input-group">
+                    <label for="sizing-max-drop">
+                        <span id="max-drop-label">Max allowable pressure drop</span>
+                        <span class="unit">%</span>
+                    </label>
+                    <input type="number" id="sizing-max-drop" min="0" max="100" step="1" value="10" placeholder="e.g., 10">
+                </div>
+                
+                <div class="input-group">
+                    <label for="sizing-temperature">
+                        <span id="sizing-temperature-label">Gas temperature</span>
+                        <span class="unit">°C</span>
+                    </label>
+                    <input type="number" id="sizing-temperature" value="15" step="0.1" placeholder="e.g., 15">
+                </div>
+                
+                <button id="calculate-sizing" class="calculate-btn">
+                    <i class="fas fa-calculator"></i> <span id="sizing-calculate-button">CALCULATE PIPE SIZE</span>
+                </button>
+            </div>
+            
+            <div class="results-section">
+                <h2 class="section-title"><i class="fas fa-ruler-combined"></i> <span id="sizing-results-title">Pipe Sizing Results</span></h2>
+                
+                <div class="result-item">
+                    <div class="result-title">
+                        <i class="fas fa-ruler-horizontal"></i> <span id="recommended-size-title">Recommended pipe size</span>
+                    </div>
+                    <div class="result-value" id="recommended-size">—</div>
+                </div>
+                
+                <div class="result-item">
+                    <div class="result-title">
+                        <i class="fas fa-tachometer-alt"></i> <span id="sizing-pressure-drop-title">Pressure drop</span>
+                    </div>
+                    <div class="result-value" id="sizing-pressure-drop-value">—</div>
+                    
+                    <div class="pressure-units">
+                        <div class="pressure-unit">
+                            <div class="unit-value" id="sizing-pressure-drop-kpa">—</div>
+                            <div class="unit-label">kPa</div>
+                        </div>
+                        <div class="pressure-unit">
+                            <div class="unit-value" id="sizing-pressure-drop-bar">—</div>
+                            <div class="unit-label">bar</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-item">
+                    <div class="result-title">
+                        <i class="fas fa-bolt"></i> <span id="sizing-velocity-title">Flow velocity</span>
+                    </div>
+                    <div class="result-value" id="sizing-velocity">—</div> m/s
+                </div>
+
+                <div class="result-item">
+                    <div class="result-title">
+                        <i class="fas fa-check-circle"></i> <span id="sizing-validation-title">Validation</span>
+                    </div>
+                    <div class="result-details">
+                        <div>
+                            <span class="status-indicator" id="sizing-pressure-drop-status"></span>
+                            <strong id="sizing-pressure-drop-validation">Pressure drop:</strong> 
+                            <span id="sizing-pressure-drop-validation-value"></span>
+                        </div>
+                        <div>
+                            <span class="status-indicator" id="sizing-velocity-status"></span>
+                            <strong id="sizing-velocity-validation">Flow velocity:</strong> 
+                            <span id="sizing-velocity-validation-value"></span>
+                        </div>
+                        <div id="sizing-validation-summary"></div>
+                    </div>
+                </div>
+
+                <div class="export-buttons">
+                    <button class="export-btn" id="sizing-export-pdf">
+                        <i class="fas fa-file-pdf"></i> Export to PDF
+                    </button>
+                    <button class="export-btn" id="sizing-export-excel">
+                        <i class="fas fa-file-excel"></i> Export to Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="calculator-container" id="calculations-tab" style="display: none;">
+            <div class="input-section">
+                <h2 class="section-title"><i class="fas fa-calculator"></i> <span id="calc-process-title">Calculation Process</span></h2>
+                <p id="calc-description">Step-by-step explanation of the calculation process</p>
+                
+                <div class="calculation-step">
+                    <h3 id="step1-title">1. Input Parameters</h3>
+                    <p id="step1-desc">Collect all necessary input data: gas type, pipe specifications, flow rate, pressure, temperature, etc.</p>
+                </div>
+                
+                <div class="calculation-step">
+                    <h3 id="step2-title">2. Gas Properties</h3>
+                    <p id="step2-desc">Determine gas density and viscosity based on type and temperature.</p>
+                </div>
+                
+                <div class="calculation-step">
+                    <h3 id="step3-title">3. Pipe Properties</h3>
+                    <p id="step3-desc">Get inner diameter and roughness for selected pipe type and size.</p>
+                </div>
+                
+                <div class="calculation-step">
+                    <h3 id="step4-title">4. Flow Velocity</h3>
+                    <p id="step4-desc">Calculate velocity using flow rate and pipe cross-section area.</p>
+                    <div class="formula">v = Q / (π * (D/2)²)</div>
+                </div>
+                
+                <div class="calculation-step">
+                    <h3 id="step5-title">5. Reynolds Number</h3>
+                    <p id="step5-desc">Calculate Re to determine flow regime.</p>
+                    <div class="formula">Re = (ρ * v * D) / μ</div>
+                </div>
+                
+                <div class="calculation-step">
+                    <h3 id="step6-title">6. Friction Factor</h3>
+                    <p id="step6-desc">Calculate f using appropriate equation based on flow regime.</p>
+                    <div class="formula">For laminar: f = 64 / Re<br>For turbulent: Haaland equation</div>
+                </div>
+                
+                <div class="calculation-step">
+                    <h3 id="step7-title">7. Pressure Drop</h3>
+                    <p id="step7-desc">Calculate total pressure drop including friction and elevation.</p>
+                    <div class="formula">ΔP_friction = f * (L/D) * (ρ * v² / 2)<br>ΔP_elevation = ρ * g * Δh</div>
+                </div>
+                
+                <div class="calculation-step">
+                    <h3 id="step8-title">8. Validation</h3>
+                    <p id="step8-desc">Check if results meet standards and provide recommendations.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="calculator-container" id="flow-calc-tab" style="display: none;">
+            <div class="input-section">
+                <h2 class="section-title"><i class="fas fa-calculator"></i> <span id="flow-calc-title">Flow Rate Calculator</span></h2>
+                
+                <div class="input-group">
+                    <label for="flow-calc-gas-type">
+                        <span id="flow-calc-gas-type-label">Gas type</span>
+                        <span class="unit" id="flow-calc-gas-type-unit">Select gas type</span>
+                    </label>
+                    <select id="flow-calc-gas-type">
+                        <option value="natural" selected>Natural gas</option>
+                        <option value="propane">Propane</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="flow-calc-power">
+                        <span id="flow-calc-power-label">Power Consumption</span>
+                        <span class="unit">kW</span>
+                    </label>
+                    <input type="number" id="flow-calc-power" min="0" step="0.1" value="100" placeholder="e.g., 100">
+                </div>
+                
+                <div class="input-group">
+                    <label for="flow-calc-temperature">
+                        <span id="flow-calc-temperature-label">Gas temperature</span>
+                        <span class="unit">°C</span>
+                    </label>
+                    <input type="number" id="flow-calc-temperature" value="15" step="0.1" placeholder="e.g., 15">
+                </div>
+                
+                <button id="calculate-flow" class="calculate-btn">
+                    <i class="fas fa-calculator"></i> <span id="calculate-flow-button">CALCULATE FLOW RATE</span>
+                </button>
+            </div>
+            
+            <div class="results-section">
+                <h2 class="section-title"><i class="fas fa-chart-line"></i> <span id="flow-results-title">Flow Rate Results</span></h2>
+                
+                <div class="result-item">
+                    <div class="result-title">
+                        <i class="fas fa-stream"></i> <span id="calculated-flow-title">Calculated Flow Rate</span>
+                    </div>
+                    <div class="result-value" id="calculated-flow">— m³/h</div>
+                </div>
+                
+                <div class="result-item">
+                    <div class="result-title">
+                        <i class="fas fa-info-circle"></i> <span id="flow-details-title">Details</span>
+                    </div>
+                    <div class="result-details">
+                        <div><strong id="flow-calc-gas-type-detail">Gas type:</strong> <span id="flow-calc-gas-type-value">—</span></div>
+                        <div><strong id="flow-calc-power-detail">Power:</strong> <span id="flow-calc-power-value">— kW</span></div>
+                        <div><strong id="flow-calc-hv-detail">Heating Value:</strong> <span id="flow-calc-hv-value">— kWh/m³</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Language translations
+        const translations = {
+            en: {
+                // Header
+                'main-title': 'Gas Pipeline Calculator',
+                'main-description': 'Professional calculator for gas pipeline pressure drop calculations',
+                'copyright-notice': '© 2023 Gas Pipeline Calculator | Forbidden for resale without owner\'s permission',
+                
+                // Tabs
+                'tab-pressure': 'Pressure Drop',
+                'tab-sizing': 'Pipe Sizing',
+                'tab-calculations': 'Calculation Process',
+                'tab-flow': 'Flow Calculator',
+                
+                // Disclaimer
+                'disclaimer-text': '<strong>Important:</strong> Final calculations must be verified by a competent engineer. This tool provides preliminary results only.',
+                
+                // Input section
+                'input-params-title': 'Input Parameters',
+                'gas-type-label': 'Gas type',
+                'gas-type-unit': 'Select gas type',
+                'pipe-type-label': 'Pipe type',
+                'pipe-type-unit': 'Select pipe type',
+                'pipe-size-label': 'Nominal pipe diameter',
+                'pipe-length-label': 'Pipe length',
+                'fittings-label': 'Fittings factor',
+                'fittings-unit': '% of length',
+                'height-label': 'Height difference',
+                'flow-rate-label': 'Gas flow rate',
+                'pressure-label': 'Initial pressure',
+                'temperature-label': 'Gas temperature',
+                'gas-properties-title': 'Gas properties',
+                'density-label': 'Density at 15°C:',
+                'viscosity-label': 'Viscosity at 15°C:',
+                'roughness-label': 'Pipe roughness:',
+                'multi-pipeline-title': 'Additional Pipelines',
+                'calculate-button': 'CALCULATE PRESSURE DROP',
+                
+                // Results section
+                'results-title': 'Calculation Results',
+                'pressure-drop-title': 'Pressure drop',
+                'reynolds-title': 'Reynolds number',
+                'velocity-title': 'Flow velocity',
+                'validation-title': 'Validation',
+                'pressure-drop-validation': 'Pressure drop:',
+                'velocity-validation': 'Flow velocity:',
+                'recommendations-title': 'Recommendations',
+                'rec1': 'Consider increasing pipe diameter if pressure drop exceeds 10% of initial pressure',
+                'rec2': 'For natural gas, velocity should typically be between 5-20 m/s',
+                'rec3': 'Include safety factor of 10-20% for unforeseen pressure losses',
+                'details-title': 'Calculation details',
+                'calc-pipe-type-label': 'Pipe type:',
+                'calc-nominal-diameter-label': 'Nominal diameter:',
+                'calc-inner-diameter-label': 'Inner diameter:',
+                'calc-length-label': 'Pipe length:',
+                'calc-fittings-label': 'Fittings factor:',
+                'calc-height-label': 'Height difference:',
+                'calc-flow-rate-label': 'Gas flow rate:',
+                'calc-pressure-label': 'Initial pressure:',
+                'calc-temperature-label': 'Temperature:',
+                'calc-density-label': 'Gas density:',
+                'calc-viscosity-label': 'Gas viscosity:',
+                'calc-roughness-label': 'Pipe roughness:',
+                'calc-friction-label': 'Friction factor (f):',
+                'formula-used': 'Formula used:',
+                'formula-label': 'Formula:',
+                'reynolds-description': 'Determines fluid flow regime (laminar/turbulent)',
+                'flow-type-label': 'Flow type:',
+                'formula-velocity': 'Formula:',
+                'velocity-description': 'Basic formula for flow velocity calculation',
+                
+                // Sizing tab
+                'sizing-input-title': 'Input Parameters for Pipe Sizing',
+                'sizing-gas-type-label': 'Gas type',
+                'sizing-gas-type-unit': 'Select gas type',
+                'sizing-pipe-type-label': 'Pipe type',
+                'sizing-pipe-type-unit': 'Select pipe type',
+                'sizing-length-label': 'Pipe length',
+                'sizing-flow-rate-label': 'Gas flow rate',
+                'sizing-pressure-label': 'Initial pressure',
+                'max-drop-label': 'Max allowable pressure drop',
+                'sizing-temperature-label': 'Gas temperature',
+                'sizing-calculate-button': 'CALCULATE PIPE SIZE',
+                'sizing-results-title': 'Pipe Sizing Results',
+                'recommended-size-title': 'Recommended pipe size',
+                'sizing-pressure-drop-title': 'Pressure drop',
+                'sizing-velocity-title': 'Flow velocity',
+                'sizing-validation-title': 'Validation',
+                'sizing-pressure-drop-validation': 'Pressure drop:',
+                'sizing-velocity-validation': 'Flow velocity:',
+                
+                // Calculations tab
+                'calc-process-title': 'Calculation Process',
+                'calc-description': 'Step-by-step explanation of the calculation process',
+                'step1-title': '1. Input Parameters',
+                'step1-desc': 'Collect all necessary input data: gas type, pipe specifications, flow rate, pressure, temperature, etc.',
+                'step2-title': '2. Gas Properties',
+                'step2-desc': 'Determine gas density and viscosity based on type and temperature.',
+                'step3-title': '3. Pipe Properties',
+                'step3-desc': 'Get inner diameter and roughness for selected pipe type and size.',
+                'step4-title': '4. Flow Velocity',
+                'step4-desc': 'Calculate velocity using flow rate and pipe cross-section area.',
+                'step5-title': '5. Reynolds Number',
+                'step5-desc': 'Calculate Re to determine flow regime.',
+                'step6-title': '6. Friction Factor',
+                'step6-desc': 'Calculate f using appropriate equation based on flow regime.',
+                'step7-title': '7. Pressure Drop',
+                'step7-desc': 'Calculate total pressure drop including friction and elevation.',
+                'step8-title': '8. Validation',
+                'step8-desc': 'Check if results meet standards and provide recommendations.',
+                
+                // Flow Calc tab
+                'flow-calc-title': 'Flow Rate Calculator',
+                'flow-calc-gas-type-label': 'Gas type',
+                'flow-calc-gas-type-unit': 'Select gas type',
+                'flow-calc-power-label': 'Power Consumption',
+                'flow-calc-temperature-label': 'Gas temperature',
+                'calculate-flow-button': 'CALCULATE FLOW RATE',
+                'flow-results-title': 'Flow Rate Results',
+                'calculated-flow-title': 'Calculated Flow Rate',
+                'flow-details-title': 'Details',
+                'flow-calc-gas-type-detail': 'Gas type:',
+                'flow-calc-power-detail': 'Power:',
+                'flow-calc-hv-detail': 'Heating Value:'
+            },
+            uk: {
+                // Header
+                'main-title': 'Калькулятор газопроводів',
+                'main-description': 'Професійний калькулятор для розрахунків падіння тиску в газопроводах',
+                'copyright-notice': '© 2023 Калькулятор газопроводів | Заборонено для перепродажу без дозволу власника',
+                
+                // Tabs
+                'tab-pressure': 'Падіння тиску',
+                'tab-sizing': 'Підбір діаметра',
+                'tab-calculations': 'Процес розрахунку',
+                'tab-flow': 'Розрахунок витрати',
+                
+                // Disclaimer
+                'disclaimer-text': '<strong>Важливо:</strong> Остаточні розрахунки мають бути перевірені компетентним інженером. Цей інструмент надає лише попередні результати.',
+                
+                // Input section
+                'input-params-title': 'Вхідні параметри',
+                'gas-type-label': 'Тип газу',
+                'gas-type-unit': 'Оберіть тип газу',
+                'pipe-type-label': 'Тип труби',
+                'pipe-type-unit': 'Оберіть тип труби',
+                'pipe-size-label': 'Номінальний діаметр труби',
+                'pipe-length-label': 'Довжина труби',
+                'fittings-label': 'Коефіцієнт фітингів',
+                'fittings-unit': '% від довжини',
+                'height-label': 'Перепад висот',
+                'flow-rate-label': 'Витрата газу',
+                'pressure-label': 'Початковий тиск',
+                'temperature-label': 'Температура газу',
+                'gas-properties-title': 'Властивості газу',
+                'density-label': 'Густина при 15°C:',
+                'viscosity-label': 'В\'язкість при 15°C:',
+                'roughness-label': 'Шорсткість труби:',
+                'multi-pipeline-title': 'Додаткові трубопроводи',
+                'calculate-button': 'РОЗРАХУВАТИ ПАДІННЯ ТИСКУ',
+                
+                // Results section
+                'results-title': 'Результати розрахунків',
+                'pressure-drop-title': 'Падіння тиску',
+                'reynolds-title': 'Число Рейнольдса',
+                'velocity-title': 'Швидкість потоку',
+                'validation-title': 'Перевірка',
+                'pressure-drop-validation': 'Падіння тиску:',
+                'velocity-validation': 'Швидкість потоку:',
+                'recommendations-title': 'Рекомендації',
+                'rec1': 'Розгляньте збільшення діаметра труби, якщо падіння тиску перевищує 10% від початкового тиску',
+                'rec2': 'Для природного газу швидкість повинна бути зазвичай між 5-20 м/с',
+                'rec3': 'Включіть коефіцієнт запасу 10-20% для непередбачених втрат тиску',
+                'details-title': 'Деталі розрахунку',
+                'calc-pipe-type-label': 'Тип труби:',
+                'calc-nominal-diameter-label': 'Номінальний діаметр:',
+                'calc-inner-diameter-label': 'Внутрішній діаметр:',
+                'calc-length-label': 'Довжина труби:',
+                'calc-fittings-label': 'Коефіцієнт фітингів:',
+                'calc-height-label': 'Перепад висот:',
+                'calc-flow-rate-label': 'Витрата газу:',
+                'calc-pressure-label': 'Початковий тиск:',
+                'calc-temperature-label': 'Температура:',
+                'calc-density-label': 'Густина газу:',
+                'calc-viscosity-label': 'В\'язкість газу:',
+                'calc-roughness-label': 'Шорсткість труби:',
+                'calc-friction-label': 'Коефіцієнт тертя (f):',
+                'formula-used': 'Використана формула:',
+                'formula-label': 'Формула:',
+                'reynolds-description': 'Визначає режим течії рідини (ламінарний/турбулентний)',
+                'flow-type-label': 'Тип течії:',
+                'formula-velocity': 'Формула:',
+                'velocity-description': 'Базова формула для розрахунку швидкості потоку',
+                
+                // Sizing tab
+                'sizing-input-title': 'Вхідні параметри для підбору діаметра',
+                'sizing-gas-type-label': 'Тип газу',
+                'sizing-gas-type-unit': 'Оберіть тип газу',
+                'sizing-pipe-type-label': 'Тип труби',
+                'sizing-pipe-type-unit': 'Оберіть тип труби',
+                'sizing-length-label': 'Довжина труби',
+                'sizing-flow-rate-label': 'Витрата газу',
+                'sizing-pressure-label': 'Початковий тиск',
+                'max-drop-label': 'Макс. допустиме падіння тиску',
+                'sizing-temperature-label': 'Температура газу',
+                'sizing-calculate-button': 'ПІДІБРАТИ ДІАМЕТР ТРУБИ',
+                'sizing-results-title': 'Результати підбору діаметра',
+                'recommended-size-title': 'Рекомендований розмір труби',
+                'sizing-pressure-drop-title': 'Падіння тиску',
+                'sizing-velocity-title': 'Швидкість потоку',
+                'sizing-validation-title': 'Перевірка',
+                'sizing-pressure-drop-validation': 'Падіння тиску:',
+                'sizing-velocity-validation': 'Швидкість потоку:',
+                
+                // Calculations tab
+                'calc-process-title': 'Процес розрахунку',
+                'calc-description': 'Покрокове пояснення процесу розрахунку',
+                'step1-title': '1. Вхідні параметри',
+                'step1-desc': 'Збір всіх необхідних вхідних даних: тип газу, характеристики труби, витрата, тиск, температура тощо.',
+                'step2-title': '2. Властивості газу',
+                'step2-desc': 'Визначення густини та в\'язкості газу на основі типу та температури.',
+                'step3-title': '3. Властивості труби',
+                'step3-desc': 'Отримання внутрішнього діаметра та шорсткості для обраного типу та розміру труби.',
+                'step4-title': '4. Швидкість потоку',
+                'step4-desc': 'Розрахунок швидкості за допомогою витрати та площі перерізу труби.',
+                'step5-title': '5. Число Рейнольдса',
+                'step5-desc': 'Розрахунок Re для визначення режиму течії.',
+                'step6-title': '6. Коефіцієнт тертя',
+                'step6-desc': 'Розрахунок f за допомогою відповідної формули залежно від режиму течії.',
+                'step7-title': '7. Падіння тиску',
+                'step7-desc': 'Розрахунок загального падіння тиску, включаючи тертя та перепад висот.',
+                'step8-title': '8. Перевірка',
+                'step8-desc': 'Перевірка відповідності результатів нормам та надання рекомендацій.',
+                
+                // Flow Calc tab
+                'flow-calc-title': 'Розрахунок витрати газу',
+                'flow-calc-gas-type-label': 'Тип газу',
+                'flow-calc-gas-type-unit': 'Оберіть тип газу',
+                'flow-calc-power-label': 'Споживана потужність',
+                'flow-calc-temperature-label': 'Температура газу',
+                'calculate-flow-button': 'РОЗРАХУВАТИ ВИТРАТУ',
+                'flow-results-title': 'Результати розрахунку витрати',
+                'calculated-flow-title': 'Розрахована витрата',
+                'flow-details-title': 'Деталі',
+                'flow-calc-gas-type-detail': 'Тип газу:',
+                'flow-calc-power-detail': 'Потужність:',
+                'flow-calc-hv-detail': 'Теплотворність:'
+            }
+        };
+
+        // Current language
+        let currentLanguage = 'en';
+
+        // Function to switch language
+        function switchLanguage() {
+            currentLanguage = currentLanguage === 'en' ? 'uk' : 'en';
+            document.querySelectorAll('[id]').forEach(el => {
+                const key = el.id.replace(/-/g, '');
+                if (translations[currentLanguage][key]) {
+                    el.innerHTML = translations[currentLanguage][key];
+                }
+            });
+            // Update button text
+            document.getElementById('language-toggle').textContent = currentLanguage === 'en' ? 'UA' : 'EN';
+        }
+
+        // Add event listener for language toggle
+        document.getElementById('language-toggle').addEventListener('click', switchLanguage);
+
+        // Initial language setup
+        switchLanguage(); // To set to Ukrainian if needed, but default is English
+
+        // Pipe dimensions (inner diameter in mm)
+        const pipeDimensions = {
+            pe: {
+                20: 16.6,
+                25: 20.4,
+                32: 26.6,
+                40: 33.5,
+                50: 42.3,
+                63: 53.6,
+                75: 64.0,
+                90: 77.0,
+                110: 94.2,
+                125: 106.8,
+                140: 119.6,
+                160: 136.6,
+                180: 153.6,
+                200: 170.6
+            },
+            steel: {
+                20: 21.3,
+                25: 26.7,
+                32: 33.4,
+                40: 42.2,
+                50: 48.3,
+                63: 60.3,
+                75: 76.1,
+                90: 88.9,
+                110: 114.3,
+                125: 139.7,
+                140: 168.3,
+                160: 219.1,
+                180: 273.0,
+                200: 323.9
+            }
+        };
+
+        // Pipe roughness (mm)
+        const pipeRoughness = {
+            pe: 0.0015,
+            steel: 0.045
+        };
+
+        // Get DOM elements
+        const gasTypeSelect = document.getElementById('gas-type');
+        const pipeTypeSelect = document.getElementById('pipe-type');
+        const pipeSizeSelect = document.getElementById('pipe-size');
+        const pipeLengthInput = document.getElementById('pipe-length');
+        const fittingsFactorInput = document.getElementById('fittings-factor');
+        const heightDifferenceInput = document.getElementById('height-difference');
+        const pressureInput = document.getElementById('pressure');
+        const temperatureInput = document.getElementById('temperature');
+        const innerDiameterValue = document.getElementById('inner-diameter-value');
+        const equivalentLengthValue = document.getElementById('equivalent-length-value');
+        const densityValue = document.getElementById('density-value');
+        const viscosityValue = document.getElementById('viscosity-value');
+        const roughnessValue = document.getElementById('roughness-value');
+        const pressureBar = document.getElementById('pressure-bar');
+        const pipelinesContainer = document.getElementById('pipelines-container');
+        const addPipelineBtn = document.getElementById('add-pipeline');
+        const pipelineResultsContainer = document.getElementById('pipeline-results-container');
+        const exportPdfBtn = document.getElementById('export-pdf');
+        const exportExcelBtn = document.getElementById('export-excel');
+
+        // Get gas properties with temperature and pressure correction
+        const getGasProperties = (gasType, temperature, pressureInBar = 1) => {
+            let baseDensity, baseViscosity, densityTempCoeff, viscosityTempCoeff;
+            
+            if (gasType === 'natural') {
+                baseDensity = 0.73; // kg/m³ at 15°C and 1 bar
+                baseViscosity = 1.12e-5; // Pa·s at 15°C
+                densityTempCoeff = -0.002; // per °C
+                viscosityTempCoeff = 0.0002; // per °C
+            } else { // propane
+                baseDensity = 1.83; // kg/m³ at 15°C and 1 bar
+                baseViscosity = 8e-6; // Pa·s at 15°C
+                densityTempCoeff = -0.0015;
+                viscosityTempCoeff = 0.00015;
+            }
+            
+            return {
+                density: baseDensity * pressureInBar * (1 + densityTempCoeff * (temperature - 15)),
+                viscosity: baseViscosity * (1 + viscosityTempCoeff * (temperature - 15))
+            };
+        };
+
+        // Update pipe parameters when selection changes
+        function updatePipeParameters() {
+            const pipeType = pipeTypeSelect.value;
+            const nominalSize = parseInt(pipeSizeSelect.value);
+            const innerDiameter = pipeDimensions[pipeType][nominalSize];
+            innerDiameterValue.textContent = innerDiameter + ' mm';
+            
+            const roughness = pipeRoughness[pipeType];
+            roughnessValue.textContent = roughness + ' mm';
+        }
+
+        // Update gas properties
+        function updateGasProperties() {
+            const gasType = gasTypeSelect.value;
+            const temperature = parseFloat(temperatureInput.value) || 15;
+            const pressure = parseFloat(pressureInput.value) || 0;
+            const pressureInBar = pressure / 100;
+            const props = getGasProperties(gasType, temperature, pressureInBar);
+            densityValue.textContent = props.density.toFixed(2) + ' kg/m³';
+            viscosityValue.textContent = props.viscosity.toExponential(2) + ' Pa·s';
+        }
+
+        // Update equivalent length
+        function updateEquivalentLength() {
+            const length = parseFloat(pipeLengthInput.value) || 0;
+            const fittings = parseFloat(fittingsFactorInput.value) || 0;
+            const equivalent = length * (1 + fittings / 100);
+            equivalentLengthValue.textContent = equivalent.toFixed(1) + ' m';
+        }
+
+        // Add event listeners
+        gasTypeSelect.addEventListener('change', updateGasProperties);
+        pipeTypeSelect.addEventListener('change', updatePipeParameters);
+        pipeSizeSelect.addEventListener('change', updatePipeParameters);
+        pipeLengthInput.addEventListener('input', updateEquivalentLength);
+        fittingsFactorInput.addEventListener('input', updateEquivalentLength);
+        temperatureInput.addEventListener('input', updateGasProperties);
+        pressureInput.addEventListener('input', () => {
+            const pressure = parseFloat(pressureInput.value) || 0;
+            pressureBar.textContent = (pressure / 100).toFixed(2) + ' bar';
+            updateGasProperties();
+        });
+
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                document.querySelectorAll('.calculator-container').forEach(container => {
+                    container.style.display = 'none';
+                });
+                document.getElementById(tab.dataset.tab + '-tab').style.display = 'flex';
+            });
+        });
+
+        // Add additional pipeline
+        let pipelineCount = 1;
+        addPipelineBtn.addEventListener('click', () => {
+            pipelineCount++;
+            const pipelineItem = document.createElement('div');
+            pipelineItem.className = 'pipeline-item';
+            pipelineItem.innerHTML = `
+                <h4>${currentLanguage === 'en' ? 'Additional Pipeline' : 'Додатковий трубопровід'} ${pipelineCount}</h4>
+                <div class="input-group">
+                    <label>
+                        <span>${currentLanguage === 'en' ? 'Pipe type' : 'Тип труби'}</span>
+                    </label>
+                    <select>
+                        <option value="pe">Polyethylene (PE)</option>
+                        <option value="steel">Steel</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>
+                        <span>${currentLanguage === 'en' ? 'Nominal diameter' : 'Номінальний діаметр'}</span>
+                        <span class="unit">DN</span>
+                    </label>
+                    <select>
+                        ${Array.from(pipeSizeSelect.options).map(option => `<option value="${option.value}">${option.text}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>
+                        <span>${currentLanguage === 'en' ? 'Length' : 'Довжина'}</span>
+                        <span class="unit">m</span>
+                    </label>
+                    <input type="number" min="0" step="0.1" value="0">
+                </div>
+                <div class="input-group">
+                    <label>
+                        <span>${currentLanguage === 'en' ? 'Fittings factor' : 'Коефіцієнт фітингів'}</span>
+                        <span class="unit">%</span>
+                    </label>
+                    <input type="number" min="0" max="100" step="5" value="0">
+                </div>
+                <div class="input-group">
+                    <label>
+                        <span>${currentLanguage === 'en' ? 'Height difference' : 'Перепад висот'}</span>
+                        <span class="unit">m</span>
+                    </label>
+                    <input type="number" step="0.1" value="0">
+                </div>
+                <button class="remove-pipeline"><i class="fas fa-times"></i></button>
+            `;
+            pipelinesContainer.appendChild(pipelineItem);
+            
+            // Add remove event
+            pipelineItem.querySelector('.remove-pipeline').addEventListener('click', () => {
+                pipelineItem.remove();
+                pipelineCount--;
+            });
+        });
+
+        // Initialize values
+        updatePipeParameters();
+        updateGasProperties();
+        updateEquivalentLength();
+        
+        // Calculate friction factor using Haaland equation
+        function calculateFrictionFactor(reynolds, relativeRoughness) {
+            // For laminar flow
+            if (reynolds < 2300) {
+                return 64 / reynolds;
+            }
+            
+            // For turbulent flow - Haaland equation
+            const term = Math.pow(relativeRoughness/3.7, 1.11) + 6.9/reynolds;
+            return Math.pow(-1.8 * Math.log10(term), -2);
+        }
+        
+        // Calculate Reynolds number
+        function calculateReynolds(diameter, velocity, density, viscosity) {
+            return (density * velocity * (diameter / 1000)) / viscosity;
+        }
+        
+        // Calculate flow velocity
+        function calculateVelocity(flowRate, diameter) {
+            const area = Math.PI * Math.pow(diameter / 2000, 2); // in m²
+            return (flowRate / 3600) / area; // Convert m³/h to m³/s
+        }
+        
+        // Calculate pressure drop due to elevation
+        function calculateElevationPressureDrop(density, heightDifference) {
+            // ΔP = ρ * g * Δh
+            // where ρ is density (kg/m³), g is gravity (9.81 m/s²), Δh is height difference (m)
+            // Result in Pa, convert to kPa by dividing by 1000
+            return (density * 9.81 * heightDifference) / 1000;
+        }
+        
+        // Calculate pressure drop for a single pipeline segment
+        function calculatePipelinePressureDrop(pipeType, nominalDiameter, length, fittingsFactor, heightDifference, flowRate, gasType, temperature, pipelineName) {
+            // Get gas properties with temperature correction
+            const pressure = parseFloat(document.getElementById('pressure').value) || 0;
+            const pressureInBar = pressure / 100;
+            const props = getGasProperties(gasType, temperature, pressureInBar);
+            const density = props.density;
+            const viscosity = props.viscosity;
+            
+            // Get pipe dimensions and roughness
+            const innerDiameter = pipeDimensions[pipeType][nominalDiameter];
+            const roughness = pipeRoughness[pipeType];
+            const relativeRoughness = roughness / innerDiameter;
+            
+            // Calculate equivalent length with fittings
+            const equivalentLength = length * (1 + fittingsFactor/100);
+            
+            // Calculate flow velocity
+            const velocity = calculateVelocity(flowRate, innerDiameter);
+            
+            // Calculate Reynolds number
+            const reynolds = calculateReynolds(innerDiameter, velocity, density, viscosity);
+            
+            // Calculate friction factor
+            const frictionFactor = calculateFrictionFactor(reynolds, relativeRoughness);
+            
+            // Calculate pressure drop due to friction (Darcy-Weisbach equation)
+            const pressureDropFriction = (frictionFactor * (equivalentLength / (innerDiameter / 1000)) * density * Math.pow(velocity, 2)) / 2;
+            
+            // Calculate pressure drop due to elevation
+            const pressureDropElevation = calculateElevationPressureDrop(density, heightDifference);
+            
+            // Total pressure drop (convert to kPa from Pa)
+            const totalPressureDrop = (pressureDropFriction + pressureDropElevation) / 1000;
+            
+            return {
+                pipelineName,
+                pipeType,
+                nominalDiameter,
+                innerDiameter,
+                length,
+                fittingsFactor,
+                heightDifference,
+                equivalentLength,
+                velocity,
+                reynolds,
+                frictionFactor,
+                pressureDropFriction: pressureDropFriction / 1000,
+                pressureDropElevation: pressureDropElevation,
+                totalPressureDrop,
+                density,
+                viscosity,
+                roughness
+            };
+        }
+        
+        // Pressure Drop Calculator
+        document.getElementById('calculate-pressure').addEventListener('click', function() {
+            // Get input values
+            const gasType = gasTypeSelect.value;
+            const pipeType = pipeTypeSelect.value;
+            const nominalDiameter = parseInt(pipeSizeSelect.value);
+            const length = parseFloat(pipeLengthInput.value) || 0;
+            const fittingsFactor = parseFloat(fittingsFactorInput.value) || 0;
+            const heightDifference = parseFloat(heightDifferenceInput.value) || 0;
+            const flowRate = parseFloat(document.getElementById('flow-rate').value) || 0;
+            const pressure = parseFloat(pressureInput.value) || 0;
+            const temperature = parseFloat(temperatureInput.value) || 15;
+            
+            // Validate inputs
+            if (flowRate <= 0 || length <= 0) {
+                alert(currentLanguage === 'en' 
+                    ? 'Please enter valid values for flow rate and pipe length.'
+                    : 'Будь ласка, введіть коректні значення витрати та довжини труби.');
+                return;
+            }
+            
+            // Calculate pressure drop for main pipeline
+            const mainPipelineResult = calculatePipelinePressureDrop(
+                pipeType, nominalDiameter, length, fittingsFactor, 
+                heightDifference, flowRate, gasType, temperature,
+                currentLanguage === 'en' ? 'Main Pipeline' : 'Основний трубопровід'
+            );
+            
+            let totalPressureDrop = mainPipelineResult.totalPressureDrop;
+            const allPipelineResults = [mainPipelineResult];
+            
+            // Calculate pressure drop for additional pipelines
+            const pipelineItems = pipelinesContainer.querySelectorAll('.pipeline-item');
+            pipelineItems.forEach((item, index) => {
+                const pipelineType = item.querySelector('select').value;
+                const pipelineSize = parseInt(item.querySelectorAll('select')[1].value);
+                const pipelineLength = parseFloat(item.querySelectorAll('input')[0].value) || 0;
+                const pipelineFittings = parseFloat(item.querySelectorAll('input')[1].value) || 0;
+                const pipelineHeight = parseFloat(item.querySelectorAll('input')[2].value) || 0;
+                
+                const pipelineResult = calculatePipelinePressureDrop(
+                    pipelineType, pipelineSize, pipelineLength, pipelineFittings, 
+                    pipelineHeight, flowRate, gasType, temperature,
+                    `${currentLanguage === 'en' ? 'Additional Pipeline' : 'Додатковий трубопровід'} ${index + 2}`
+                );
+                
+                allPipelineResults.push(pipelineResult);
+                totalPressureDrop += pipelineResult.totalPressureDrop;
+            });
+            
+            // Update results
+            document.getElementById('pressure-drop-value').textContent = totalPressureDrop.toFixed(4) + ' kPa';
+            document.getElementById('pressure-drop-kpa').textContent = totalPressureDrop.toFixed(4) + ' kPa';
+            document.getElementById('pressure-drop-bar').textContent = (totalPressureDrop / 100).toFixed(6) + ' bar';
+            document.getElementById('pressure-drop-mbar').textContent = (totalPressureDrop * 10).toFixed(2) + ' mbar';
+            
+            document.getElementById('reynolds').textContent = mainPipelineResult.reynolds.toFixed(0);
+            
+            // Determine flow type
+            let flowType = 'Turbulent';
+            if (mainPipelineResult.reynolds < 2300) flowType = 'Laminar';
+            else if (mainPipelineResult.reynolds < 4000) flowType = 'Transitional';
+            
+            // Translate flow type if in Ukrainian
+            if (currentLanguage === 'uk') {
+                if (flowType === 'Laminar') flowType = 'Ламінарний';
+                else if (flowType === 'Transitional') flowType = 'Перехідний';
+                else flowType = 'Турбулентний';
+            }
+            
+            document.getElementById('flow-type').textContent = flowType;
+            document.getElementById('flow-velocity').textContent = mainPipelineResult.velocity.toFixed(2) + ' m/s';
+            
+            document.getElementById('calc-pipe-type').textContent = mainPipelineResult.pipeType;
+            document.getElementById('calc-nominal-diameter').textContent = 'DN' + mainPipelineResult.nominalDiameter;
+            document.getElementById('calc-inner-diameter').textContent = mainPipelineResult.innerDiameter;
+            document.getElementById('calc-length').textContent = mainPipelineResult.length;
+            document.getElementById('calc-fittings').textContent = mainPipelineResult.fittingsFactor;
+            document.getElementById('calc-height').textContent = mainPipelineResult.heightDifference;
+            document.getElementById('calc-flow-rate').textContent = flowRate;
+            document.getElementById('calc-pressure').textContent = pressure;
+            document.getElementById('calc-pressure-bar').textContent = (pressure / 100).toFixed(2);
+            document.getElementById('calc-temperature').textContent = temperature;
+            document.getElementById('calc-density').textContent = mainPipelineResult.density.toFixed(2);
+            document.getElementById('calc-viscosity').textContent = mainPipelineResult.viscosity.toExponential(2);
+            document.getElementById('calc-roughness').textContent = mainPipelineResult.roughness;
+            document.getElementById('calc-friction').textContent = mainPipelineResult.frictionFactor.toFixed(4);
+            
+            // Display pipeline-specific results
+            pipelineResultsContainer.innerHTML = '';
+            allPipelineResults.forEach(result => {
+                const pipelineResultDiv = document.createElement('div');
+                pipelineResultDiv.className = 'pipeline-result-item';
+                pipelineResultDiv.innerHTML = `
+                    <h4>${result.pipelineName}</h4>
+                    <div><strong>${currentLanguage === 'en' ? 'Pipe type' : 'Тип труби'}:</strong> ${result.pipeType}</div>
+                    <div><strong>${currentLanguage === 'en' ? 'Nominal diameter' : 'Номінальний діаметр'}:</strong> DN${result.nominalDiameter}</div>
+                    <div><strong>${currentLanguage === 'en' ? 'Inner diameter' : 'Внутрішній діаметр'}:</strong> ${result.innerDiameter} mm</div>
+                    <div><strong>${currentLanguage === 'en' ? 'Length' : 'Довжина'}:</strong> ${result.length} m</div>
+                    <div><strong>${currentLanguage === 'en' ? 'Fittings factor' : 'Коефіцієнт фітингів'}:</strong> ${result.fittingsFactor}%</div>
+                    <div><strong>${currentLanguage === 'en' ? 'Equivalent length' : 'Еквівалентна довжина'}:</strong> ${result.equivalentLength.toFixed(1)} m</div>
+                    <div><strong>${currentLanguage === 'en' ? 'Height difference' : 'Перепад висот'}:</strong> ${result.heightDifference} m</div>
+                    <div><strong>${currentLanguage === 'en' ? 'Flow velocity' : 'Швидкість потоку'}:</strong> ${result.velocity.toFixed(2)} m/s</div>
+                    <div><strong>${currentLanguage === 'en' ? 'Reynolds number' : 'Число Рейнольдса'}:</strong> ${result.reynolds.toFixed(0)}</div>
+                    <div><strong>${currentLanguage === 'en' ? 'Friction factor' : 'Коефіцієнт тертя'}:</strong> ${result.frictionFactor.toFixed(4)}</div>
+                    <div><strong>${currentLanguage === 'en' ? 'Pressure drop (friction)' : 'Падіння тиску (тертя)'}:</strong> ${result.pressureDropFriction.toFixed(4)} kPa</div>
+                    <div><strong>${currentLanguage === 'en' ? 'Pressure drop (elevation)' : 'Падіння тиску (висота)'}:</strong> ${result.pressureDropElevation.toFixed(4)} kPa</div>
+                    <div><strong>${currentLanguage === 'en' ? 'Total pressure drop' : 'Загальне падіння тиску'}:</strong> ${result.totalPressureDrop.toFixed(4)} kPa</div>
+                `;
+                pipelineResultsContainer.appendChild(pipelineResultDiv);
+            });
+            
+            // Validation
+            const pressureDropPercent = (totalPressureDrop / pressure) * 100;
+            const pressureDropStatus = document.getElementById('pressure-drop-status');
+            const pressureDropValidationValue = document.getElementById('pressure-drop-validation-value');
+            const velocityStatus = document.getElementById('velocity-status');
+            const velocityValidationValue = document.getElementById('velocity-validation-value');
+            const validationSummary = document.getElementById('validation-summary');
+            
+            // Pressure drop validation
+            if (pressureDropPercent <= 10) {
+                pressureDropStatus.className = 'status-indicator status-good';
+                pressureDropValidationValue.textContent = `${pressureDropPercent.toFixed(2)}% ${currentLanguage === 'en' ? '(within limits)' : '(в межах норми)'}`;
+            } else {
+                pressureDropStatus.className = 'status-indicator status-bad';
+                pressureDropValidationValue.textContent = `${pressureDropPercent.toFixed(2)}% ${currentLanguage === 'en' ? '(exceeds 10% limit)' : '(перевищує ліміт 10%)'}`;
+            }
+            
+            // Velocity validation
+            if (mainPipelineResult.velocity <= 20) {
+                velocityStatus.className = 'status-indicator status-good';
+                velocityValidationValue.textContent = `${mainPipelineResult.velocity.toFixed(2)} m/s ${currentLanguage === 'en' ? '(within limits)' : '(в межах норми)'}`;
+            } else {
+                velocityStatus.className = 'status-indicator status-bad';
+                velocityValidationValue.textContent = `${mainPipelineResult.velocity.toFixed(2)} m/s ${currentLanguage === 'en' ? '(exceeds 20 m/s limit)' : '(перевищує ліміт 20 м/с)'}`;
+            }
+            
+            // Summary
+            if (pressureDropPercent <= 10 && mainPipelineResult.velocity <= 20) {
+                validationSummary.textContent = currentLanguage === 'en' 
+                    ? 'All parameters are within acceptable limits.' 
+                    : 'Всі параметри в межах допустимих значень.';
+                validationSummary.style.color = 'var(--success-color)';
+            } else {
+                validationSummary.textContent = currentLanguage === 'en' 
+                    ? 'Some parameters exceed recommended limits. Consider design changes.' 
+                    : 'Деякі параметри перевищують рекомендовані значення. Розгляньте зміни в проекті.';
+                validationSummary.style.color = 'var(--accent-color)';
+            }
+        });
+        
+        // Pipe Sizing Calculator
+        document.getElementById('calculate-sizing').addEventListener('click', function() {
+            // Get input values
+            const gasType = document.getElementById('sizing-gas-type').value;
+            const pipeType = document.getElementById('sizing-pipe-type').value;
+            const length = parseFloat(document.getElementById('sizing-length').value) || 0;
+            const flowRate = parseFloat(document.getElementById('sizing-flow-rate').value) || 0;
+            const pressure = parseFloat(document.getElementById('sizing-pressure').value) || 0;
+            const maxDropPercent = parseFloat(document.getElementById('sizing-max-drop').value) || 10;
+            const temperature = parseFloat(document.getElementById('sizing-temperature').value) || 15;
+            
+            // Validate inputs
+            if (flowRate <= 0 || length <= 0 || pressure <= 0) {
+                alert(currentLanguage === 'en' 
+                    ? 'Please enter valid values for flow rate, pipe length and pressure.'
+                    : 'Будь ласка, введіть коректні значення витрати, довжини труби та тиску.');
+                return;
+            }
+            
+            // Get gas properties with temperature correction
+            const pressureInBar = pressure / 100;
+            const props = getGasProperties(gasType, temperature, pressureInBar);
+            const density = props.density;
+            const viscosity = props.viscosity;
+            
+            // Maximum allowable pressure drop (kPa)
+            const maxPressureDrop = pressure * (maxDropPercent / 100);
+            
+            // Try different pipe sizes to find the smallest that meets requirements
+            const availableSizes = [20, 25, 32, 40, 50, 63, 75, 90, 110, 125, 140, 160, 180, 200];
+            let recommendedSize = null;
+            let resultingPressureDrop = 0;
+            let resultingVelocity = 0;
+            
+            for (const size of availableSizes) {
+                const innerDiameter = pipeDimensions[pipeType][size];
+                const roughness = pipeRoughness[pipeType];
+                const relativeRoughness = roughness / innerDiameter;
+                
+                // Calculate flow velocity
+                const velocity = calculateVelocity(flowRate, innerDiameter);
+                
+                // Calculate Reynolds number
+                const reynolds = calculateReynolds(innerDiameter, velocity, density, viscosity);
+                
+                // Calculate friction factor
+                const frictionFactor = calculateFrictionFactor(reynolds, relativeRoughness);
+                
+                // Calculate pressure drop due to friction (Darcy-Weisbach equation)
+                const pressureDrop = (frictionFactor * (length / (innerDiameter / 1000)) * density * Math.pow(velocity, 2)) / 2;
+                
+                // Convert to kPa
+                const pressureDropKpa = pressureDrop / 1000;
+                
+                if (pressureDropKpa <= maxPressureDrop) {
+                    recommendedSize = size;
+                    resultingPressureDrop = pressureDropKpa;
+                    resultingVelocity = velocity;
+                    break;
+                }
+            }
+            
+            // Update results
+            if (recommendedSize) {
+                document.getElementById('recommended-size').textContent = 'DN' + recommendedSize;
+                document.getElementById('sizing-pressure-drop-value').textContent = resultingPressureDrop.toFixed(4) + ' kPa';
+                document.getElementById('sizing-pressure-drop-kpa').textContent = resultingPressureDrop.toFixed(4) + ' kPa';
+                document.getElementById('sizing-pressure-drop-bar').textContent = (resultingPressureDrop / 100).toFixed(6) + ' bar';
+                document.getElementById('actual-pressure-drop').textContent = resultingPressureDrop.toFixed(4) + ' kPa (' + (resultingPressureDrop / pressure * 100).toFixed(2) + '%)';
+                document.getElementById('sizing-velocity').textContent = resultingVelocity.toFixed(2);
+                
+                // Validation
+                const pressureDropPercent = (resultingPressureDrop / pressure) * 100;
+                const pressureDropStatus = document.getElementById('sizing-pressure-drop-status');
+                const pressureDropValidationValue = document.getElementById('sizing-pressure-drop-validation-value');
+                const velocityStatus = document.getElementById('sizing-velocity-status');
+                const velocityValidationValue = document.getElementById('sizing-velocity-validation-value');
+                const validationSummary = document.getElementById('sizing-validation-summary');
+                
+                // Pressure drop validation
+                if (pressureDropPercent <= 10) {
+                    pressureDropStatus.className = 'status-indicator status-good';
+                    pressureDropValidationValue.textContent = `${pressureDropPercent.toFixed(2)}% ${currentLanguage === 'en' ? '(within limits)' : '(в межах норми)'}`;
+                } else {
+                    pressureDropStatus.className = 'status-indicator status-bad';
+                    pressureDropValidationValue.textContent = `${pressureDropPercent.toFixed(2)}% ${currentLanguage === 'en' ? '(exceeds 10% limit)' : '(перевищує ліміт 10%)'}`;
+                }
+                
+                // Velocity validation
+                if (resultingVelocity <= 20) {
+                    velocityStatus.className = 'status-indicator status-good';
+                    velocityValidationValue.textContent = `${resultingVelocity.toFixed(2)} m/s ${currentLanguage === 'en' ? '(within limits)' : '(в межах норми)'}`;
+                } else {
+                    velocityStatus.className = 'status-indicator status-bad';
+                    velocityValidationValue.textContent = `${resultingVelocity.toFixed(2)} m/s ${currentLanguage === 'en' ? '(exceeds 20 m/s limit)' : '(перевищує ліміт 20 м/с)'}`;
+                }
+                
+                // Summary
+                if (pressureDropPercent <= 10 && resultingVelocity <= 20) {
+                    validationSummary.textContent = currentLanguage === 'en' 
+                        ? 'All parameters are within acceptable limits.' 
+                        : 'Всі параметри в межах допустимих значень.';
+                    validationSummary.style.color = 'var(--success-color)';
+                } else {
+                    validationSummary.textContent = currentLanguage === 'en' 
+                        ? 'Some parameters exceed recommended limits. Consider design changes.' 
+                        : 'Деякі параметри перевищують рекомендовані значення. Розгляньте зміни в проекті.';
+                    validationSummary.style.color = 'var(--accent-color)';
+                }
+            } else {
+                document.getElementById('recommended-size').textContent = currentLanguage === 'en' 
+                    ? 'No suitable size found' 
+                    : 'Відповідний розмір не знайдено';
+                document.getElementById('sizing-pressure-drop-value').textContent = '—';
+                document.getElementById('sizing-pressure-drop-kpa').textContent = '—';
+                document.getElementById('sizing-pressure-drop-bar').textContent = '—';
+                document.getElementById('actual-pressure-drop').textContent = '—';
+                document.getElementById('sizing-velocity').textContent = '—';
+            }
+        });
+        
+        // Export functionality
+        exportPdfBtn.addEventListener('click', function() {
+            // Create PDF document
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Add title
+            doc.setFontSize(20);
+            doc.text(currentLanguage === 'en' ? 'Gas Pipeline Calculation Report' : 'Звіт з розрахунків газопроводу', 105, 15, { align: 'center' });
+            
+            // Add date
+            doc.setFontSize(12);
+            doc.text(`${currentLanguage === 'en' ? 'Date' : 'Дата'}: ${new Date().toLocaleDateString()}`, 15, 25);
+            
+            // Add calculation results
+            doc.setFontSize(16);
+            doc.text(currentLanguage === 'en' ? 'Calculation Results' : 'Результати розрахунків', 15, 35);
+            
+            doc.setFontSize(12);
+            let yPosition = 45;
+            
+            // Add pressure drop results
+            doc.text(`${currentLanguage === 'en' ? 'Pressure drop' : 'Падіння тиску'}: ${document.getElementById('pressure-drop-value').textContent}`, 15, yPosition);
+            yPosition += 10;
+            
+            // Add Reynolds number
+            doc.text(`${currentLanguage === 'en' ? 'Reynolds number' : 'Число Рейнольдса'}: ${document.getElementById('reynolds').textContent}`, 15, yPosition);
+            yPosition += 10;
+            
+            // Add flow velocity
+            doc.text(`${currentLanguage === 'en' ? 'Flow velocity' : 'Швидкість потоку'}: ${document.getElementById('flow-velocity').textContent}`, 15, yPosition);
+            yPosition += 10;
+            
+            // Add flow type
+            doc.text(`${currentLanguage === 'en' ? 'Flow type' : 'Тип течії'}: ${document.getElementById('flow-type').textContent}`, 15, yPosition);
+            yPosition += 15;
+            
+            // Add validation results
+            doc.setFontSize(14);
+            doc.text(currentLanguage === 'en' ? 'Validation' : 'Перевірка', 15, yPosition);
+            yPosition += 10;
+            
+            doc.setFontSize(12);
+            doc.text(`${document.getElementById('pressure-drop-validation-value').textContent}`, 15, yPosition);
+            yPosition += 7;
+            doc.text(`${document.getElementById('velocity-validation-value').textContent}`, 15, yPosition);
+            yPosition += 10;
+            doc.setTextColor(document.getElementById('validation-summary').style.color);
+            doc.text(`${document.getElementById('validation-summary').textContent}`, 15, yPosition);
+            doc.setTextColor(0, 0, 0); // Reset color
+            
+            // Save the PDF
+            doc.save('gas_pipeline_calculations.pdf');
+        });
+        
+        exportExcelBtn.addEventListener('click', function() {
+            // Create CSV content
+            let csvContent = "data:text/csv;charset=utf-8,";
+            
+            // Add title
+            csvContent += `${currentLanguage === 'en' ? 'Gas Pipeline Calculation Report' : 'Звіт з розрахунків газопроводу'}\r\n`;
+            
+            // Add date
+            csvContent += `${currentLanguage === 'en' ? 'Date' : 'Дата'},${new Date().toLocaleDateString()}\r\n\r\n`;
+            
+            // Add calculation results
+            csvContent += `${currentLanguage === 'en' ? 'Calculation Results' : 'Результати розрахунків'}\r\n`;
+            
+            // Add pressure drop results
+            csvContent += `${currentLanguage === 'en' ? 'Pressure drop' : 'Падіння тиску'},${document.getElementById('pressure-drop-value').textContent}\r\n`;
+            
+            // Add Reynolds number
+            csvContent += `${currentLanguage === 'en' ? 'Reynolds number' : 'Число Рейнольдса'},${document.getElementById('reynolds').textContent}\r\n`;
+            
+            // Add flow velocity
+            csvContent += `${currentLanguage === 'en' ? 'Flow velocity' : 'Швидкість потоку'},${document.getElementById('flow-velocity').textContent}\r\n`;
+            
+            // Add flow type
+            csvContent += `${currentLanguage === 'en' ? 'Flow type' : 'Тип течії'},${document.getElementById('flow-type').textContent}\r\n\r\n`;
+            
+            // Add validation results
+            csvContent += `${currentLanguage === 'en' ? 'Validation' : 'Перевірка'}\r\n`;
+            csvContent += `${document.getElementById('pressure-drop-validation-value').textContent}\r\n`;
+            csvContent += `${document.getElementById('velocity-validation-value').textContent}\r\n`;
+            csvContent += `${document.getElementById('validation-summary').textContent}\r\n`;
+            
+            // Create download link
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "gas_pipeline_calculations.csv");
+            document.body.appendChild(link);
+            
+            // Trigger download
+            link.click();
+        });
+
+        // Heating values (kWh/m³)
+        const heatingValues = {
+            natural: 10.5,
+            propane: 25.8
+        };
+
+        // Flow Rate Calculator
+        document.getElementById('calculate-flow').addEventListener('click', function() {
+            const gasType = document.getElementById('flow-calc-gas-type').value;
+            const power = parseFloat(document.getElementById('flow-calc-power').value) || 0;
+            const temperature = parseFloat(document.getElementById('flow-calc-temperature').value) || 15;
+            
+            if (power <= 0) {
+                alert(currentLanguage === 'en' 
+                    ? 'Please enter a valid power value.'
+                    : 'Будь ласка, введіть коректне значення потужності.');
+                return;
+            }
+            
+            let hv = heatingValues[gasType];
+            // Simple temperature correction (example: -0.001 per °C from 15°C)
+            hv *= (1 - 0.001 * (temperature - 15));
+            
+            const flowRate = power / hv;
+            
+            document.getElementById('calculated-flow').textContent = flowRate.toFixed(3) + ' m³/h';
+            document.getElementById('flow-calc-gas-type-value').textContent = gasType === 'natural' ? (currentLanguage === 'en' ? 'Natural gas' : 'Природний газ') : 'Propane';
+            document.getElementById('flow-calc-power-value').textContent = power + ' kW';
+            document.getElementById('flow-calc-hv-value').textContent = hv.toFixed(2) + ' kWh/m³';
+        });
+    </script>
+</body>
+</html>
