@@ -31,12 +31,16 @@
         }
 
         body {
-            /* Удаляем градиент, устанавливаем сплошной фон по умолчанию */
-            background: #8B0000; /* Темно-красный для английской версии */
+            background: #8B0000;
             color: var(--text-color);
             line-height: 1.6;
             min-height: 100vh;
             padding: 20px;
+            transition: background-color 0.5s ease;
+        }
+
+        body.ua-mode {
+            background: #87CEEB;
         }
 
         .container {
@@ -86,7 +90,7 @@
             top: 20px;
             right: 20px;
             display: flex;
-            gap: 10px; /* Расстояние между кнопками */
+            gap: 10px;
         }
 
         .language-btn {
@@ -101,7 +105,7 @@
         }
 
         .language-btn.active {
-            background: var(--accent-color); /* Цвет активной кнопки */
+            background: var(--accent-color);
             cursor: default;
         }
 
@@ -441,7 +445,6 @@
             <div class="copyright" id="copyright-notice">© 2023 Gas Pipeline Calculator | Forbidden for resale without owner's permission</div>
         </header>
 
-        <!-- Остальная часть HTML остается без изменений -->
         <div class="tabs">
             <div class="tab active" data-tab="pressure-drop" id="tab-pressure">Pressure Drop</div>
             <div class="tab" data-tab="pipe-sizing" id="tab-sizing">Pipe Sizing</div>
@@ -1238,7 +1241,7 @@
             updateSelectOptions();
 
             // Update background color
-            document.body.style.background = lang === 'en' ? '#8B0000' : '#87CEEB';
+            document.body.classList.toggle('ua-mode', lang === 'uk');
 
             // Update active button state
             document.getElementById('language-en').classList.toggle('active', lang === 'en');
@@ -1281,39 +1284,39 @@
             setLanguage('uk');
         });
 
-        // Pipe dimensions (inner diameter in mm)
+        // CORRECTED Pipe dimensions (inner diameter in mm)
         const pipeDimensions = {
             pe: {
                 20: 16.6,
                 25: 20.4,
-                32: 26.6,
-                40: 33.5,
-                50: 42.3,
-                63: 53.6,
-                75: 64.0,
-                90: 77.0,
-                110: 94.2,
-                125: 106.8,
-                140: 119.6,
-                160: 136.6,
-                180: 153.6,
-                200: 170.6
+                32: 26.0,
+                40: 32.6,
+                50: 40.8,
+                63: 51.4,
+                75: 61.2,
+                90: 73.6,
+                110: 90.0,
+                125: 102.6,
+                140: 115.4,
+                160: 131.4,
+                180: 147.8,
+                200: 164.2
             },
             steel: {
-                20: 21.3,
-                25: 26.7,
-                32: 33.4,
-                40: 42.2,
-                50: 48.3,
-                63: 60.3,
-                75: 76.1,
-                90: 88.9,
-                110: 114.3,
-                125: 139.7,
-                140: 168.3,
-                160: 219.1,
-                180: 273.0,
-                200: 323.9
+                20: 21.3,  // DN20 - зовнішній діаметр, внутрішній для газових труб
+                25: 26.9,
+                32: 35.2,
+                40: 40.9,
+                50: 52.5,
+                63: 66.7,
+                75: 80.9,
+                90: 102.3,
+                110: 107.1,
+                125: 132.5,
+                140: 157.1,
+                160: 181.7,
+                180: 206.3,
+                200: 230.9
             }
         };
 
@@ -1344,25 +1347,40 @@
         const exportPdfBtn = document.getElementById('export-pdf');
         const exportExcelBtn = document.getElementById('export-excel');
 
-        // Get gas properties with temperature and pressure correction
+        // CORRECTED Get gas properties with temperature and pressure correction
         const getGasProperties = (gasType, temperature, pressureInBar = 1) => {
-            let baseDensity, baseViscosity, densityTempCoeff, viscosityTempCoeff;
+            let baseDensity, baseViscosity;
             
             if (gasType === 'natural') {
                 baseDensity = 0.73; // kg/m³ at 15°C and 1 bar
                 baseViscosity = 1.12e-5; // Pa·s at 15°C
-                densityTempCoeff = -0.002; // per °C
-                viscosityTempCoeff = 0.0002; // per °C
             } else { // propane
                 baseDensity = 1.83; // kg/m³ at 15°C and 1 bar
                 baseViscosity = 8e-6; // Pa·s at 15°C
-                densityTempCoeff = -0.0015;
-                viscosityTempCoeff = 0.00015;
             }
             
+            // CORRECTED density calculation using ideal gas law
+            // ρ = ρ₀ * (P/P₀) * (T₀/T)
+            // where ρ₀ is density at standard conditions (15°C, 1 bar)
+            const T0 = 15 + 273.15; // Standard temperature in Kelvin (15°C)
+            const T = temperature + 273.15; // Current temperature in Kelvin
+            
+            // Calculate density with pressure and temperature correction
+            let density = baseDensity * (pressureInBar / 1) * (T0 / T);
+            
+            // Ensure density doesn't fall below physical limits
+            // For natural gas, minimum density should be around 0.65-0.70 kg/m³
+            // For propane, minimum density should be around 1.6-1.7 kg/m³
+            const minDensity = gasType === 'natural' ? 0.65 : 1.6;
+            density = Math.max(density, minDensity);
+            
+            // Viscosity correction with temperature (minor effect)
+            const viscosityTempCoeff = gasType === 'natural' ? 0.0002 : 0.00015;
+            const viscosity = baseViscosity * (1 + viscosityTempCoeff * (temperature - 15));
+            
             return {
-                density: baseDensity * pressureInBar * (1 + densityTempCoeff * (temperature - 15)),
-                viscosity: baseViscosity * (1 + viscosityTempCoeff * (temperature - 15))
+                density: density,
+                viscosity: viscosity
             };
         };
 
@@ -1629,7 +1647,7 @@
             
             document.getElementById('reynolds').textContent = mainPipelineResult.reynolds.toFixed(0);
             
-                        // Determine flow type
+            // Determine flow type
             let flowType = 'Turbulent';
             if (mainPipelineResult.reynolds < 2300) flowType = 'Laminar';
             else if (mainPipelineResult.reynolds < 4000) flowType = 'Transitional';
