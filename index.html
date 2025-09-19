@@ -568,7 +568,8 @@
                     </label>
                     <input type="number" id="pressure" min="0" step="0.1" value="300" placeholder="e.g., 300">
                     <div class="pressure-conversion">
-                        <span id="pressure-bar">— bar</span>
+                        <span id="gauge-pressure-text">Gauge pressure:</span> <span id="gauge-pressure-value">— bar</span><br>
+                        <span id="absolute-pressure-text">Absolute pressure:</span> <span id="absolute-pressure-display">— bar</span>
                     </div>
                 </div>
                 
@@ -583,16 +584,30 @@
                 <div class="gas-properties">
                     <h3 id="gas-properties-title">Gas properties</h3>
                     <div class="gas-property">
-                        <span id="density-label">Density at 15°C:</span>
+                        <span id="density-label">Density at current conditions:</span>
                         <span id="density-value">— kg/m³</span>
+                    </div>
+                    <div class="gas-property">
+                        <span id="density-std-label">Density at standard conditions:</span>
+                        <span id="density-std-value">— kg/m³</span>
                     </div>
                     <div class="gas-property">
                         <span id="viscosity-label">Viscosity at 15°C:</span>
                         <span id="viscosity-value">— Pa·s</span>
                     </div>
                     <div class="gas-property">
+                        <span id="absolute-pressure-label">Absolute pressure:</span>
+                        <span id="absolute-pressure-value">— kPa</span>
+                    </div>
+                    <div class="gas-property">
                         <span id="roughness-label">Pipe roughness:</span>
                         <span id="roughness-value">— mm</span>
+                    </div>
+                    <div class="formula-reference" id="density-formula-explanation">
+                        Using ideal gas law: ρ = ρ₀ × (P_abs / P₀) × (T₀ / T)
+                    </div>
+                    <div class="formula-reference" id="std-conditions">
+                        Standard conditions: 15°C, 101.325 kPa (1 atm)
                     </div>
                 </div>
 
@@ -1029,14 +1044,20 @@
                 'pressure-label': 'Initial pressure',
                 'temperature-label': 'Gas temperature',
                 'gas-properties-title': 'Gas properties',
-                'density-label': 'Density at 15°C:',
+                'density-label': 'Density at current conditions:',
+                'density-std-label': 'Density at standard conditions:',
                 'viscosity-label': 'Viscosity at 15°C:',
                 'roughness-label': 'Pipe roughness:',
+                'absolute-pressure-label': 'Absolute pressure:',
                 'multi-pipeline-title': 'Additional Pipelines',
                 'calculate-button': 'CALCULATE PRESSURE DROP',
                 'inner-diameter-text': 'Inner diameter:',
                 'equivalent-length-text': 'Equivalent length with fittings:',
                 'height-note': 'Positive for upward flow, negative for downward',
+                'density-formula-explanation': 'Using ideal gas law: ρ = ρ₀ × (P_abs / P₀) × (T₀ / T)',
+                'std-conditions': 'Standard conditions: 15°C, 101.325 kPa (1 atm)',
+                'gauge-pressure': 'Gauge pressure:',
+                'absolute-pressure': 'Absolute pressure:',
                 
                 // Results section
                 'results-title': 'Calculation Results',
@@ -1156,14 +1177,20 @@
                 'pressure-label': 'Початковий тиск',
                 'temperature-label': 'Температура газу',
                 'gas-properties-title': 'Властивості газу',
-                'density-label': 'Густина при 15°C:',
+                'density-label': 'Густина за поточних умов:',
+                'density-std-label': 'Густина за стандартних умов:',
                 'viscosity-label': 'В\'язкість при 15°C:',
                 'roughness-label': 'Шорсткість труби:',
+                'absolute-pressure-label': 'Абсолютний тиск:',
                 'multi-pipeline-title': 'Додаткові трубопроводи',
                 'calculate-button': 'РОЗРАХУВАТИ ПАДІННЯ ТИСКУ',
                 'inner-diameter-text': 'Внутрішній діаметр:',
                 'equivalent-length-text': 'Еквівалентна довжина з фітингами:',
                 'height-note': 'Додатнє для руху вгору, від\'ємне для руху вниз',
+                'density-formula-explanation': 'За законом ідеального газу: ρ = ρ₀ × (P_abs / P₀) × (T₀ / T)',
+                'std-conditions': 'Стандартні умови: 15°C, 101.325 kPa (1 атм)',
+                'gauge-pressure': 'Надлишковий тиск:',
+                'absolute-pressure': 'Абсолютний тиск:',
                 
                 // Results section
                 'results-title': 'Результати розрахунків',
@@ -1284,6 +1311,9 @@
             
             // Update pipe size options
             updatePipeSizeOptions();
+            
+            // Update gas properties to refresh labels
+            updateGasProperties();
         }
 
         // Update select options based on language
@@ -1362,7 +1392,6 @@
         const densityValue = document.getElementById('density-value');
         const viscosityValue = document.getElementById('viscosity-value');
         const roughnessValue = document.getElementById('roughness-value');
-        const pressureBar = document.getElementById('pressure-bar');
         const pipelinesContainer = document.getElementById('pipelines-container');
         const addPipelineBtn = document.getElementById('add-pipeline');
         const pipelineResultsContainer = document.getElementById('pipeline-results-container');
@@ -1409,29 +1438,39 @@
         }
 
         // Get gas properties with temperature and pressure correction
-        const getGasProperties = (gasType, temperature, pressureInBar = 1) => {
+        const getGasProperties = (gasType, temperature, pressureInKpa = 101.325) => {
             let baseDensity, baseViscosity;
             
+            // Standard conditions: 15°C, 101.325 kPa (1 atm)
+            const STANDARD_TEMPERATURE = 15; // °C
+            const STANDARD_PRESSURE = 101.325; // kPa
+            
             if (gasType === 'natural') {
-                baseDensity = 0.73; // kg/m³ at 15°C and 1 bar
+                baseDensity = 0.73; // kg/m³ at 15°C and 101.325 kPa
                 baseViscosity = 1.12e-5; // Pa·s at 15°C
             } else { // propane
-                baseDensity = 1.83; // kg/m³ at 15°C and 1 bar
+                baseDensity = 1.83; // kg/m³ at 15°C and 101.325 kPa
                 baseViscosity = 8e-6; // Pa·s at 15°C
             }
             
-            // Density calculation using ideal gas law
-            // ρ = ρ₀ * (P/P₀) * (T₀/T)
-            // where ρ₀ is density at standard conditions (15°C, 1 bar)
-            const T0 = 15 + 273.15; // Standard temperature in Kelvin (15°C)
+            // Calculate density using ideal gas law:
+            // ρ = ρ₀ × (P_abs / P₀) × (T₀ / T)
+            // where:
+            // ρ₀ - density at standard conditions (15°C, 101.325 kPa)
+            // P_abs - absolute pressure (kPa)
+            // P₀ - standard pressure (101.325 kPa)
+            // T₀ - standard temperature (15°C = 288.15 K)
+            // T - current temperature (in Kelvin)
+            const T0 = STANDARD_TEMPERATURE + 273.15; // Standard temperature in Kelvin
             const T = temperature + 273.15; // Current temperature in Kelvin
             
-            // Calculate density with pressure and temperature correction
-            let density = baseDensity * (pressureInBar / 1) * (T0 / T);
+            // Convert gauge pressure to absolute pressure
+            // Absolute pressure = Gauge pressure + Atmospheric pressure
+            const atmosphericPressure = 101.325; // Standard atmospheric pressure in kPa
+            const absolutePressure = pressureInKpa + atmosphericPressure;
             
-            // Ensure density doesn't fall below physical limits
-            const minDensity = gasType === 'natural' ? 0.65 : 1.87; // Updated for propane
-            density = Math.max(density, minDensity);
+            // Calculate density using ideal gas law
+            const density = baseDensity * (absolutePressure / STANDARD_PRESSURE) * (T0 / T);
             
             // Viscosity correction with temperature (minor effect)
             const viscosityTempCoeff = gasType === 'natural' ? 0.0002 : 0.00015;
@@ -1439,9 +1478,78 @@
             
             return {
                 density: density,
-                viscosity: viscosity
+                viscosity: viscosity,
+                densityStd: baseDensity, // density at standard conditions
+                absolutePressure: absolutePressure // in kPa
             };
         };
+
+        // Update gas properties display
+        function updateGasProperties() {
+            const gasType = gasTypeSelect.value;
+            const temperature = parseFloat(temperatureInput.value) || 15;
+            const pressure = parseFloat(pressureInput.value) || 0;
+            
+            const props = getGasProperties(gasType, temperature, pressure);
+            
+            // Update displayed values
+            densityValue.textContent = props.density.toFixed(4) + ' kg/m³';
+            viscosityValue.textContent = props.viscosity.toExponential(2) + ' Pa·s';
+            
+            // Add new elements for standard density and absolute pressure if they don't exist
+            if (!document.getElementById('density-std-value')) {
+                const gasPropertiesDiv = document.querySelector('.gas-properties');
+                
+                // Add standard density
+                const densityStdDiv = document.createElement('div');
+                densityStdDiv.className = 'gas-property';
+                densityStdDiv.innerHTML = `
+                    <span id="density-std-label">${translations[currentLanguage]['density-std-label']}</span>
+                    <span id="density-std-value">— kg/m³</span>
+                `;
+                gasPropertiesDiv.appendChild(densityStdDiv);
+                
+                // Add absolute pressure
+                const absolutePressureDiv = document.createElement('div');
+                absolutePressureDiv.className = 'gas-property';
+                absolutePressureDiv.innerHTML = `
+                    <span id="absolute-pressure-label">${translations[currentLanguage]['absolute-pressure-label']}</span>
+                    <span id="absolute-pressure-value">— kPa</span>
+                `;
+                gasPropertiesDiv.appendChild(absolutePressureDiv);
+                
+                // Add formula explanation
+                const formulaDiv = document.createElement('div');
+                formulaDiv.className = 'formula-reference';
+                formulaDiv.id = 'density-formula-explanation';
+                gasPropertiesDiv.appendChild(formulaDiv);
+                
+                // Add standard conditions note
+                const conditionsDiv = document.createElement('div');
+                conditionsDiv.className = 'formula-reference';
+                conditionsDiv.id = 'std-conditions';
+                gasPropertiesDiv.appendChild(conditionsDiv);
+            }
+            
+            // Update values
+            document.getElementById('density-std-value').textContent = props.densityStd.toFixed(4) + ' kg/m³';
+            document.getElementById('absolute-pressure-value').textContent = props.absolutePressure.toFixed(3) + ' kPa';
+            document.getElementById('density-formula-explanation').textContent = translations[currentLanguage]['density-formula-explanation'];
+            document.getElementById('std-conditions').textContent = translations[currentLanguage]['std-conditions'];
+            
+            // Also update pressure display to show both gauge and absolute
+            if (!document.getElementById('gauge-pressure-value')) {
+                const pressureConversionDiv = document.querySelector('.pressure-conversion');
+                pressureConversionDiv.innerHTML = `
+                    <div>${translations[currentLanguage]['gauge-pressure']} <span id="gauge-pressure-value">—</span> bar</div>
+                    <div>${translations[currentLanguage]['absolute-pressure']} <span id="absolute-pressure-display">—</span> bar</div>
+                `;
+            }
+            
+            const pressureVal = parseFloat(pressureInput.value) || 0;
+            document.getElementById('gauge-pressure-value').textContent = (pressureVal / 100).toFixed(3);
+            document.getElementById('absolute-pressure-display').textContent = (props.absolutePressure / 100).toFixed(3);
+        }
 
         // Update pipe parameters when selection changes
         function updatePipeParameters() {
@@ -1479,17 +1587,6 @@
             updateGasProperties();
         }
 
-        // Update gas properties
-        function updateGasProperties() {
-            const gasType = gasTypeSelect.value;
-            const temperature = parseFloat(temperatureInput.value) || 15;
-            const pressure = parseFloat(pressureInput.value) || 0;
-            const pressureInBar = pressure / 100;
-            const props = getGasProperties(gasType, temperature, pressureInBar);
-            densityValue.textContent = props.density.toFixed(2) + ' kg/m³';
-            viscosityValue.textContent = props.viscosity.toExponential(2) + ' Pa·s';
-        }
-
         // Update equivalent length
         function updateEquivalentLength() {
             const length = parseFloat(pipeLengthInput.value) || 0;
@@ -1508,8 +1605,6 @@
         fittingsFactorInput.addEventListener('input', updateEquivalentLength);
         temperatureInput.addEventListener('input', updateGasProperties);
         pressureInput.addEventListener('input', () => {
-            const pressure = parseFloat(pressureInput.value) || 0;
-            pressureBar.textContent = (pressure / 100).toFixed(2) + ' bar';
             updateGasProperties();
         });
 
@@ -1663,8 +1758,7 @@
         function calculatePipelinePressureDrop(pipeType, size, length, fittingsFactor, heightDifference, flowRate, gasType, temperature, pipelineName) {
             // Get gas properties with temperature correction
             const pressure = parseFloat(document.getElementById('pressure').value) || 0;
-            const pressureInBar = pressure / 100;
-            const props = getGasProperties(gasType, temperature, pressureInBar);
+            const props = getGasProperties(gasType, temperature, pressure);
             const density = props.density;
             const viscosity = props.viscosity;
             
