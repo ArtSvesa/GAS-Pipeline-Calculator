@@ -506,6 +506,14 @@
                     </div>
                 </div>
                 
+                <div class="input-group">
+                    <label for="pipe-roughness">
+                        <span id="roughness-label">Pipe roughness</span>
+                        <span class="unit">mm</span>
+                    </label>
+                    <input type="number" id="pipe-roughness" min="0.001" step="0.001" placeholder="Enter roughness">
+                </div>
+                
                 <div class="custom-inputs" id="custom-inputs" style="display: none;">
                     <div class="input-group">
                         <label for="custom-diameter">
@@ -513,13 +521,6 @@
                             <span class="unit">mm</span>
                         </label>
                         <input type="number" id="custom-diameter" min="1" step="0.1" placeholder="Enter diameter">
-                    </div>
-                    <div class="input-group">
-                        <label for="custom-roughness">
-                            <span>Custom roughness</span>
-                            <span class="unit">mm</span>
-                        </label>
-                        <input type="number" id="custom-roughness" min="0.001" step="0.001" placeholder="Enter roughness">
                     </div>
                 </div>
                 
@@ -597,7 +598,7 @@
                     </div>
                     <div class="gas-property">
                         <span id="absolute-pressure-label">Absolute pressure:</span>
-                        <span id="absolute-pressure-value">— kPa</span>
+                        <span id="absolute-pressure-value">— bar</span>
                     </div>
                     <div class="gas-property">
                         <span id="roughness-label">Pipe roughness:</span>
@@ -697,6 +698,10 @@
                             <div class="unit-value" id="final-pressure-bar">—</div>
                             <div class="unit-label">bar</div>
                         </div>
+                        <div class="pressure-unit">
+                            <div class="unit-value" id="final-pressure-mbar">—</div>
+                            <div class="unit-label">millibar</div>
+                        </div>
                     </div>
                 </div>
 
@@ -791,6 +796,14 @@
                 </div>
                 
                 <div class="input-group">
+                    <label for="sizing-roughness">
+                        <span id="sizing-roughness-label">Pipe roughness</span>
+                        <span class="unit">mm</span>
+                    </label>
+                    <input type="number" id="sizing-roughness" min="0.001" step="0.001" placeholder="Enter roughness">
+                </div>
+                
+                <div class="input-group">
                     <label for="sizing-length">
                         <span id="sizing-length-label">Pipe length</span>
                         <span class="unit">m</span>
@@ -840,50 +853,23 @@
                 
                 <div class="result-item">
                     <div class="result-title">
-                        <i class="fas fa-ruler-horizontal"></i> <span id="recommended-size-title">Recommended pipe size</span>
+                        <i class="fas fa-ruler-horizontal"></i> <span id="recommended-size-title">Recommended pipe sizes</span>
                     </div>
-                    <div class="result-value" id="recommended-size">—</div>
+                    <div id="recommended-size">—</div>
                 </div>
                 
-                <div class="result-item">
-                    <div class="result-title">
-                        <i class="fas fa-tachometer-alt"></i> <span id="sizing-pressure-drop-title">Pressure drop</span>
-                    </div>
-                    <div class="result-value" id="sizing-pressure-drop-value">—</div>
-                    
-                    <div class="pressure-units">
-                        <div class="pressure-unit">
-                            <div class="unit-value" id="sizing-pressure-drop-kpa">—</div>
-                            <div class="unit-label">kPa</div>
-                        </div>
-                        <div class="pressure-unit">
-                            <div class="unit-value" id="sizing-pressure-drop-bar">—</div>
-                            <div class="unit-label">bar</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="result-item">
-                    <div class="result-title">
-                        <i class="fas fa-bolt"></i> <span id="sizing-velocity-title">Flow velocity</span>
-                    </div>
-                    <div class="result-value" id="sizing-velocity">—</div> m/s
-                </div>
-
                 <div class="result-item">
                     <div class="result-title">
                         <i class="fas fa-check-circle"></i> <span id="sizing-validation-title">Validation</span>
                     </div>
                     <div class="result-details">
                         <div>
-                            <span class="status-indicator" id="sizing-pressure-drop-status"></span>
-                            <strong id="sizing-pressure-drop-validation">Pressure drop:</strong> 
-                            <span id="sizing-pressure-drop-validation-value"></span>
+                            <strong id="sizing-pressure-drop-validation">Maximum allowable pressure drop:</strong> 
+                            <span id="sizing-max-pressure-drop-value"></span>
                         </div>
                         <div>
-                            <span class="status-indicator" id="sizing-velocity-status"></span>
-                            <strong id="sizing-velocity-validation">Flow velocity:</strong> 
-                            <span id="sizing-velocity-validation-value"></span>
+                            <strong id="sizing-velocity-validation">Maximum allowable velocity:</strong> 
+                            <span id="sizing-max-velocity-value">20 m/s</span>
                         </div>
                         <div id="sizing-validation-summary"></div>
                     </div>
@@ -1099,6 +1085,7 @@
                 'sizing-gas-type-unit': 'Select gas type',
                 'sizing-pipe-type-label': 'Pipe type',
                 'sizing-pipe-type-unit': 'Select pipe type',
+                'sizing-roughness-label': 'Pipe roughness',
                 'sizing-length-label': 'Pipe length',
                 'sizing-flow-rate-label': 'Gas flow rate',
                 'sizing-pressure-label': 'Initial pressure',
@@ -1106,12 +1093,10 @@
                 'sizing-temperature-label': 'Gas temperature',
                 'sizing-calculate-button': 'CALCULATE PIPE SIZE',
                 'sizing-results-title': 'Pipe Sizing Results',
-                'recommended-size-title': 'Recommended pipe size',
-                'sizing-pressure-drop-title': 'Pressure drop',
-                'sizing-velocity-title': 'Flow velocity',
+                'recommended-size-title': 'Recommended pipe sizes',
                 'sizing-validation-title': 'Validation',
-                'sizing-pressure-drop-validation': 'Pressure drop:',
-                'sizing-velocity-validation': 'Flow velocity:',
+                'sizing-pressure-drop-validation': 'Maximum allowable pressure drop:',
+                'sizing-velocity-validation': 'Maximum allowable velocity:',
                 
                 // Calculations tab
                 'calc-process-title': 'Calculation Process',
@@ -1232,6 +1217,7 @@
                 'sizing-gas-type-unit': 'Оберіть тип газу',
                 'sizing-pipe-type-label': 'Тип труби',
                 'sizing-pipe-type-unit': 'Оберіть тип труби',
+                'sizing-roughness-label': 'Шорсткість труби',
                 'sizing-length-label': 'Довжина труби',
                 'sizing-flow-rate-label': 'Витрата газу',
                 'sizing-pressure-label': 'Початковий тиск',
@@ -1239,12 +1225,10 @@
                 'sizing-temperature-label': 'Температура газу',
                 'sizing-calculate-button': 'ПІДІБРАТИ ДІАМЕТР ТРУБИ',
                 'sizing-results-title': 'Результати підбору діаметра',
-                'recommended-size-title': 'Рекомендований розмір труби',
-                'sizing-pressure-drop-title': 'Падіння тиску',
-                'sizing-velocity-title': 'Швидкість потоку',
+                'recommended-size-title': 'Рекомендовані розміри труб',
                 'sizing-validation-title': 'Перевірка',
-                'sizing-pressure-drop-validation': 'Падіння тиску:',
-                'sizing-velocity-validation': 'Швидкість потоку:',
+                'sizing-pressure-drop-validation': 'Макс. допустиме падіння тиску:',
+                'sizing-velocity-validation': 'Макс. допустима швидкість:',
                 
                 // Calculations tab
                 'calc-process-title': 'Процес розрахунку',
@@ -1358,13 +1342,24 @@
                 "PE20": 16.6,
                 "PE25": 20.4,
                 "PE32": 26.0,
+                "PE40": 32.6,
+                "PE50": 40.8,
                 "PE63": 51.4,
+                "PE75": 61.4,
+                "PE90": 73.6,
+                "PE110": 90.0,
                 "Custom": "custom"
             },
             steel: {
-                "Steel20": 17.3,
-                "Steel25": 22.0,
-                "Steel32": 28.0,
+                "DN15": 15.8,
+                "DN20": 21.6,
+                "DN25": 27.2,
+                "DN32": 35.8,
+                "DN40": 41.8,
+                "DN50": 52.5,
+                "DN65": 68.0,
+                "DN80": 80.5,
+                "DN100": 105.3,
                 "Custom": "custom"
             }
         };
@@ -1379,9 +1374,10 @@
         const gasTypeSelect = document.getElementById('gas-type');
         const pipeTypeSelect = document.getElementById('pipe-type');
         const pipeSizeSelect = document.getElementById('pipe-size');
+        const pipeRoughnessInput = document.getElementById('pipe-roughness');
+        const sizingRoughnessInput = document.getElementById('sizing-roughness');
         const customInputs = document.getElementById('custom-inputs');
         const customDiameterInput = document.getElementById('custom-diameter');
-        const customRoughnessInput = document.getElementById('custom-roughness');
         const pipeLengthInput = document.getElementById('pipe-length');
         const fittingsFactorInput = document.getElementById('fittings-factor');
         const heightDifferenceInput = document.getElementById('height-difference');
@@ -1413,13 +1409,8 @@
                 
                 // Translate option text
                 if (currentLanguage === 'uk') {
-                    if (size === 'PE20') option.text = 'PE20';
-                    else if (size === 'PE25') option.text = 'PE25';
-                    else if (size === 'PE32') option.text = 'PE32';
-                    else if (size === 'PE63') option.text = 'PE63';
-                    else if (size === 'Steel20') option.text = 'Сталь20';
-                    else if (size === 'Steel25') option.text = 'Сталь25';
-                    else if (size === 'Steel32') option.text = 'Сталь32';
+                    if (size.startsWith('PE')) option.text = size;
+                    else if (size.startsWith('DN')) option.text = size;
                     else if (size === 'Custom') option.text = 'Вручну';
                 } else {
                     option.text = size;
@@ -1514,7 +1505,7 @@
                 absolutePressureDiv.className = 'gas-property';
                 absolutePressureDiv.innerHTML = `
                     <span id="absolute-pressure-label">${translations[currentLanguage]['absolute-pressure-label']}</span>
-                    <span id="absolute-pressure-value">— kPa</span>
+                    <span id="absolute-pressure-value">— bar</span>
                 `;
                 gasPropertiesDiv.appendChild(absolutePressureDiv);
                 
@@ -1533,7 +1524,7 @@
             
             // Update values
             document.getElementById('density-std-value').textContent = props.densityStd.toFixed(4) + ' kg/m³';
-            document.getElementById('absolute-pressure-value').textContent = props.absolutePressure.toFixed(3) + ' kPa';
+            document.getElementById('absolute-pressure-value').textContent = (props.absolutePressure / 100).toFixed(3) + ' bar';
             document.getElementById('density-formula-explanation').textContent = translations[currentLanguage]['density-formula-explanation'];
             document.getElementById('std-conditions').textContent = translations[currentLanguage]['std-conditions'];
             
@@ -1556,32 +1547,27 @@
             const pipeType = pipeTypeSelect.value;
             const selectedSize = pipeSizeSelect.value;
             
+            // Get roughness from input field or use default
+            let roughness = parseFloat(pipeRoughnessInput.value) || pipeRoughness[pipeType];
+            roughnessValue.textContent = roughness.toFixed(4) + ' mm';
+            
             // Show/hide custom inputs
             if (selectedSize === 'Custom') {
                 customInputs.style.display = 'grid';
                 
-                // Set default roughness based on pipe type
-                customRoughnessInput.value = pipeRoughness[pipeType];
-                
-                // Update inner diameter and roughness if custom values are provided
+                // Update inner diameter if custom value is provided
                 const customDiameter = parseFloat(customDiameterInput.value) || 0;
-                const customRoughness = parseFloat(customRoughnessInput.value) || pipeRoughness[pipeType];
                 
                 if (customDiameter > 0) {
                     innerDiameterValue.textContent = customDiameter.toFixed(1) + ' mm';
                 } else {
                     innerDiameterValue.textContent = '— mm';
                 }
-                
-                roughnessValue.textContent = customRoughness.toFixed(4) + ' mm';
             } else {
                 customInputs.style.display = 'none';
                 
                 const innerDiameter = pipeDimensions[pipeType][selectedSize];
                 innerDiameterValue.textContent = innerDiameter + ' mm';
-                
-                const roughness = pipeRoughness[pipeType];
-                roughnessValue.textContent = roughness + ' mm';
             }
             
             updateGasProperties();
@@ -1597,10 +1583,15 @@
 
         // Add event listeners
         gasTypeSelect.addEventListener('change', updateGasProperties);
-        pipeTypeSelect.addEventListener('change', updatePipeSizeOptions);
+        pipeTypeSelect.addEventListener('change', function() {
+            // Set default roughness when pipe type changes
+            pipeRoughnessInput.value = pipeRoughness[this.value];
+            sizingRoughnessInput.value = pipeRoughness[this.value];
+            updatePipeSizeOptions();
+        });
         pipeSizeSelect.addEventListener('change', updatePipeParameters);
+        pipeRoughnessInput.addEventListener('input', updatePipeParameters);
         customDiameterInput.addEventListener('input', updatePipeParameters);
-        customRoughnessInput.addEventListener('input', updatePipeParameters);
         pipeLengthInput.addEventListener('input', updateEquivalentLength);
         fittingsFactorInput.addEventListener('input', updateEquivalentLength);
         temperatureInput.addEventListener('input', updateGasProperties);
@@ -1648,6 +1639,13 @@
                 </div>
                 <div class="input-group">
                     <label>
+                        <span>${currentLanguage === 'en' ? 'Roughness' : 'Шорсткість'}</span>
+                        <span class="unit">mm</span>
+                    </label>
+                    <input type="number" min="0.001" step="0.001" value="${pipeRoughness[pipeTypeSelect.value]}">
+                </div>
+                <div class="input-group">
+                    <label>
                         <span>${currentLanguage === 'en' ? 'Length' : 'Довжина'}</span>
                         <span class="unit">m</span>
                     </label>
@@ -1690,13 +1688,8 @@
                     
                     // Translate option text
                     if (currentLanguage === 'uk') {
-                        if (size === 'PE20') option.text = 'PE20';
-                        else if (size === 'PE25') option.text = 'PE25';
-                        else if (size === 'PE32') option.text = 'PE32';
-                        else if (size === 'PE63') option.text = 'PE63';
-                        else if (size === 'Steel20') option.text = 'Сталь20';
-                        else if (size === 'Steel25') option.text = 'Сталь25';
-                        else if (size === 'Steel32') option.text = 'Сталь32';
+                        if (size.startsWith('PE')) option.text = size;
+                        else if (size.startsWith('DN')) option.text = size;
                         else if (size === 'Custom') option.text = 'Вручну';
                     } else {
                         option.text = size;
@@ -1755,7 +1748,7 @@
         }
         
         // Calculate pressure drop for a single pipeline segment
-        function calculatePipelinePressureDrop(pipeType, size, length, fittingsFactor, heightDifference, flowRate, gasType, temperature, pipelineName) {
+        function calculatePipelinePressureDrop(pipeType, size, length, fittingsFactor, heightDifference, flowRate, gasType, temperature, pipelineName, customRoughness = null) {
             // Get gas properties with temperature correction
             const pressure = parseFloat(document.getElementById('pressure').value) || 0;
             const props = getGasProperties(gasType, temperature, pressure);
@@ -1767,10 +1760,10 @@
             
             if (size === 'Custom') {
                 innerDiameter = parseFloat(document.getElementById('custom-diameter').value) || 0;
-                roughness = parseFloat(document.getElementById('custom-roughness').value) || pipeRoughness[pipeType];
+                roughness = customRoughness || parseFloat(pipeRoughnessInput.value) || pipeRoughness[pipeType];
             } else {
                 innerDiameter = pipeDimensions[pipeType][size];
-                roughness = pipeRoughness[pipeType];
+                roughness = customRoughness || parseFloat(pipeRoughnessInput.value) || pipeRoughness[pipeType];
             }
             
             const relativeRoughness = roughness / innerDiameter;
@@ -1829,6 +1822,7 @@
             const flowRate = parseFloat(document.getElementById('flow-rate').value) || 0;
             const pressure = parseFloat(pressureInput.value) || 0;
             const temperature = parseFloat(temperatureInput.value) || 15;
+            const roughness = parseFloat(pipeRoughnessInput.value) || pipeRoughness[pipeType];
             
             // Validate inputs
             if (flowRate <= 0 || length <= 0) {
@@ -1853,7 +1847,8 @@
             const mainPipelineResult = calculatePipelinePressureDrop(
                 pipeType, size, length, fittingsFactor, 
                 heightDifference, flowRate, gasType, temperature,
-                currentLanguage === 'en' ? 'Main Pipeline' : 'Основний трубопровід'
+                currentLanguage === 'en' ? 'Main Pipeline' : 'Основний трубопровід',
+                roughness
             );
             
             let totalPressureDrop = mainPipelineResult.totalPressureDrop;
@@ -1864,14 +1859,16 @@
             pipelineItems.forEach((item, index) => {
                 const pipelineType = item.querySelector('select').value;
                 const pipelineSize = item.querySelectorAll('select')[1].value;
-                const pipelineLength = parseFloat(item.querySelectorAll('input')[0].value) || 0;
-                const pipelineFittings = parseFloat(item.querySelectorAll('input')[1].value) || 0;
-                const pipelineHeight = parseFloat(item.querySelectorAll('input')[2].value) || 0;
+                const pipelineRoughness = parseFloat(item.querySelectorAll('input')[0].value) || pipeRoughness[pipelineType];
+                const pipelineLength = parseFloat(item.querySelectorAll('input')[1].value) || 0;
+                const pipelineFittings = parseFloat(item.querySelectorAll('input')[2].value) || 0;
+                const pipelineHeight = parseFloat(item.querySelectorAll('input')[3].value) || 0;
                 
                 const pipelineResult = calculatePipelinePressureDrop(
                     pipelineType, pipelineSize, pipelineLength, pipelineFittings, 
                     pipelineHeight, flowRate, gasType, temperature,
-                    `${currentLanguage === 'en' ? 'Additional Pipeline' : 'Додатковий трубопровід'} ${index + 2}`
+                    `${currentLanguage === 'en' ? 'Additional Pipeline' : 'Додатковий трубопровід'} ${index + 2}`,
+                    pipelineRoughness
                 );
                 
                 allPipelineResults.push(pipelineResult);
@@ -1903,6 +1900,7 @@
             document.getElementById('final-pressure').textContent = finalPressure.toFixed(4) + ' kPa';
             document.getElementById('final-pressure-kpa').textContent = finalPressure.toFixed(4) + ' kPa';
             document.getElementById('final-pressure-bar').textContent = (finalPressure / 100).toFixed(6) + ' bar';
+            document.getElementById('final-pressure-mbar').textContent = (finalPressure * 10).toFixed(2) + ' mbar';
             
             // Validation
             const pressureDropPercent = (totalPressureDrop / pressure) * 100;
@@ -1983,6 +1981,7 @@
             const pressure = parseFloat(document.getElementById('sizing-pressure').value) || 0;
             const maxDropPercent = parseFloat(document.getElementById('sizing-max-drop').value) || 10;
             const temperature = parseFloat(document.getElementById('sizing-temperature').value) || 15;
+            const roughness = parseFloat(document.getElementById('sizing-roughness').value) || pipeRoughness[pipeType];
             
             // Validate inputs
             if (flowRate <= 0 || length <= 0 || pressure <= 0) {
@@ -1995,67 +1994,65 @@
             // Calculate maximum allowable pressure drop
             const maxPressureDrop = (maxDropPercent / 100) * pressure;
             
-            let selectedPipe = null;
-            let minPressureDrop = Infinity;
-            let selectedVelocity = 0;
+            let suitablePipes = [];
             
-            // Iterate through pipe sizes to find the smallest that meets pressure drop criteria
+            // Iterate through pipe sizes to find all that meet pressure drop and velocity criteria
             for (let size in pipeDimensions[pipeType]) {
                 if (size === 'Custom') continue; // Skip custom option for sizing
                 
                 const result = calculatePipelinePressureDrop(
-                    pipeType, size, length, 0, 0, flowRate, gasType, temperature, 'Test'
+                    pipeType, size, length, 0, 0, flowRate, gasType, temperature, 'Test', roughness
                 );
                 
-                if (result.totalPressureDrop <= maxPressureDrop && result.totalPressureDrop < minPressureDrop) {
-                    minPressureDrop = result.totalPressureDrop;
-                    selectedPipe = size;
-                    selectedVelocity = result.velocity;
+                if (result.totalPressureDrop <= maxPressureDrop && result.velocity <= 20) {
+                    suitablePipes.push({
+                        size: size,
+                        pressureDrop: result.totalPressureDrop,
+                        velocity: result.velocity
+                    });
                 }
             }
             
+            // Sort by diameter (ascending)
+            suitablePipes.sort((a, b) => {
+                const getSizeNumber = (str) => {
+                    if (str.startsWith('PE')) return parseInt(str.replace('PE', ''));
+                    if (str.startsWith('DN')) return parseInt(str.replace('DN', ''));
+                    return 0;
+                };
+                return getSizeNumber(a.size) - getSizeNumber(b.size);
+            });
+            
             // Update results
-            if (selectedPipe) {
-                document.getElementById('recommended-size').textContent = selectedPipe;
-                document.getElementById('sizing-pressure-drop-value').textContent = minPressureDrop.toFixed(4) + ' kPa';
-                document.getElementById('sizing-pressure-drop-kpa').textContent = minPressureDrop.toFixed(4) + ' kPa';
-                document.getElementById('sizing-pressure-drop-bar').textContent = (minPressureDrop / 100).toFixed(6) + ' bar';
-                document.getElementById('sizing-velocity').textContent = selectedVelocity.toFixed(2);
+            const recommendedSizeElement = document.getElementById('recommended-size');
+            recommendedSizeElement.innerHTML = '';
+            
+            if (suitablePipes.length > 0) {
+                suitablePipes.forEach(pipe => {
+                    const pipeInfo = document.createElement('div');
+                    pipeInfo.className = 'pressure-unit';
+                    pipeInfo.innerHTML = `
+                        <div class="unit-value">${pipe.size}</div>
+                        <div class="unit-label">${currentLanguage === 'en' ? 'Pressure drop' : 'Падіння тиску'}: ${pipe.pressureDrop.toFixed(4)} kPa</div>
+                        <div class="unit-label">${currentLanguage === 'en' ? 'Velocity' : 'Швидкість'}: ${pipe.velocity.toFixed(2)} m/s</div>
+                    `;
+                    recommendedSizeElement.appendChild(pipeInfo);
+                });
                 
-                // Validation
-                const pressureDropPercent = (minPressureDrop / pressure) * 100;
-                const pressureDropStatus = pressureDropPercent <= maxDropPercent ? 'good' : 'warning';
-                const velocityStatus = selectedVelocity <= 20 ? 'good' : 
-                                     selectedVelocity <= 30 ? 'warning' : 'bad';
-                
-                document.getElementById('sizing-pressure-drop-status').className = `status-indicator status-${pressureDropStatus}`;
-                document.getElementById('sizing-velocity-status').className = `status-indicator status-${velocityStatus}`;
-                
-                document.getElementById('sizing-pressure-drop-validation-value').textContent = 
+                document.getElementById('sizing-max-pressure-drop-value').textContent = `${maxPressureDrop.toFixed(4)} kPa (${(maxPressureDrop / 100).toFixed(6)} bar)`;
+                document.getElementById('sizing-validation-summary').textContent = 
                     currentLanguage === 'en' 
-                    ? `${pressureDropPercent.toFixed(1)}% of initial pressure (${pressureDropStatus})`
-                    : `${pressureDropPercent.toFixed(1)}% від початкового тиску (${pressureDropStatus === 'good' ? 'добре' : 'попередження'})`;
-                
-                document.getElementById('sizing-velocity-validation-value').textContent = 
-                    currentLanguage === 'en' 
-                    ? `${selectedVelocity.toFixed(2)} m/s (${velocityStatus})`
-                    : `${selectedVelocity.toFixed(2)} м/с (${velocityStatus === 'good' ? 'добре' : velocityStatus === 'warning' ? 'попередження' : 'погано'})`;
-                
-                let validationSummary = '';
-                if (pressureDropStatus === 'warning' || velocityStatus === 'bad') {
-                    validationSummary = currentLanguage === 'en'
-                        ? 'Consider adjusting parameters for optimal performance.'
-                        : 'Розгляньте зміну параметрів для оптимальної роботи.';
-                } else {
-                    validationSummary = currentLanguage === 'en'
-                        ? 'Selected pipe size is optimal.'
-                        : 'Обраний розмір труби є оптимальним.';
-                }
-                document.getElementById('sizing-validation-summary').textContent = validationSummary;
+                    ? `Found ${suitablePipes.length} suitable pipe size(s) that meet the criteria.`
+                    : `Знайдено ${suitablePipes.length} відповідних розмірів труби, які відповідають критеріям.`;
             } else {
-                document.getElementById('recommended-size').textContent = currentLanguage === 'en' 
-                    ? 'No suitable pipe size found.'
-                    : 'Не знайдено відповідного розміру труби.';
+                recommendedSizeElement.textContent = currentLanguage === 'en' 
+                    ? 'No suitable pipe size found. Consider increasing maximum allowable pressure drop or using a different pipe type.'
+                    : 'Не знайдено відповідного розміру труби. Розгляньте можливість збільшення максимально допустимого падіння тиску або використання іншого типу труби.';
+                
+                document.getElementById('sizing-validation-summary').textContent = 
+                    currentLanguage === 'en' 
+                    ? 'No pipe sizes meet the criteria. Try adjusting the input parameters.'
+                    : 'Жоден розмір труби не відповідає критеріям. Спробуйте змінити вхідні параметри.';
             }
         });
         
@@ -2165,23 +2162,25 @@
             doc.setFontSize(16);
             doc.text(translations[currentLanguage]['sizing-results-title'], 20, 20);
             
+            const results = [];
+            const recommendedSizes = document.getElementById('recommended-size').querySelectorAll('.pressure-unit');
+            
+            recommendedSizes.forEach(pipe => {
+                const size = pipe.querySelector('.unit-value').textContent;
+                const pressureDrop = pipe.querySelectorAll('.unit-label')[0].textContent;
+                const velocity = pipe.querySelectorAll('.unit-label')[1].textContent;
+                
+                results.push([size, pressureDrop, velocity]);
+            });
+            
             doc.autoTable({
                 startY: 30,
-                head: [[translations[currentLanguage]['details-title'], 'Value']],
-                body: [
-                    [
-                        translations[currentLanguage]['recommended-size-title'],
-                        document.getElementById('recommended-size').textContent
-                    ],
-                    [
-                        translations[currentLanguage]['sizing-pressure-drop-title'],
-                        document.getElementById('sizing-pressure-drop-value').textContent
-                    ],
-                    [
-                        translations[currentLanguage]['sizing-velocity-title'],
-                        document.getElementById('sizing-velocity').textContent + ' m/s'
-                    ]
-                ]
+                head: [[
+                    translations[currentLanguage]['recommended-size-title'],
+                    translations[currentLanguage]['sizing-pressure-drop-validation'],
+                    translations[currentLanguage]['sizing-velocity-validation']
+                ]],
+                body: results
             });
             
             doc.save('Pipe_Sizing_Calculations.pdf');
@@ -2190,9 +2189,22 @@
         document.getElementById('sizing-export-excel').addEventListener('click', function() {
             let csvContent = 'data:text/csv;charset=utf-8,';
             csvContent += `${translations[currentLanguage]['sizing-results-title']}\n\n`;
-            csvContent += `${translations[currentLanguage]['recommended-size-title']},${document.getElementById('recommended-size').textContent}\n`;
-            csvContent += `${translations[currentLanguage]['sizing-pressure-drop-title']},${document.getElementById('sizing-pressure-drop-value').textContent}\n`;
-            csvContent += `${translations[currentLanguage]['sizing-velocity-title']},${document.getElementById('sizing-velocity').textContent} m/s\n`;
+            
+            const recommendedSizes = document.getElementById('recommended-size').querySelectorAll('.pressure-unit');
+            
+            if (recommendedSizes.length > 0) {
+                csvContent += `${translations[currentLanguage]['recommended-size-title']},${translations[currentLanguage]['sizing-pressure-drop-validation']},${translations[currentLanguage]['sizing-velocity-validation']}\n`;
+                
+                recommendedSizes.forEach(pipe => {
+                    const size = pipe.querySelector('.unit-value').textContent;
+                    const pressureDrop = pipe.querySelectorAll('.unit-label')[0].textContent;
+                    const velocity = pipe.querySelectorAll('.unit-label')[1].textContent;
+                    
+                    csvContent += `${size},${pressureDrop},${velocity}\n`;
+                });
+            } else {
+                csvContent += document.getElementById('recommended-size').textContent;
+            }
             
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement('a');
