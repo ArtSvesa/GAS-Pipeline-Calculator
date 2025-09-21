@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LPG Pressure Regulating Station Calculator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1, h2, h3 {
+            margin-bottom: 15px;
+        }
+        
+        .language-switcher {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        
+        .lang-btn {
+            padding: 5px 10px;
+            margin-left: 10px;
+            cursor: pointer;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background-color: #f1f1f1;
+            font-weight: bold;
+        }
+        
+        .lang-btn.active {
+            background-color: #c8102e;
+            color: white;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .results {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        
+        .result-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ccc;
+        }
+        
+        th {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+        
+        .equipment-table {
+            overflow-x: auto;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .pressure-levels {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .pressure-item {
+            padding: 10px;
+            border-radius: 5px;
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        .recommendation-note {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #fff8e1;
+            border-left: 4px solid #ffc107;
+            font-style: italic;
+        }
+        
+        .error {
+            color: #d32f2f;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        
+        .config-options {
+            margin-top: 10px;
+        }
+        
+        .config-option {
+            margin-bottom: 5px;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .config-option:before {
+            content: "•";
+            position: absolute;
+            left: 10px;
+        }
+        
+        .info-note {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            font-size: 0.9em;
+        }
+        
+        .calculation-formula {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        
+        /* Стилі для англійської версії (червоно-біла тема) */
+        .en-theme {
+            background-color: #f8f8f8;
+            color: #333;
+        }
+        
+        .en-theme .container {
+            background-color: #fff;
+            border: 1px solid #c8102e;
+        }
+        
+        .en-theme h1, .en-theme h2, .en-theme h3 {
+            color: #c8102e;
+        }
+        
+        .en-theme button {
+            background-color: #c8102e;
+            color: white;
+        }
+        
+        .en-theme .results {
+            background-color: #f1f1f1;
+            border: 1px solid #c8102e;
+        }
+        
+        .en-theme .result-item {
+            border-left: 4px solid #c8102e;
+        }
+        
+        /* Стилі для української версії (синьо-жовта тема) */
+        .ua-theme {
+            background: linear-gradient(to bottom, #0057b7 50%, #ffd700 50%);
+            color: #0057b7;
+        }
+        
+        .ua-theme .container {
+            background-color: #fff;
+            border: 2px solid #0057b7;
+        }
+        
+        .ua-theme h1, .ua-theme h2, .ua-theme h3 {
+            color: #0057b7;
+        }
+        
+        .ua-theme button {
+            background-color: #ffd700;
+            color: #0057b7;
+        }
+        
+        .ua-theme .results {
+            background-color: #e6f0ff;
+            border: 2px solid #0057b7;
+        }
+        
+        .ua-theme .result-item {
+            border-left: 4px solid #ffd700;
+        }
+        
+        .ua-theme .lang-btn.active {
+            background-color: #0057b7;
+            color: white;
+        }
+    </style>
+</head>
+<body class="en-theme">
+    <div class="container">
+        <div class="language-switcher">
+            <span class="lang-btn active" id="en-btn">ENG</span>
+            <span class="lang-btn" id="ua-btn">UKR</span>
+        </div>
+        
+        <h1 id="title">LPG Pressure Regulating Station Calculator</h1>
+        
+        <div class="input-group">
+            <label for="upstream-pressure" id="upstream-label">Upstream Pressure (bar):</label>
+            <input type="number" id="upstream-pressure" step="0.1" min="0" placeholder="Enter upstream pressure">
+        </div>
+        
+        <div class="input-group">
+            <label for="target-pressure" id="target-pressure-label">Target Working Pressure (mbar):</label>
+            <input type="number" id="target-pressure" step="1" min="0" placeholder="Enter target pressure">
+        </div>
+        
+        <div class="input-group">
+            <label for="min-pressure" id="min-pressure-label">Minimum Allowable Pressure (mbar):</label>
+            <input type="number" id="min-pressure" step="1" min="0" value="450" placeholder="Enter minimum pressure">
+        </div>
+        
+        <div class="input-group">
+            <label for="flow-rate" id="flow-label">Flow Rate (m³/h):</label>
+            <input type="number" id="flow-rate" step="1" min="0" placeholder="Enter flow rate">
+        </div>
+        
+        <div class="input-group">
+            <label for="ac-value" id="ac-label">AC Value for Monitor Regulator (%):</label>
+            <input type="number" id="ac-value" step="0.1" min="0" value="5" placeholder="Enter AC value">
+        </div>
+        
+        <div class="input-group">
+            <label for="ag-value" id="ag-label">AG Value for OPSO (%):</label>
+            <input type="number" id="ag-value" step="0.1" min="0" value="10" placeholder="Enter AG value">
+        </div>
+        
+        <div class="input-group">
+            <label for="manufacturer" id="manufacturer-label">Preferred Manufacturer:</label>
+            <select id="manufacturer">
+                <option value="any">Any</option>
+                <option value="jeavons">JEAVONS</option>
+                <option value="rego">REGO</option>
+                <option value="clesse">Clesse</option>
+                <option value="fiorentini">Pietro Fiorentini</option>
+                <option value="mesura">Mesura</option>
+                <option value="cavagna">Cavagna Group</option>
+                <option value="itron">Itron (Elster)</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+        
+        <button id="calculate-btn">Calculate Configuration</button>
+        
+        <div class="results hidden" id="results">
+            <h2 id="results-title">Configuration Results</h2>
+            
+            <div class="result-item">
+                <h3 id="configuration-title">Recommended Configuration:</h3>
+                <p id="configuration-result"></p>
+            </div>
+            
+            <div class="result-item">
+                <h3 id="devices-title">Required Safety Devices:</h3>
+                <p id="devices-result"></p>
+            </div>
+            
+            <div class="result-item">
+                <h3 id="settings-title">Active Regulator Pressure Settings:</h3>
+                <div id="settings-info"></div>
+                <div class="pressure-levels" id="pressure-levels-result"></div>
+            </div>
+            
+            <div class="result-item">
+                <h3 id="safety-settings-title">Safety Device Settings:</h3>
+                <div id="safety-settings-result"></div>
+            </div>
+            
+            <div class="result-item">
+                <h3 id="equipment-title">Recommended Equipment:</h3>
+                <div class="equipment-table" id="equipment-result"></div>
+                <div id="equipment-note"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Дані про обладнання
+        const equipmentData = {
+            jeavons: [
+                { type: 'Regulator', model: 'J98', pressureRange: 'according to manufacturer\'s instructions', flowRate: 'according to manufacturer\'s instructions', accuracy: 'according to manufacturer\'s instructions' },
+                { type: 'Regulator', model: 'J99', pressureRange: 'according to manufacturer\'s instructions', flowRate: 'according to manufacturer\'s instructions', accuracy: 'according to manufacturer\'s instructions' },
+                { type: 'Regulator', model: 'J7-J125-S5', pressureRange: 'according to manufacturer\'s instructions', flowRate: 'according to manufacturer\'s instructions', accuracy: 'according to manufacturer\'s instructions', twoStage: true },
+                { type: 'OPSO', model: 'S300HP', pressureRange: 'according to manufacturer\'s instructions', settingRange: 'according to manufacturer\'s instructions' },
+                { type: 'OPSO', model: 'J76', pressureRange: 'according to manufacturer\'s instructions', settingRange: 'according to manufacturer\'s instructions' },
+                { type: 'OPSO', model: 'J77', pressureRange: 'according to manufacturer\'s instructions', settingRange: 'according to manufacturer\'s instructions' }
+            ],
+            rego: [
+                { type: 'Regulator', model: 'LV4403B', pressureRange: 'according to manufacturer\'s instructions', flowRate: 'according to manufacturer\'s instructions', accuracy: 'according to manufacturer\'s instructions' },
+                { type: 'Regulator', model: 'LV4503B', pressureRange: 'according to manufacturer\'s instructions', flowRate: 'according to manufacturer\'s instructions', accuracy: 'according to manufacturer\'s instructions' },
+                { type: 'OPSO', model: 'LVS5302', pressureRange: 'according to manufacturer\'s instructions', settingRange: 'according to manufacturer\'s instructions' },
+                { type: 'OPSO', model: 'LVS5502', pressureRange: 'according to manufacturer\'s instructions', settingRange: 'according to manufacturer\'s instructions' }
+            ],
+            clesse: [
+                { type: 'Regulator', model: 'CS100', pressureRange: 'according to manufacturer\'s instructions', flowRate: 'according to manufacturer\'s instructions', accuracy: 'according to manufacturer\'s instructions' },
+                { type: 'Regulator', model: 'CS200', pressureRange: 'according to manufacturer\'s instructions', flowRate: 'according to manufacturer\'s instructions', accuracy: 'according to manufacturer\'s instructions' },
+                { type: 'OPSO', model: 'OV1', pressureRange: 'according to manufacturer\'s instructions', settingRange: 'according to manufacturer\'s instructions' },
+                { type: 'OPSO', model: 'OV2', pressureRange: 'according to manufacturer\'s instructions', settingRange: 'according to manufacturer\'s instructions' }
+            ],
+            fiorentini: [
+                { type: 'Regulator', model: 'RSU32', pressureRange: 'according to manufacturer\'s instructions', flowRate: 'according to manufacturer\'s instructions', accuracy: 'according to manufacturer\'s instructions' },
+                { type: 'Regulator', model: 'RSU50', pressureRange: 'according to manufacturer\'s instructions', flowRate: 'according to manufacturer\'s instructions', accuracy: 'according to manufacturer\'s instructions' },
+                { type: 'Regulator', model: '100HP', pressureRange: 'according to manufacturer\'s instructions', flowRate: 'according to manufacturer\'s instructions', accuracy: 'according to manufacturer\'s instructions', hasIntegratedOPSO: true },
+                { type: 'OPSO', model: 'S513', pressureRange: 'according to manufacturer\'s instructions', settingRange: 'according to manufacturer\'s instructions' },
+                { type: 'OPSO', model: 'S516', pressureRange: 'according to manufacturer\'s instructions', settingRange: 'according to manufacturer\'s instructions' }
+            ],
+            mesura: [
+                { type: 'Regulator', model: 'MR30', pressureRange: 'according to manufacturer\'s instructions', flowRate: 'according to manufacturer\'s instructions', accuracy: 'according to manufacturer\'s instructions' },
+                { type: 'Regulator', model: 'MR50', pressureRange: 'according to manufacturer\'s instructions', flowRate: 'according to manufacturer\'s instructions', accuracy: 'according to manufacturer\'s instructions' },
+                { type: 'OPSO', model: 'MOS20', pressureRange: 'according to manufacturer\'s instructions', settingRange: 'according to manufacturer\'s instructions' },
+                { type: 'OPSO', model: 'MOS40', pressureRange: 'according to manufacturer\'s instructions', settingRange: 'according to manufacturer\'s instructions' }
+            ],
+            cavagna: [
+                { type: 'Regulator', model: 'Novacomet 492', pressureRange: 'according to manufacturer\'s instructions', flowRate: 'according to manufacturer\'s instructions', accuracy: 'according to manufacturer\'s instructions' },
+                { type: 'Regulator', model: 'Novacomet 493', pressureRange: 'according to manufacturer\'s instructions', flowRate: 'according to manufacturer\'s instructions', accuracy: 'according to manufacturer\'s instructions' },
+                { type: 'OPSO', model: 'Novacomet OPSO 492', pressureRange: 'according to manufacturer\'s instructions', settingRange: 'according to manufacturer\'s instructions' }
+            ],
+            itron: [
+                { type: 'Regulator', model: 'Elster RG系列', pressureRange: 'according to manufacturer\'s instructions', flowRate: 'according to manufacturer\'s instructions', accuracy: 'according to manufacturer\'s instructions' },
+                { type: 'OPSO', model: 'Elster OPSO', pressureRange: 'according to manufacturer\'s instructions', settingRange: 'according to manufacturer\'s instructions' }
+            ]
+        };
+
+        // Тексти для двох мов
+        const translations = {
+            en: {
+                title: "LPG Pressure Regulating Station Calculator",
+                upstreamLabel: "Upstream Pressure (bar):",
+                targetPressureLabel: "Target Working Pressure (mbar):",
+                minPressureLabel: "Minimum Allowable Pressure (mbar):",
+                flowLabel: "Flow Rate (m³/h):",
+                acLabel: "AC Value for Monitor Regulator (%):",
+                agLabel: "AG Value for OPSO (%):",
+                manufacturerLabel: "Preferred Manufacturer:",
+                calculateBtn: "Calculate Configuration",
+                resultsTitle: "Configuration Results",
+                configurationTitle: "Recommended Configuration:",
+                devicesTitle: "Required Safety Devices:",
+                settingsTitle: "Active Regulator Pressure Settings:",
+                safetySettingsTitle: "Safety Device Settings:",
+                equipmentTitle: "Recommended Equipment:",
+                lowPressureConfig: "Only active regulator required (upstream pressure ≤ 0.1 bar)",
+                group1Config: "Group 1: Active regulator + OPSO arrangement",
+                group2Config: "Group 2: Monitor regulator + Active regulator arrangement",
+                group3Config: "Group 3: Active regulator + Monitor regulator + OPSO arrangement",
+                group4Config: "Group 4: Active regulator + Double OPSO arrangement",
+                activeRegulator: "Active Regulator",
+                monitorRegulator: "Monitor Regulator",
+                opsDevice: "Overpressure Shut-off Device (OPSO)",
+                settingFormula: "Setpoint = 100/(100+AC%) × ",
+                settingFormulaOPSO: "Setpoint = 100/(100+AG%) × ",
+                peakLevelOP: "Peak Level OP",
+                TOP: "TOP",
+                MIP: "MIP",
+                pressureTable: "Pressure Relationships",
+                pressureHeader: "MOP (bar)",
+                peakLevelHeader: "Peak Level OP ≤",
+                topHeader: "TOP ≤",
+                mipHeader: "MIP ≤",
+                minLoad: "Minimum Load",
+                nomLoad: "Nominal Load",
+                maxLoad: "Maximum Load",
+                zeroFlow: "Zero Flow (Lock-up)",
+                pressure: "Pressure",
+                twoStageNote: "For inlet pressure >5 bar and outlet pressure <100 mbar, a two-stage regulation system is recommended.",
+                highPressureNote: "For inlet pressure >5 bar and outlet pressure >100 mbar, the following regulators are recommended:",
+                configOptions: "For upstream pressure between 0.101 bar and 16 bar, two configurations are possible:",
+                option1: "Active regulator + Monitor regulator",
+                option2: "Active regulator + OPSO",
+                highPressureOptions: "For upstream pressure above 16 bar, two configurations are possible:",
+                highOption1: "Active regulator + Monitor regulator + OPSO",
+                highOption2: "Active regulator + OPSO + OPSO",
+                settingsInfo: "Active regulator pressure settings define the pressure levels at different operating conditions:",
+                settingsMinLoad: "Minimum Load - pressure at minimum gas consumption",
+                settingsNomLoad: "Nominal Load - pressure at normal gas consumption",
+                settingsMaxLoad: "Maximum Load - pressure at peak gas consumption",
+                settingsZeroFlow: "Zero Flow (Lock-up) - pressure when no gas is flowing",
+                actualSettings: "Actual Settings Calculation:",
+                monitorSetting: "Monitor regulator setting",
+                opsosSetting: "OPSO setting"
+            },
+            ua: {
+                title: "Калькулятор станції регулювання тиску LPG",
+                upstreamLabel: "Вхідний тиск (бар):",
+                targetPressureLabel: "Робочий вихідний тиск (мбар):",
+                minPressureLabel: "Мінімально допустимий тиск (мбар):",
+                flowLabel: "Витрата (м³/год):",
+                acLabel: "Значення AC для монітор-регулятора (%):",
+                agLabel: "Значення AG для OPSO (%):",
+                manufacturerLabel: "Бажаний виробник:",
+                calculateBtn: "Розрахувати конфігурацію",
+                resultsTitle: "Результати розрахунків",
+                configurationTitle: "Рекомендована конфігурація:",
+                devicesTitle: "Необхідні запобіжні пристрої:",
+                settingsTitle: "Налаштування активного регулятора:",
+                safetySettingsTitle: "Налаштування запобіжних пристроїв:",
+                equipmentTitle: "Рекомендоване обладнання:",
+                lowPressureConfig: "Потрібен лише активний регулятор (вхідний тиск ≤ 0.1 бар)",
+                group1Config: "Група 1: Активний регулятор + OPSO",
+                group2Config: "Група 2: Монітор-регулятор + Активний регулятор",
+                group3Config: "Група 3: Активний регулятор + Монітор-регулятор + OPSO",
+                group4Config: "Група 4: Активний регулятор + Подвійний OPSO",
+                activeRegulator: "Активний регулятор",
+                monitorRegulator: "Монітор-регулятор",
+                opsDevice: "Запобіжний клапан надлишкового тиску (OPSO)",
+                settingFormula: "Налаштування = 100/(100+AC%) × ",
+                settingFormulaOPSO: "Налаштування = 100/(100+AG%) × ",
+                peakLevelOP: "Піковий рівень OP",
+                TOP: "TOP",
+                MIP: "MIP",
+                pressureTable: "Співвідношення тисків",
+                pressureHeader: "MOP (бар)",
+                peakLevelHeader: "Піковий рівень OP ≤",
+                topHeader: "TOP ≤",
+                mipHeader: "MIP ≤",
+                minLoad: "Мінімальне навантаження",
+                nomLoad: "Номінальне навантаження",
+                maxLoad: "Пікове навантаження",
+                zeroFlow: "Нульова витрата (Lock-up)",
+                pressure: "Тиск",
+                twoStageNote: "Для вхідного тиску >5 бар і вихідного тиску <100 мбар рекомендується двоступенева система регулювання.",
+                highPressureNote: "Для вхідного тиску >5 бар і вихідного тиску >100 мбар рекомендуються наступні регулятори:",
+                configOptions: "Для вхідного тиску від 0.101 бар до 16 бар можливі дві конфігурації:",
+                option1: "Активний регулятор + Монітор-регулятор",
+                option2: "Активний регулятор + OPSO",
+                highPressureOptions: "Для вхідного тиску вище 16 бар можливі дві конфігурації:",
+                highOption1: "Активний регулятор + Монітор-регулятор + OPSO",
+                highOption2: "Активний регулятор + OPSO + OPSO",
+                settingsInfo: "Налаштування тиску активного регулятора визначають рівні тиску при різних умовах експлуатації:",
+                settingsMinLoad: "Мінімальне навантаження - тиск при мінімальному споживанні газу",
+                settingsNomLoad: "Номінальне навантаження - тиск при нормальному споживанні газу",
+                settingsMaxLoad: "Пікове навантаження - тиск при максимальному споживанні газу",
+                settingsZeroFlow: "Нульова витрата (Lock-up) - тиск, коли газ не споживається",
+                actualSettings: "Розрахунок фактичних налаштувань:",
+                monitorSetting: "Налаштування монітор-регулятора",
+                opsosSetting: "Налаштування OPSO"
+            }
+        };
+
+        // Поточний стан мови
+        let currentLang = 'en';
+        
+        // Елементи DOM
+        const bodyElement = document.body;
+        const titleElement = document.getElementById('title');
+        const upstreamLabel = document.getElementById('upstream-label');
+        const targetPressureLabel = document.getElementById('target-pressure-label');
+        const minPressureLabel = document.getElementById('min-pressure-label');
+        const flowLabel = document.getElementById('flow-label');
+        const acLabel = document.getElementById('ac-label');
+        const agLabel = document.getElementById('ag-label');
+        const manufacturerLabel = document.getElementById('manufacturer-label');
+        const calculateBtn = document.getElementById('calculate-btn');
+        const resultsSection = document.getElementById('results');
+        const resultsTitle = document.getElementById('results-title');
+        const configurationTitle = document.getElementById('configuration-title');
+        const configurationResult = document.getElementById('configuration-result');
+        const devicesTitle = document.getElementById('devices-title');
+        const devicesResult = document.getElementById('devices-result');
+        const settingsTitle = document.getElementById('settings-title');
+        const settingsInfo = document.getElementById('settings-info');
+        const pressureLevelsResult = document.getElementById('pressure-levels-result');
+        const safetySettingsTitle = document.getElementById('safety-settings-title');
+        const safetySettingsResult = document.getElementById('safety-settings-result');
+        const equipmentTitle = document.getElementById('equipment-title');
+        const equipmentResult = document.getElementById('equipment-result');
+        const equipmentNote = document.getElementById('equipment-note');
+        const enBtn = document.getElementById('en-btn');
+        const uaBtn = document.getElementById('ua-btn');
+        
+        // Функція для зміни мови
+        function setLanguage(lang) {
+            currentLang = lang;
+            
+            // Оновлення активних кнопок
+            if (lang === 'en') {
+                enBtn.classList.add('active');
+                uaBtn.classList.remove('active');
+                bodyElement.className = 'en-theme';
+            } else {
+                uaBtn.classList.add('active');
+                enBtn.classList.remove('active');
+                bodyElement.className = 'ua-theme';
+            }
+            
+            // Оновлення тексту
+            const t = translations[lang];
+            titleElement.textContent = t.title;
+            upstreamLabel.textContent = t.upstreamLabel;
+            targetPressureLabel.textContent = t.targetPressureLabel;
+            minPressureLabel.textContent = t.minPressureLabel;
+            flowLabel.textContent = t.flowLabel;
+            acLabel.textContent = t.acLabel;
+            agLabel.textContent = t.agLabel;
+            manufacturerLabel.textContent = t.manufacturerLabel;
+            calculateBtn.textContent = t.calculateBtn;
+            resultsTitle.textContent = t.resultsTitle;
+            configurationTitle.textContent = t.configurationTitle;
+            devicesTitle.textContent = t.devicesTitle;
+            settingsTitle.textContent = t.settingsTitle;
+            safetySettingsTitle.textContent = t.safetySettingsTitle;
+            equipmentTitle.textContent = t.equipmentTitle;
+            
+            // Оновити результати, якщо вони відображаються
+            if (!resultsSection.classList.contains('hidden')) {
+                calculateConfiguration();
+            }
+        }
+        
+        // Обробники подій для перемикачів мов
+        enBtn.addEventListener('click', () => setLanguage('en'));
+        uaBtn.addEventListener('click', () => setLanguage('ua'));
+        
+        // Функція для визначення конфігурації
+        function calculateConfiguration() {
+            const upstreamPressureInput = document.getElementById('upstream-pressure');
+            const targetPressureInput = document.getElementById('target-pressure');
+            const minPressureInput = document.getElementById('min-pressure');
+            const flowRateInput = document.getElementById('flow-rate');
+            const acValueInput = document.getElementById('ac-value');
+            const agValueInput = document.getElementById('ag-value');
+            
+            const upstreamPressure = parseFloat(upstreamPressureInput.value);
+            const targetPressure = parseFloat(targetPressureInput.value) / 1000; // Конвертуємо мбар в бар
+            const minPressure = parseFloat(minPressureInput.value) / 1000; // Конвертуємо мбар в бар
+            const flowRate = parseFloat(flowRateInput.value);
+            const acValue = parseFloat(acValueInput.value) || 5; // Значення за замовчуванням 5%
+            const agValue = parseFloat(agValueInput.value) || 10; // Значення за замовчуванням 10%
+            const manufacturer = document.getElementById('manufacturer').value;
+            
+            // Валідація вхідних даних
+            let isValid = true;
+            let errorMessage = '';
+            
+            if (isNaN(upstreamPressure) || upstreamPressure < 0) {
+                isValid = false;
+                errorMessage = currentLang === 'en' ? 
+                    "Please enter valid upstream pressure." : 
+                    "Будь ласка, введіть коректний вхідний тиск.";
+                upstreamPressureInput.style.borderColor = '#d32f2f';
+            } else {
+                upstreamPressureInput.style.borderColor = '#ccc';
+            }
+            
+            if (isNaN(targetPressure) || targetPressure < 0) {
+                isValid = false;
+                errorMessage = currentLang === 'en' ? 
+                    "Please enter valid target pressure." : 
+                    "Будь ласка, введіть коректний цільовий тиск.";
+                targetPressureInput.style.borderColor = '#d32f2f';
+            } else {
+                targetPressureInput.style.borderColor = '#ccc';
+            }
+            
+            if (!isValid) {
+                alert(errorMessage);
+                return;
+            }
+            
+            // Визначення конфігурації на основі тиску
+            let configType, devices;
+            const t = translations[currentLang];
+            
+            if (upstreamPressure <= 0.1) {
+                configType = t.lowPressureConfig;
+                devices = t.activeRegulator;
+            } else if (upstreamPressure < 16) {
+                // Пропонуємо дві конфігурації для цього діапазону
+                configType = t.configOptions;
+                devices = `
+                    <div class="config-options">
+                        <div class="config-option">${t.option1}</div>
+                        <div class="config-option">${t.option2}</div>
+                    </div>
+                `;
+            } else {
+                // Пропонуємо дві конфігурації для тиску вище 16 бар
+                configType = t.highPressureOptions;
+                devices = `
+                    <div class="config-options">
+                        <div class="config-option">${t.highOption1}</div>
+                        <div class="config-option">${t.highOption2}</div>
+                    </div>
+                `;
+            }
+            
+            // Оновлення результатів
+            configurationResult.innerHTML = configType;
+            devicesResult.innerHTML = devices;
+            
+            // Додаємо інформацію про налаштування регулятора
+            settingsInfo.innerHTML = `
+                <div class="info-note">
+                    <p>${t.settingsInfo}</p>
+                    <ul>
+                        <li>${t.settingsMinLoad}</li>
+                        <li>${t.settingsNomLoad}</li>
+                        <li>${t.settingsMaxLoad}</li>
+                        <li>${t.settingsZeroFlow}</li>
+                    </ul>
+                </div>
+            `;
+            
+            // Розрахунок налаштувань
+            calculateSettings(targetPressure, minPressure, acValue, agValue);
+            
+            // Підбір обладнання
+            recommendEquipment(upstreamPressure, targetPressure, flowRate, manufacturer);
+            
+            // Показати результати
+            resultsSection.classList.remove('hidden');
+        }
+        
+        // Функція для розрахунку налаштувань
+        function calculateSettings(targetPressure, minPressure, acValue, agValue) {
+            const t = translations[currentLang];
+            let peakLevelOP, top, mip;
+            
+            // Визначення коефіцієнтів згідно з таблицею 5
+            if (targetPressure > 16) {
+                peakLevelOP = 1.025 * targetPressure;
+                top = 1.1 * targetPressure;
+                mip = 1.2 * targetPressure;
+            } else if (targetPressure > 5) {
+                peakLevelOP = 1.05 * targetPressure;
+                top = 1.2 * targetPressure;
+                mip = 1.3 * targetPressure;
+            } else if (targetPressure > 2) {
+                peakLevelOP = 1.075 * targetPressure;
+                top = 1.3 * targetPressure;
+                mip = 1.4 * targetPressure;
+            } else if (targetPressure > 0.1) {
+                peakLevelOP = 1.125 * targetPressure;
+                top = 1.5 * targetPressure;
+                mip = 1.75 * targetPressure;
+            } else {
+                peakLevelOP = 1.125 * targetPressure;
+                top = 1.5 * targetPressure;
+                mip = 2.5 * targetPressure;
+            }
+            
+            // Розрахунок тисків для різних режимів навантаження
+            // При нульовій витраті - найвищий тиск
+            const zeroFlowPressure = peakLevelOP;
+            // При мінімальному навантаженні - трохи нижчий тиск
+            const minLoadPressure = zeroFlowPressure * 0.95;
+            // При номінальному навантаженні - цільовий тиск
+            const nomLoadPressure = targetPressure;
+            // При максимальному навантаженні - найнижчий тиск
+            const maxLoadPressure = Math.max(minPressure, targetPressure * 0.85);
+            
+            // Формування відображення для різних режимів навантаження
+            pressureLevelsResult.innerHTML = `
+                <div class="pressure-item">
+                    <h4>${t.zeroFlow}</h4>
+                    <p>${(zeroFlowPressure * 1000).toFixed(0)} ${currentLang === 'en' ? 'mbar' : 'мбар'}</p>
+                </div>
+                <div class="pressure-item">
+                    <h4>${t.minLoad}</h4>
+                    <p>${(minLoadPressure * 1000).toFixed(0)} ${currentLang === 'en' ? 'mbar' : 'мбар'}</p>
+                </div>
+                <div class="pressure-item">
+                    <h4>${t.nomLoad}</h4>
+                    <p>${(nomLoadPressure * 1000).toFixed(0)} ${currentLang === 'en' ? 'mbar' : 'мбар'}</p>
+                </div>
+                <div class="pressure-item">
+                    <h4>${t.maxLoad}</h4>
+                    <p>${(maxLoadPressure * 1000).toFixed(0)} ${currentLang === 'en' ? 'mbar' : 'мбар'}</p>
+                </div>
+            `;
+            
+            // Формування таблиці співвідношень тисків
+            let tableHTML = `
+                <h4>${t.pressureTable}</h4>
+                <table>
+                    <tr>
+                        <th>${t.pressureHeader}</th>
+                        <th>${t.peakLevelHeader}</th>
+                        <th>${t.topHeader}</th>
+                        <th>${t.mipHeader}</th>
+                    </tr>
+                    <tr>
+                        <td>${targetPressure.toFixed(3)}</td>
+                        <td>${peakLevelOP.toFixed(3)}</td>
+                        <td>${top.toFixed(3)}</td>
+                        <td>${mip.toFixed(3)}</td>
+                    </tr>
+                </table>
+            `;
+            
+            // Розрахунок фактичних налаштувань на основі AC та AG
+            const monitorSetting = (100 / (100 + acValue)) * top;
+            const opsosSetting = (100 / (100 + agValue)) * mip;
+            
+            // Формування формул для налаштувань запобіжних пристроїв
+            let settingsHTML = `
+                <h4>${t.actualSettings}</h4>
+                <div class="calculation-formula">
+                    <p><strong>${t.monitorSetting}:</strong> ${t.settingFormula}${t.TOP} = 100/(100+${acValue}) × ${top.toFixed(3)} = ${monitorSetting.toFixed(3)} bar</p>
+                    <p><strong>${t.opsosSetting}:</strong> ${t.settingFormulaOPSO}${t.MIP} = 100/(100+${agValue}) × ${mip.toFixed(3)} = ${opsosSetting.toFixed(3)} bar</p>
+                </div>
+            `;
+            
+            safetySettingsResult.innerHTML = tableHTML + settingsHTML;
+        }
+        
+        // Функція для підбору обладнання
+        function recommendEquipment(upstream, downstream, flow, manufacturer) {
+            let equipmentToShow = [];
+            const t = translations[currentLang];
+            
+            // Визначення відповідного обладнання на основі виробника
+            if (manufacturer === 'any') {
+                // Для вхідного тиску >5 бар
+                if (upstream > 5) {
+                    // Для вихідного тиску >100 мбар
+                    if (downstream > 0.1) {
+                        equipmentToShow = [
+                            { type: 'Regulator', model: 'REGO LV4403B', pressureRange: 'according to manufacturer\'s instructions', flowRate: 'according to manufacturer\'s instructions', accuracy: 'according to manufacturer\'s instructions' },
+                            { type: 'OPSO', model: 'Jeavons S300HP', pressureRange: 'according to manufacturer\'s instructions', settingRange: 'according to manufacturer\'s instructions' },
+                            { type: 'OPSO', model: 'Novacomet OPSO 492', pressureRange: 'according to manufacturer\'s instructions', settingRange: 'according to manufacturer\'s instructions' },
+                            { type: 'Regulator', model: 'Pietro Fiorentini 100HP', pressureRange: 'according to manufacturer\'s instructions', flowRate: 'according to manufacturer\'s instructions', accuracy: 'according to manufacturer\'s instructions', hasIntegratedOPSO: true }
+                        ];
+                        equipmentNote.innerHTML = `<div class="recommendation-note">${t.highPressureNote}</div>`;
+                    } 
+                    // Для вихідного тиску <100 мбар
+                    else {
+                        equipmentToShow = [
+                            { type: '1st Stage Regulator', model: 'Pietro Fiorentini 100HP', pressureRange: 'according to manufacturer\'s instructions', flowRate: 'according to manufacturer\'s instructions', accuracy: 'according to manufacturer\'s instructions', hasIntegratedOPSO: true },
+                            { type: '2nd Stage Regulator', model: 'Jeavons J7-J125-S5', pressureRange: 'according to manufacturer\'s instructions', flowRate: 'according to manufacturer\'s instructions', accuracy: 'according to manufacturer\'s instructions', twoStage: true },
+                            { type: 'OPSO', model: 'Honeywell Elster', pressureRange: 'according to manufacturer\'s instructions', settingRange: 'according to manufacturer\'s instructions' },
+                            { type: '1st Stage Regulator', model: 'REGO LV4403B', pressureRange: 'according to manufacturer\'s instructions', flowRate: 'according to manufacturer\'s instructions', accuracy: 'according to manufacturer\'s instructions' },
+                            { type: '2nd Stage Regulator', model: 'Jeavons J7-J125-S5', pressureRange: 'according to manufacturer\'s instructions', flowRate: 'according to manufacturer\'s instructions', accuracy: 'according to manufacturer\'s instructions', twoStage: true },
+                            { type: 'OPSO', model: 'Honeywell Elster', pressureRange: 'according to manufacturer\'s instructions', settingRange: 'according to manufacturer\'s instructions' }
+                        ];
+                        equipmentNote.innerHTML = `<div class="recommendation-note">${t.twoStageNote}</div>`;
+                    }
+                } else {
+                    // Показати обладнання всіх виробників для звичайних умов
+                    for (const brand in equipmentData) {
+                        equipmentToShow = equipmentToShow.concat(
+                            equipmentData[brand].filter(item => isEquipmentSuitable(item, downstream, flow))
+                        );
+                    }
+                    equipmentNote.innerHTML = '';
+                }
+            } else if (equipmentData[manufacturer]) {
+                // Показати обладнання конкретного виробника
+                equipmentToShow = equipmentData[manufacturer].filter(item => 
+                    isEquipmentSuitable(item, downstream, flow)
+                );
+                equipmentNote.innerHTML = '';
+            }
+            
+            // Формування таблиці з обладнанням
+            if (equipmentToShow.length > 0) {
+                let tableHTML = `
+                    <table>
+                        <tr>
+                            <th>${currentLang === 'en' ? 'Type' : 'Тип'}</th>
+                            <th>${currentLang === 'en' ? 'Model' : 'Модель'}</th>
+                            <th>${currentLang === 'en' ? 'Pressure Range' : 'Діапазон тиску'}</th>
+                            <th>${currentLang === 'en' ? 'Flow Rate' : 'Витрата'}</th>
+                            <th>${currentLang === 'en' ? 'Accuracy' : 'Точність'}</th>
+                        </tr>
+                `;
+                
+                equipmentToShow.forEach(item => {
+                    const pressureRangeText = currentLang === 'en' ? 'according to manufacturer\'s instructions' : 'згідно інструкції виробника';
+                    const flowRateText = currentLang === 'en' ? 'according to manufacturer\'s instructions' : 'згідно інструкції виробника';
+                    const accuracyText = currentLang === 'en' ? 'according to manufacturer\'s instructions' : 'згідно інструкції виробника';
+                    
+                    tableHTML += `
+                        <tr>
+                            <td>${item.type}</td>
+                            <td>${item.model}</td>
+                            <td>${pressureRangeText}</td>
+                            <td>${flowRateText}</td>
+                            <td>${accuracyText}</td>
+                        </tr>
+                    `;
+                });
+                
+                tableHTML += `</table>`;
+                equipmentResult.innerHTML = tableHTML;
+            } else {
+                equipmentResult.textContent = currentLang === 'en' ? 
+                    "No suitable equipment found for the specified parameters." : 
+                    "Не знайдено відповідного обладнання для вказаних параметрів.";
+                equipmentNote.innerHTML = '';
+            }
+        }
+        
+        // Допоміжна функція для перевірки придатності обладнання
+        function isEquipmentSuitable(item, pressure, flow) {
+            // Спрощена логіка перевірки відповідності обладнання
+            if (item.type === 'Regulator' || item.type.includes('Stage')) {
+                return pressure >= 0.035 && pressure <= 4; // Базовий діапазон для регуляторів
+            } else if (item.type === 'OPSO') {
+                return pressure >= 1.5 && pressure <= 16; // Базовий діапазон для OPSO
+            }
+            return false;
+        }
+        
+        // Додавання обробника подій для кнопки розрахунку
+        calculateBtn.addEventListener('click', calculateConfiguration);
+        
+        // Ініціалізація мови за замовчуванням
+        setLanguage('en');
+    </script>
+</body>
+</html>
