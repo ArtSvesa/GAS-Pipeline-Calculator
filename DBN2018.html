@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gas pressure drop calculator (in accordance with DBN V.2.5-20:2018 / Ukraine standard)</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .input-section {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+        
+        .results-section {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: var(--primary-color);
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .result-value {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .flow-regime {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+        
+        .laminar {
+            background-color: rgba(39, 174, 96, 0.2);
+            color: var(--success-color);
+        }
+        
+        .critical {
+            background-color: rgba(243, 156, 18, 0.2);
+            color: var(--warning-color);
+        }
+        
+        .turbulent {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: var(--accent-color);
+        }
+        
+        .pressure-indicator {
+            height: 30px;
+            background: linear-gradient(90deg, #e74c3c, #f39c12, #27ae60);
+            border-radius: 15px;
+            margin: 15px 0;
+            position: relative;
+        }
+        
+        .pressure-marker {
+            position: absolute;
+            top: -10px;
+            width: 4px;
+            height: 50px;
+            background-color: var(--primary-color);
+            transform: translateX(-50%);
+        }
+        
+        .gas-properties {
+            background: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-top: 30px;
+        }
+        
+        .gas-properties h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        
+        .property-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .property-item {
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: var(--border-radius);
+        }
+        
+        .property-name {
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        .property-value {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+        }
+        
+        .diameter-selector {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .diameter-selector select {
+            flex: 2;
+        }
+        
+        .diameter-selector input {
+            flex: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .property-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .diameter-selector {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Gas pressure drop calculator</h1>
+            <p class="subtitle">In accordance with DBN V.2.5-20:2018 / Ukraine standard</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="input-section">
+                <h2>Input Parameters</h2>
+                
+                <div class="form-group">
+                    <label for="pressure-type">System Pressure:</label>
+                    <select id="pressure-type">
+                        <option value="low">Low Pressure (up to 0.05 bar)</option>
+                        <option value="medium">Medium Pressure (0.05 - 3 bar)</option>
+                        <option value="high">High Pressure (over 3 bar)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="pressure-start">Initial Pressure (bar):</label>
+                    <input type="number" id="pressure-start" value="0.017" min="0" step="0.001">
+                </div>
+                
+                <div class="form-group">
+                    <label for="diameter-select">Pipe Internal Diameter:</label>
+                    <div class="diameter-selector">
+                        <select id="diameter-select">
+                            <option value="10">DN 10 (10 mm)</option>
+                            <option value="15">DN 15 (15 mm)</option>
+                            <option value="20">DN 20 (20 mm)</option>
+                            <option value="25">DN 25 (25 mm)</option>
+                            <option value="32">DN 32 (32 mm)</option>
+                            <option value="40">DN 40 (40 mm)</option>
+                            <option value="50">DN 50 (50 mm)</option>
+                            <option value="65">DN 65 (65 mm)</option>
+                            <option value="80">DN 80 (80 mm)</option>
+                            <option value="100">DN 100 (100 mm)</option>
+                            <option value="125">DN 125 (125 mm)</option>
+                            <option value="150">DN 150 (150 mm)</option>
+                            <option value="200">DN 200 (200 mm)</option>
+                            <option value="250">DN 250 (250 mm)</option>
+                            <option value="custom">Custom diameter</option>
+                        </select>
+                        <input type="number" id="custom-diameter" placeholder="mm" min="1" max="1000" step="1" style="display: none;">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="flow-rate">Gas Flow Rate (m³/h):</label>
+                    <input type="number" id="flow-rate" value="2.5" min="0.1" step="0.1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="length">Pipeline Length (m):</label>
+                    <input type="number" id="length" value="15" min="1" step="1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="pipe-material">Pipe Material:</label>
+                    <select id="pipe-material">
+                        <option value="steel">Steel</option>
+                        <option value="polyethylene">Polyethylene</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="temperature">Gas Temperature (°C):</label>
+                    <input type="number" id="temperature" value="15" min="-50" max="100" step="0.1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="local-resistance">Local Resistance Coefficient (%):</label>
+                    <input type="number" id="local-resistance" value="10" min="0" max="20" step="1">
+                </div>
+                
+                <button id="calculate-btn">Calculate</button>
+            </div>
+            
+            <div class="results-section">
+                <h2>Calculation Results</h2>
+                
+                <div class="result-item">
+                    <span>Reynolds Number:</span>
+                    <span id="reynolds-number" class="result-value">-</span>
+                </div>
+                
+                <div class="result-item">
+                    <span>Flow Regime:</span>
+                    <span id="flow-regime-value">-</span>
+                </div>
+                
+                <div class="result-item">
+                    <span>Pressure Drop (bar):</span>
+                    <span id="pressure-drop-bar" class="result-value">-</span>
+                </div>
+                
+                <div class="result-item">
+                    <span>Final Pressure (bar):</span>
+                    <span id="pressure-end-bar" class="result-value">-</span>
+                </div>
+                
+                <div class="result-item">
+                    <span>Initial Pressure (bar):</span>
+                    <span id="pressure-start-bar" class="result-value">-</span>
+                </div>
+                
+                <div class="result-item">
+                    <span>Gas Velocity (m/s):</span>
+                    <span id="gas-velocity" class="result-value">-</span>
+                </div>
+                
+                <div class="pressure-indicator">
+                    <div id="pressure-marker" class="pressure-marker" style="left: 0%;"></div>
+                </div>
+                
+                <div id="message" style="margin-top: 20px; padding: 15px; border-radius: 8px; background-color: #f8f9fa;"></div>
+            </div>
+        </div>
+        
+        <div class="gas-properties">
+            <h3>Propane Properties under Specified Conditions</h3>
+            <div class="property-grid">
+                <div class="property-item">
+                    <div class="property-name">Gas Density</div>
+                    <div id="density-value" class="property-value">- kg/m³</div>
+                </div>
+                <div class="property-item">
+                    <div class="property-name">Kinematic Viscosity</div>
+                    <div id="viscosity-value" class="property-value">- m²/s</div>
+                </div>
+                <div class="property-item">
+                    <div class="property-name">Pressure (absolute)</div>
+                    <div id="absolute-pressure" class="property-value">- bar</div>
+                </div>
+                <div class="property-item">
+                    <div class="property-name">Temperature</div>
+                    <div id="temperature-value" class="property-value">- °C</div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 Gas pressure drop calculator | Calculation according to DBN V.2.5-20:2018 / Ukraine standard</p>
+        </footer>
+    </div>
+
+    <script>
+        // Constants
+        const PRESSURE_CONVERSION = 100000;  // bar -> Pa (1 bar = 100,000 Pa)
+        const ATMOSPHERIC_PRESSURE = 1.01325;  // bar (standard atmospheric pressure)
+        const LAMINAR_FLOW_MAX = 2000;
+        const CRITICAL_FLOW_MAX = 4000;
+        const R = 8.314;  // Universal gas constant (J/(mol·K))
+        const M_PROPANE = 0.0441;  // Molar mass of propane (kg/mol)
+        
+        // Roughness coefficients for different pipe materials
+        const ROUGHNESS_COEFFICIENTS = {
+            steel: 0.01,
+            polyethylene: 0.002
+        };
+        
+        // DOM Elements
+        const calculateBtn = document.getElementById('calculate-btn');
+        const pressureMarker = document.getElementById('pressure-marker');
+        const messageDiv = document.getElementById('message');
+        const diameterSelect = document.getElementById('diameter-select');
+        const customDiameterInput = document.getElementById('custom-diameter');
+        
+        // Handle diameter selection change
+        diameterSelect.addEventListener('change', function() {
+            if (this.value === 'custom') {
+                customDiameterInput.style.display = 'block';
+                customDiameterInput.value = ''; // Clear previous value
+            } else {
+                customDiameterInput.style.display = 'none';
+            }
+        });
+        
+        // Functions for calculating propane properties
+        function calculatePropaneDensity(temperature, pressure) {
+            // Calculation of propane density using the ideal gas law: ρ = P * M / (R * T)
+            // temperature - temperature in °C
+            // pressure - pressure in bar (gauge)
+            
+            const absolutePressure = pressure + ATMOSPHERIC_PRESSURE;  // Absolute pressure in bar
+            const absoluteTemperature = temperature + 273.15;  // Temperature in Kelvin
+            
+            // Convert pressure to Pa: 1 bar = 100,000 Pa
+            const pressurePa = absolutePressure * 100000;
+            
+            // Density calculation: ρ = P * M / (R * T)
+            const density = (pressurePa * M_PROPANE) / (R * absoluteTemperature);
+            
+            return density;
+        }
+        
+        function calculatePropaneViscosity(temperature) {
+            // Calculation of kinematic viscosity of propane based on temperature
+            // Approximate formula for typical temperature range
+            const baseViscosity = 8.5e-6;  // base viscosity at 20°C (m²/s)
+            const temperatureCoefficient = -0.0001e-6;  // temperature coefficient of viscosity change
+            
+            return baseViscosity + temperatureCoefficient * (temperature - 20);
+        }
+        
+        // Hydraulic calculation functions
+        function calculateReynolds(diameter, flowRate, viscosity, density) {
+            if (diameter === 0 || viscosity === 0) return 0;
+            
+            // Convert diameter from mm to m
+            const diameterM = diameter / 1000;
+            
+            // Convert flow rate from m³/h to m³/s
+            const flowRateM3S = flowRate / 3600;
+            
+            // Flow velocity: v = Q / S, where S = π * d² / 4
+            const area = Math.PI * Math.pow(diameterM, 2) / 4;
+            const velocity = flowRateM3S / area;
+            
+            // Reynolds number: Re = v * d / ν
+            const re = velocity * diameterM / viscosity;
+            
+            return re;
+        }
+        
+        function getFlowRegime(re) {
+            if (re <= LAMINAR_FLOW_MAX) return { regime: "Laminar", className: "laminar" };
+            if (re <= CRITICAL_FLOW_MAX) return { regime: "Critical", className: "critical" };
+            return { regime: "Turbulent", className: "turbulent" };
+        }
+        
+        function calculateGasVelocity(diameter, flowRate) {
+            // Convert diameter from mm to m
+            const diameterM = diameter / 1000;
+            
+            // Convert flow rate from m³/h to m³/s
+            const flowRateM3S = flowRate / 3600;
+            
+            // Flow velocity: v = Q / S, where S = π * d² / 4
+            const area = Math.PI * Math.pow(diameterM, 2) / 4;
+            return flowRateM3S / area;
+        }
+        
+        function calculateLowPressureDrop(flowRate, diameter, viscosity, density, effectiveLength, pipeMaterial) {
+            // Convert diameter from mm to cm
+            const diameterCm = diameter / 10;
+            
+            const re = calculateReynolds(diameter, flowRate, viscosity, density);
+            const flowRegime = getFlowRegime(re);
+            const roughness = ROUGHNESS_COEFFICIENTS[pipeMaterial];
+            let h;
+            
+            if (flowRegime.regime === "Laminar") {
+                h = 1.132e6 * (flowRate / Math.pow(diameterCm, 4)) * viscosity * density * effectiveLength;
+            } else if (flowRegime.regime === "Critical") {
+                h = 0.516 * (Math.pow(flowRate, 2.333) / (Math.pow(diameterCm, 5.333) * Math.pow(viscosity, 0.333))) * density * effectiveLength;
+            } else {
+                const innerTerm = roughness / diameterCm + 1922 * viscosity * diameterCm / flowRate;
+                h = 69 * Math.pow(innerTerm, 0.25) * (Math.pow(flowRate, 2) / Math.pow(diameterCm, 5)) * density * effectiveLength;
+            }
+            
+            // Convert pressure drop from Pa to bar
+            return h / PRESSURE_CONVERSION;
+        }
+        
+        function calculateMediumHighPressureDrop(pressureStart, flowRate, diameter, viscosity, density, effectiveLength, pipeMaterial) {
+            const roughness = ROUGHNESS_COEFFICIENTS[pipeMaterial];
+            
+            // Convert diameter from mm to cm
+            const diameterCm = diameter / 10;
+            
+            // Pressure conversion to absolute
+            const p1_abs = pressureStart + ATMOSPHERIC_PRESSURE;  // in bar
+            
+            // Conversion from bar to MPa (1 bar = 0.1 MPa)
+            const p1_mpa = p1_abs * 0.1;
+            
+            // Calculation of the right part of the formula
+            const innerTerm = roughness / diameterCm + 1922 * viscosity * diameterCm / flowRate;
+            const rightPart = 1.4e-5 * Math.pow(innerTerm, 0.25) * (Math.pow(flowRate, 2) / Math.pow(diameterCm, 5)) * density;
+            
+            // Calculation of p2^2
+            const p2_square_mpa = Math.pow(p1_mpa, 2) - effectiveLength * rightPart;
+            
+            if (p2_square_mpa < 0) {
+                throw new Error("Invalid parameters: p2^2 < 0. Check input data.");
+            }
+            
+            // Calculation of p2 (in MPa)
+            const p2_mpa = Math.sqrt(p2_square_mpa);
+            
+            // Convert back to bar
+            const p2_abs = p2_mpa * 10;
+            
+            // Convert to gauge pressure
+            const p2 = p2_abs - ATMOSPHERIC_PRESSURE;
+            
+            // Pressure drop in bar
+            return pressureStart - p2;
+        }
+        
+        function validateParameters(params) {
+            if (params.diameter <= 0) return "Diameter must be greater than 0";
+            if (params.flowRate <= 0) return "Gas flow rate must be greater than 0";
+            if (params.length <= 0) return "Length must be greater than 0";
+            if (params.pressureStart < 0) return "Initial pressure cannot be negative";
+            if (params.localResistanceFactor < 0 || params.localResistanceFactor > 20) {
+                return "Local resistance coefficient must be between 0 and 20%";
+            }
+            if (params.temperature < -50 || params.temperature > 100) {
+                return "Temperature must be between -50°C and 100°C";
+            }
+            
+            return null;
+        }
+        
+        function getDiameterValue() {
+            const selectedOption = diameterSelect.value;
+            if (selectedOption === 'custom') {
+                return parseFloat(customDiameterInput.value) || 0;
+            } else {
+                return parseFloat(selectedOption);
+            }
+        }
+        
+        function calculateAll() {
+            // Get values from the form
+            const pressureType = document.getElementById('pressure-type').value;
+            const pressureStart = parseFloat(document.getElementById('pressure-start').value);
+            const diameter = getDiameterValue();
+            const flowRate = parseFloat(document.getElementById('flow-rate').value);
+            const length = parseFloat(document.getElementById('length').value);
+            const pipeMaterial = document.getElementById('pipe-material').value;
+            const temperature = parseFloat(document.getElementById('temperature').value);
+            const localResistanceFactor = parseFloat(document.getElementById('local-resistance').value) / 100;
+            
+            // Parameter validation
+            const validationError = validateParameters({
+                pressureStart, diameter, flowRate, length, localResistanceFactor, temperature
+            });
+            
+            if (validationError) {
+                showMessage(validationError, 'error');
+                return;
+            }
+            
+            try {
+                // Calculate propane properties
+                const density = calculatePropaneDensity(temperature, pressureStart);
+                const viscosity = calculatePropaneViscosity(temperature);
+                
+                // Update gas properties display
+                document.getElementById('density-value').textContent = density.toFixed(4) + ' kg/m³';
+                document.getElementById('viscosity-value').textContent = viscosity.toFixed(8) + ' m²/s';
+                document.getElementById('absolute-pressure').textContent = (pressureStart + ATMOSPHERIC_PRESSURE).toFixed(3) + ' bar';
+                document.getElementById('temperature-value').textContent = temperature + ' °C';
+                
+                // Calculate effective length
+                const effectiveLength = length * (1 + localResistanceFactor);
+                
+                // Calculate Reynolds number
+                const re = calculateReynolds(diameter, flowRate, viscosity, density);
+                
+                // Determine flow regime
+                const flowRegime = getFlowRegime(re);
+                
+                // Calculate pressure drop
+                let pressureDrop;
+                
+                if (pressureType === 'low') {
+                    pressureDrop = calculateLowPressureDrop(flowRate, diameter, viscosity, density, effectiveLength, pipeMaterial);
+                } else {
+                    pressureDrop = calculateMediumHighPressureDrop(
+                        pressureStart, flowRate, diameter, viscosity, density, effectiveLength, pipeMaterial
+                    );
+                }
+                
+                // Limit pressure drop (cannot exceed initial pressure)
+                pressureDrop = Math.min(pressureDrop, pressureStart);
+                const pressureEnd = pressureStart - pressureDrop;
+                
+                // Calculate gas velocity
+                const gasVelocity = calculateGasVelocity(diameter, flowRate);
+                
+                // Update interface
+                document.getElementById('reynolds-number').textContent = re.toFixed(2);
+                
+                const flowRegimeElement = document.getElementById('flow-regime-value');
+                flowRegimeElement.textContent = flowRegime.regime;
+                flowRegimeElement.className = 'flow-regime ' + flowRegime.className;
+                
+                document.getElementById('pressure-drop-bar').textContent = pressureDrop.toFixed(4);
+                document.getElementById('pressure-end-bar').textContent = pressureEnd.toFixed(4);
+                document.getElementById('pressure-start-bar').textContent = pressureStart.toFixed(4);
+                document.getElementById('gas-velocity').textContent = gasVelocity.toFixed(2);
+                
+                // Update pressure indicator
+                updatePressureIndicator(pressureStart, pressureEnd, pressureType);
+                
+                showMessage("Calculation successful", 'success');
+                
+            } catch (error) {
+                showMessage(`Calculation error: ${error.message}`, 'error');
+            }
+        }
+        
+        function updatePressureIndicator(pressureStart, pressureEnd, pressureType) {
+            let maxPressure;
+            
+            // Determine maximum pressure for the scale based on system type
+            if (pressureType === 'low') {
+                maxPressure = 0.05;
+            } else if (pressureType === 'medium') {
+                maxPressure = 3;
+            } else {
+                maxPressure = 10;
+            }
+            
+            const startPercent = Math.min(100, (pressureStart / maxPressure) * 100);
+            const endPercent = Math.min(100, (pressureEnd / maxPressure) * 100);
+            
+            // Update marker
+            pressureMarker.style.left = `${endPercent}%`;
+        }
+        
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.style.backgroundColor = type === 'error' ? '#ffebee' : '#e8f5e9';
+            messageDiv.style.color = type === 'error' ? '#c62828' : '#2e7d32';
+        }
+        
+        // Event handler for calculate button
+        calculateBtn.addEventListener('click', calculateAll);
+        
+        // Automatic calculation on page load
+        window.addEventListener('load', calculateAll);
+    </script>
+</body>
+</html>

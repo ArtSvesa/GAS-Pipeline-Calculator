@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heating Cost Calculator Ireland</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #8B0000 0%, #660000 100%);
+            color: #fff;
+            line-height: 1.6;
+            min-height: 100vh;
+            transition: background 0.5s ease;
+        }
+        
+        body.ua {
+            background: linear-gradient(135deg, #0057B7 0%, #FFD700 100%);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .logo {
+            font-size: 2.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .tagline {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .language-switcher {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        
+        .language-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background 0.3s;
+            font-weight: bold;
+        }
+        
+        .language-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .language-btn.active {
+            background: white;
+            color: #1a6fb0;
+        }
+        
+        .calculator-container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 2rem auto;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            color: #333;
+        }
+        
+        h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
+            font-size: 1.8rem;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .fuel-price-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .fuel-price-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .fuel-price-item h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+        
+        .standing-charge {
+            background: #e8f4fd;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        
+        .calculate-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+        }
+        
+        .calculate-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .results {
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .results h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .best-option {
+            background-color: #d4edda;
+            font-weight: bold;
+        }
+        
+        .formulas {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+        
+        .formula-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .formula-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .formula-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .formula-equation {
+            font-family: 'Courier New', monospace;
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        
+        .disclaimer {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 30px auto;
+            text-align: center;
+            font-size: 0.9rem;
+            color: white;
+        }
+        
+        .author {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #FFD700;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+            color: rgba(255, 255, 255, 0.8);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 1.8rem;
+            }
+            
+            .language-switcher {
+                position: static;
+                text-align: center;
+                margin-top: 15px;
+            }
+            
+            table {
+                font-size: 14px;
+            }
+            
+            .fuel-price-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="en">
+    <header>
+        <div class="container">
+            <div class="logo" data-ua="Калькулятор вартості опалення" data-en="Heating Cost Calculator">Heating Cost Calculator</div>
+            <div class="tagline" data-ua="Порівняння вартості опалення в Ірландії" data-en="Heating cost comparison for Ireland">Heating cost comparison for Ireland</div>
+            
+            <div class="language-switcher">
+                <button class="language-btn" data-lang="ua">UA</button>
+                <button class="language-btn active" data-lang="en">EN</button>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="calculator-container">
+            <h2 data-ua="Калькулятор вартості опалення" data-en="Heating Cost Calculator">Heating Cost Calculator</h2>
+            
+            <div class="input-group">
+                <label data-ua="Площа приміщення (м²)" data-en="Room area (m²)">Room area (m²)</label>
+                <input type="number" id="area" min="10" max="500" value="100">
+            </div>
+            
+            <div class="input-group">
+                <label data-ua="Висота стелі (м)" data-en="Ceiling height (m)">Ceiling height (m)</label>
+                <input type="number" id="height" min="2" max="5" step="0.1" value="2.7">
+            </div>
+            
+            <div class="input-group">
+                <label data-ua="Бажана температура (°C)" data-en="Desired temperature (°C)">Desired temperature (°C)</label>
+                <input type="number" id="temperature" min="15" max="25" value="21">
+            </div>
+            
+            <div class="input-group">
+                <label data-ua="Тривалість опалювального сезону (днів)" data-en="Heating season duration (days)">Heating season duration (days)</label>
+                <input type="number" id="season" min="90" max="365" value="180">
+            </div>
+            
+            <h3 data-ua="Ціни на паливо" data-en="Fuel Prices">Fuel Prices</h3>
+            
+            <div class="fuel-price-container">
+                <div class="fuel-price-item">
+                    <h3 data-ua="Пропан" data-en="Propane">Propane</h3>
+                    <div class="input-group">
+                        <label data-ua="Одиниця виміру" data-en="Unit of measure">Unit of measure</label>
+                        <select id="propane-unit">
+                            <option value="liter" data-ua="Літри" data-en="Liters">Liters</option>
+                            <option value="m3" data-ua="Кубічні метри (м³)" data-en="Cubic meters (m³)">Cubic meters (m³)</option>
+                            <option value="kg" data-ua="Кілограми (кг)" data-en="Kilograms (kg)">Kilograms (kg)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label data-ua="Ціна" data-en="Price">Price</label>
+                        <input type="number" id="propane-price" min="0.1" step="0.01" value="1.20">
+                    </div>
+                    <div class="standing-charge">
+                        <div class="input-group">
+                            <label data-ua="Щоденна фіксована плата (€)" data-en="Daily standing charge (€)">Daily standing charge (€)</label>
+                            <input type="number" id="propane-standing-charge" min="0" step="0.01" value="0.50">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="fuel-price-item">
+                    <h3 data-ua="Гас" data-en="Kerosene">Kerosene</h3>
+                    <div class="input-group">
+                        <label data-ua="Ціна за літр (€)" data-en="Price per liter (€)">Price per liter (€)</label>
+                        <input type="number" id="kerosene-price" min="0.1" step="0.01" value="0.95">
+                    </div>
+                </div>
+                
+                <div class="fuel-price-item">
+                    <h3 data-ua="Електроенергія" data-en="Electricity">Electricity</h3>
+                    <div class="input-group">
+                        <label data-ua="Ціна за кВт·год (€)" data-en="Price per kWh (€)">Price per kWh (€)</label>
+                        <input type="number" id="electricity-price" min="0.1" step="0.01" value="0.35">
+                    </div>
+                    <div class="standing-charge">
+                        <div class="input-group">
+                            <label data-ua="Щоденна фіксована плата (€)" data-en="Daily standing charge (€)">Daily standing charge (€)</label>
+                            <input type="number" id="electricity-standing-charge" min="0" step="0.01" value="0.70">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="fuel-price-item">
+                    <h3 data-ua="Дрова" data-en="Wood">Wood</h3>
+                    <div class="input-group">
+                        <label data-ua="Ціна за тонну (€)" data-en="Price per tonne (€)">Price per tonne (€)</label>
+                        <input type="number" id="wood-price" min="10" step="1" value="120">
+                    </div>
+                </div>
+            </div>
+            
+            <button class="calculate-btn" data-ua="Розрахувати" data-en="Calculate">Calculate</button>
+            
+            <div class="results" id="results">
+                <h3 data-ua="Результати розрахунків" data-en="Calculation Results">Calculation Results</h3>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th data-ua="Тип палива" data-en="Fuel Type">Fuel Type</th>
+                            <th data-ua="Вартість за одиницю" data-en="Cost per unit">Cost per unit</th>
+                            <th data-ua="Фіксована плата" data-en="Standing charge">Standing charge</th>
+                            <th data-ua="Річна вартість" data-en="Annual cost">Annual cost</th>
+                            <th data-ua="Ефективність" data-en="Efficiency">Efficiency</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="propane-row">
+                            <td data-ua="Пропан" data-en="Propane">Propane</td>
+                            <td id="propane-unit-cost">€1.20/L</td>
+                            <td id="propane-standing-cost">€0.50/день</td>
+                            <td id="propane-cost">-</td>
+                            <td>90%</td>
+                        </tr>
+                        <tr id="kerosene-row">
+                            <td data-ua="Гас" data-en="Kerosene">Kerosene</td>
+                            <td id="kerosene-unit-cost">€0.95/L</td>
+                            <td>-</td>
+                            <td id="kerosene-cost">-</td>
+                            <td>85%</td>
+                        </tr>
+                        <tr id="electricity-row">
+                            <td data-ua="Електроенергія" data-en="Electricity">Electricity</td>
+                            <td id="electricity-unit-cost">€0.35/kWh</td>
+                            <td id="electricity-standing-cost">€0.70/день</td>
+                            <td id="electricity-cost">-</td>
+                            <td>100%</td>
+                        </tr>
+                        <tr id="wood-row">
+                            <td data-ua="Дрова" data-en="Wood">Wood</td>
+                            <td id="wood-unit-cost">€120/tonne</td>
+                            <td>-</td>
+                            <td id="wood-cost">-</td>
+                            <td>70%</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="formulas">
+                    <h4 data-ua="Формули розрахунку" data-en="Calculation Formulas">Calculation Formulas</h4>
+                    
+                    <div class="formula-item">
+                        <div class="formula-title" data-ua="Загальна потреба в теплі:" data-en="Total heat requirement:">Total heat requirement:</div>
+                        <div class="formula-equation">Heat Needed = Volume × 0.035 kWh/m³/day × (Desired Temp - 5°C) × Season Days</div>
+                    </div>
+                    
+                    <div class="formula-item">
+                        <div class="formula-title" data-ua="Пропан:" data-en="Propane:">Propane:</div>
+                        <div class="formula-equation">Cost = (Heat Needed ÷ (Energy Density × Efficiency)) × Price + (Standing Charge × Season Days)</div>
+                        <div data-ua="Щільність енергії: 7.0 кВт·год/л, 25.3 кВт·год/м³, 13.9 кВт·год/кг" data-en="Energy density: 7.0 kWh/L, 25.3 kWh/m³, 13.9 kWh/kg">Energy density: 7.0 kWh/L, 25.3 kWh/m³, 13.9 kWh/kg</div>
+                    </div>
+                    
+                    <div class="formula-item">
+                        <div class="formula-title" data-ua="Гас:" data-en="Kerosene:">Kerosene:</div>
+                        <div class="formula-equation">Cost = (Heat Needed ÷ (10.0 kWh/L × Efficiency)) × Price</div>
+                    </div>
+                    
+                    <div class="formula-item">
+                        <div class="formula-title" data-ua="Електроенергія:" data-en="Electricity:">Electricity:</div>
+                        <div class="formula-equation">Cost = (Heat Needed ÷ Efficiency) × Price + (Standing Charge × Season Days)</div>
+                    </div>
+                    
+                    <div class="formula-item">
+                        <div class="formula-title" data-ua="Дрова:" data-en="Wood:">Wood:</div>
+                        <div class="formula-equation">Cost = (Heat Needed ÷ (1600 kWh/tonne × Efficiency)) × Price</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="disclaimer">
+            <div class="author" data-ua="Калькулятор створений Артемом Зражевським" data-en="Calculator created by Artem Zrazhevskyi">Calculator created by Artem Zrazhevskyi</div>
+            <p data-ua="Цей калькулятор призначений для попередніх розрахунків. Всі результати повинні бути перевірені та затверджені компетентним інженером перед впровадженням у реальних умовах. Ціни на паливо можуть змінюватися." data-en="This calculator is intended for preliminary calculations. All results must be verified and approved by a competent engineer before implementation in real conditions. Fuel prices may vary.">This calculator is intended for preliminary calculations. All results must be verified and approved by a competent engineer before implementation in real conditions. Fuel prices may vary.</p>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p data-ua="© 2023 Heating Cost Calculator. Всі права захищені." data-en="© 2023 Heating Cost Calculator. All rights reserved.">© 2023 Heating Cost Calculator. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Перевіряємо збережену мову або визначаємо мову за замовчуванням
+            const savedLanguage = localStorage.getItem('language') || 'en';
+            setLanguage(savedLanguage);
+            
+            // Додаємо обробники подій для кнопок перемикача мови
+            document.querySelectorAll('.language-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const lang = this.getAttribute('data-lang');
+                    setLanguage(lang);
+                    localStorage.setItem('language', lang);
+                });
+            });
+            
+            // Додаємо обробник подій для кнопки розрахунку
+            document.querySelector('.calculate-btn').addEventListener('click', calculateCosts);
+            
+            // Додаємо обробник для оновлення відображення цін при зміні
+            document.querySelectorAll('#propane-price, #kerosene-price, #electricity-price, #wood-price, #propane-unit, #propane-standing-charge, #electricity-standing-charge').forEach(input => {
+                input.addEventListener('change', updatePriceDisplay);
+            });
+            
+            // Спочатку оновлюємо відображення цін
+            updatePriceDisplay();
+            
+            function setLanguage(lang) {
+                // Змінюємо фон сторінки
+                document.body.className = lang;
+                
+                // Оновлюємо активну кнопку
+                document.querySelectorAll('.language-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.getAttribute('data-lang') === lang) {
+                        btn.classList.add('active');
+                    }
+                });
+                
+                // Оновлюємо всі тексти на сторінці
+                document.querySelectorAll('[data-ua], [data-en]').forEach(element => {
+                    if (element.hasAttribute(`data-${lang}`)) {
+                        const text = element.getAttribute(`data-${lang}`);
+                        if (element.tagName === 'OPTION') {
+                            // Для option елементів потрібно оновити текст
+                            const displayText = element.getAttribute(`data-${lang}`);
+                            if (element.textContent !== displayText) {
+                                element.textContent = displayText;
+                            }
+                        } else if (element.tagName === 'INPUT' && element.type === 'button') {
+                            element.value = text;
+                        } else if (element.tagName === 'A') {
+                            element.textContent = text;
+                        } else {
+                            element.innerHTML = text;
+                        }
+                    }
+                });
+                
+                // Оновлюємо відображення цін
+                updatePriceDisplay();
+            }
+            
+            function updatePriceDisplay() {
+                const propanePrice = parseFloat(document.getElementById('propane-price').value);
+                const propaneUnit = document.getElementById('propane-unit').value;
+                const propaneStanding = parseFloat(document.getElementById('propane-standing-charge').value);
+                const kerosenePrice = parseFloat(document.getElementById('kerosene-price').value);
+                const electricityPrice = parseFloat(document.getElementById('electricity-price').value);
+                const electricityStanding = parseFloat(document.getElementById('electricity-standing-charge').value);
+                const woodPrice = parseFloat(document.getElementById('wood-price').value);
+                
+                let propaneUnitText = "";
+                if (propaneUnit === 'liter') {
+                    propaneUnitText = "L";
+                } else if (propaneUnit === 'm3') {
+                    propaneUnitText = "m³";
+                } else if (propaneUnit === 'kg') {
+                    propaneUnitText = "kg";
+                }
+                
+                document.getElementById('propane-unit-cost').textContent = `€${propanePrice.toFixed(2)}/${propaneUnitText}`;
+                document.getElementById('propane-standing-cost').textContent = `€${propaneStanding.toFixed(2)}/day`;
+                document.getElementById('kerosene-unit-cost').textContent = `€${kerosenePrice.toFixed(2)}/L`;
+                document.getElementById('electricity-unit-cost').textContent = `€${electricityPrice.toFixed(2)}/kWh`;
+                document.getElementById('electricity-standing-cost').textContent = `€${electricityStanding.toFixed(2)}/day`;
+                document.getElementById('wood-unit-cost').textContent = `€${woodPrice.toFixed(2)}/tonne`;
+            }
+            
+            function calculateCosts() {
+                // Отримуємо значення з полів вводу
+                const area = parseFloat(document.getElementById('area').value);
+                const height = parseFloat(document.getElementById('height').value);
+                const temperature = parseFloat(document.getElementById('temperature').value);
+                const season = parseFloat(document.getElementById('season').value);
+                
+                // Отримуємо ціни на паливо
+                const propanePrice = parseFloat(document.getElementById('propane-price').value);
+                const propaneUnit = document.getElementById('propane-unit').value;
+                const propaneStanding = parseFloat(document.getElementById('propane-standing-charge').value);
+                const kerosenePrice = parseFloat(document.getElementById('kerosene-price').value);
+                const electricityPrice = parseFloat(document.getElementById('electricity-price').value);
+                const electricityStanding = parseFloat(document.getElementById('electricity-standing-charge').value);
+                const woodPrice = parseFloat(document.getElementById('wood-price').value);
+                
+                // Розрахунок об'єму приміщення
+                const volume = area * height;
+                
+                // Розрахунок потреб в теплі (спрощена формула)
+                // Припускаємо, що для обігріву 1 м³ на 1°C потрібно 0.035 кВт·ч на день
+                const heatNeeded = volume * 0.035 * (temperature - 5) * season;
+                
+                // Коефіцієнти ефективності
+                const propaneEfficiency = 0.9;
+                const keroseneEfficiency = 0.85;
+                const electricityEfficiency = 1.0;
+                const woodEfficiency = 0.7;
+                
+                // Теплотворна здатність для різних одиниць пропану
+                let propaneEnergyDensity = 0;
+                if (propaneUnit === 'liter') {
+                    propaneEnergyDensity = 7.0; // кВт·год/л
+                } else if (propaneUnit === 'm3') {
+                    propaneEnergyDensity = 25.3; // кВт·год/м³
+                } else if (propaneUnit === 'kg') {
+                    propaneEnergyDensity = 13.9; // кВт·год/кг
+                }
+                
+                // Розрахунок вартості для кожного типу палива
+                const propaneEnergyCost = (heatNeeded / (propaneEnergyDensity * propaneEfficiency)) * propanePrice;
+                const propaneStandingCost = propaneStanding * season;
+                const propaneCost = propaneEnergyCost + propaneStandingCost;
+                
+                const keroseneCost = (heatNeeded / (10.0 * keroseneEfficiency)) * kerosenePrice;
+                
+                const electricityEnergyCost = (heatNeeded / electricityEfficiency) * electricityPrice;
+                const electricityStandingCost = electricityStanding * season;
+                const electricityCost = electricityEnergyCost + electricityStandingCost;
+                
+                const woodCost = (heatNeeded / (1600.0 * woodEfficiency)) * woodPrice;
+                
+                // Відображення результатів
+                document.getElementById('propane-cost').textContent = '€' + propaneCost.toFixed(2);
+                document.getElementById('kerosene-cost').textContent = '€' + keroseneCost.toFixed(2);
+                document.getElementById('electricity-cost').textContent = '€' + electricityCost.toFixed(2);
+                document.getElementById('wood-cost').textContent = '€' + woodCost.toFixed(2);
+                
+                // Показуємо результати
+                document.getElementById('results').style.display = 'block';
+                
+                // Визначаємо найвигідніший варіант
+                const costs = [propaneCost, keroseneCost, electricityCost, woodCost];
+                const minCost = Math.min(...costs);
+                
+                // Видаляємо попередній найкращий варіант
+                document.querySelectorAll('.best-option').forEach(row => {
+                    row.classList.remove('best-option');
+                });
+                
+                // Додаємо клас для найвигіднішого варіанту
+                if (minCost === propaneCost) {
+                    document.getElementById('propane-row').classList.add('best-option');
+                } else if (minCost === keroseneCost) {
+                    document.getElementById('kerosene-row').classList.add('best-option');
+                } else if (minCost === electricityCost) {
+                    document.getElementById('electricity-row').classList.add('best-option');
+                } else {
+                    document.getElementById('wood-row').classList.add('best-option');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

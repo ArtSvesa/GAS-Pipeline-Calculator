@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IGEM TD/4 Gas Services Calculator</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background-color: #8B0000;
+            color: #fff;
+        }
+        .calculator { 
+            background-color: #f5f5f5; 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 0 10px rgba(0,0,0,0.1); 
+            color: #333;
+        }
+        h1 { 
+            color: #2c3e50; 
+            text-align: center; 
+            margin-bottom: 10px; 
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .form-group { 
+            margin-bottom: 20px; 
+        }
+        label { 
+            display: block; 
+            margin-bottom: 5px; 
+            font-weight: bold; 
+            color: #34495e; 
+        }
+        input, select { 
+            width: 100%; 
+            padding: 10px; 
+            border: 1px solid #ddd; 
+            border-radius: 5px; 
+            font-size: 16px; 
+            box-sizing: border-box; 
+        }
+        .input-group { 
+            display: flex; 
+            gap: 10px; 
+        }
+        .input-group div { 
+            flex: 1; 
+        }
+        button { 
+            padding: 15px; 
+            background-color: #3498db; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            font-size: 18px; 
+            cursor: pointer; 
+            margin: 10px 5px; 
+        }
+        button:hover { 
+            background-color: #2980b9; 
+        }
+        .result { 
+            margin-top: 30px; 
+            padding: 20px; 
+            background-color: #ecf0f1; 
+            border-radius: 5px; 
+            display: none; 
+        }
+        .result h3 { 
+            color: #27ae60; 
+            margin-top: 0; 
+        }
+        .formula { 
+            background-color: #f8f9fa; 
+            padding: 15px; 
+            border-left: 4px solid #3498db; 
+            margin: 20px 0; 
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .calculation-type { 
+            display: flex; 
+            margin-bottom: 20px; 
+        }
+        .calculation-type button { 
+            flex: 1; 
+        }
+        .active { 
+            background-color: #2ecc71 !important; 
+        }
+        .pressure-info {
+            background-color: #e8f4f8;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 14px;
+            border-left: 3px solid #3498db;
+        }
+        .absolute-pressure {
+            margin-top: 5px;
+            font-style: italic;
+            color: #666;
+            font-size: 12px;
+        }
+        .note {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fff8dc;
+            border-radius: 5px;
+            border-left: 4px solid #ffa500;
+            font-size: 13px;
+        }
+        .limitations {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #ffe6e6;
+            border-radius: 5px;
+            border-left: 4px solid #ff4444;
+            font-size: 12px;
+        }
+        .warning {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #ffc107;
+        }
+        .alert {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #dc3545;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #17a2b8;
+        }
+        .param-info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h1>IGEM TD/4 Gas Services Calculator</h1>
+        <div class="subtitle">Based on Smooth Pipe Law (Section 4 of IGEM / TD / 4 PE and steel gas services and service pipework)</div>
+        
+        <div class="formula">
+            Q = 7.574 × 10⁻⁴ × (Tₛ/Pₛ) × √[(P₁² - P₂²) × d⁵ / (S × T × Z × L × f)]
+        </div>
+
+        <div class="calculation-type">
+            <button id="btnFlow" class="active" onclick="setCalculationType('flow')">Calculate Flow Rate (Q)</button>
+            <button id="btnPressure" onclick="setCalculationType('pressure')">Calculate Pressure Loss (ΔP)</button>
+        </div>
+
+        <form id="gasFlowForm">
+            <!-- Common parameters -->
+            <div class="input-group">
+                <div class="form-group">
+                    <label for="diameter">Pipe Diameter (d), mm:</label>
+                    <input type="number" id="diameter" step="1" required min="10" max="1000" value="100">
+                </div>
+                <div class="form-group">
+                    <label for="length">Pipe Length (L), m:</label>
+                    <input type="number" id="length" step="1" required min="1" max="100000" value="100">
+                </div>
+            </div>
+
+            <!-- Parameters for FLOW calculation -->
+            <div id="flowParams">
+                <div class="input-group">
+                    <div class="form-group">
+                        <label for="p1">Inlet Pressure (P₁), bar (gauge):</label>
+                        <input type="number" id="p1" step="0.01" required min="0.1" max="100" value="5">
+                        <div class="absolute-pressure" id="p1AbsoluteFlow">Absolute pressure: 6.013 bar</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="p2">Outlet Pressure (P₂), bar (gauge):</label>
+                        <input type="number" id="p2" step="0.01" required min="0.1" max="100" value="4.5">
+                        <div class="absolute-pressure" id="p2AbsoluteFlow">Absolute pressure: 5.513 bar</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parameters for PRESSURE LOSS calculation -->
+            <div id="pressureParams" style="display: none;">
+                <div class="input-group">
+                    <div class="form-group">
+                        <label for="p1_pressure">Inlet Pressure (P₁), bar (gauge):</label>
+                        <input type="number" id="p1_pressure" step="0.01" required min="0.1" max="100" value="5">
+                        <div class="absolute-pressure" id="p1AbsolutePressure">Absolute pressure: 6.013 bar</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="flowRate">Gas Flow Rate (Q), m³/h:</label>
+                        <input type="number" id="flowRate" step="0.1" required min="1" max="100000" value="1000">
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="form-group">
+                    <label for="gasType">Gas Type (Specific Gravity S):</label>
+                    <select id="gasType" required>
+                        <option value="0.6">Natural Gas (S = 0.6) - Specific Gravity relative to air</option>
+                        <option value="1.5">Propane (S = 1.5) - Specific Gravity relative to air</option>
+                        <option value="2.0">Butane (S = 2.0) - Specific Gravity relative to air</option>
+                    </select>
+                    <div class="param-info">S - Specific Gravity (relative to air)</div>
+                </div>
+                <div class="form-group">
+                    <label for="pipeType">Pipe Type (Efficiency Factor e):</label>
+                    <select id="pipeType" required>
+                        <option value="0.86">Steel Pipe (e = 0.86) - Efficiency Factor</option>
+                        <option value="0.97">Polyethylene Pipe (e = 0.97) - Efficiency Factor</option>
+                    </select>
+                    <div class="param-info">e - Efficiency Factor (accounts for pipe roughness)</div>
+                </div>
+            </div>
+
+            <button type="button" onclick="calculate()">Calculate</button>
+            <button type="button" onclick="resetForm()">Reset</button>
+        </form>
+
+        <div id="result" class="result">
+            <h3>Calculation Results:</h3>
+            <div id="resultContent"></div>
+        </div>
+        
+        <div class="note">
+            <p><strong>Note about pressure in the formula:</strong></p>
+            <p>The formula uses <strong>absolute pressure</strong> values (P₁ and P₂).</p>
+            <p>Gauge pressure (shown on pressure gauges) is converted to absolute pressure by adding atmospheric pressure (1.013 bar).</p>
+            <p>For example: 5 bar (gauge) = 5 + 1.013 = 6.013 bar (absolute)</p>
+        </div>
+        
+        <div class="limitations">
+            <p><strong>Limitations & Assumptions:</strong></p>
+            <p>• Steady-state isothermal flow</p>
+            <p>• Does not account for fittings, valves, or elevation changes</p>
+            <p>• Best accuracy for turbulent flow (Re > 4000)</p>
+            <p>• Typical engineering accuracy: ±5-10%</p>
+        </div>
+    </div>
+
+    <script>
+        let calculationType = 'flow'; // 'flow' or 'pressure'
+        const atmosphericPressure = 1.013; // bar
+
+        function setCalculationType(type) {
+            calculationType = type;
+            document.getElementById('btnFlow').classList.remove('active');
+            document.getElementById('btnPressure').classList.remove('active');
+            document.getElementById('flowParams').style.display = 'none';
+            document.getElementById('pressureParams').style.display = 'none';
+            
+            if (type === 'flow') {
+                document.getElementById('btnFlow').classList.add('active');
+                document.getElementById('flowParams').style.display = 'block';
+            } else {
+                document.getElementById('btnPressure').classList.add('active');
+                document.getElementById('pressureParams').style.display = 'block';
+            }
+            
+            // Update absolute pressure displays
+            updateAbsolutePressureDisplays();
+        }
+
+        function updateAbsolutePressureDisplays() {
+            // For flow calculation
+            const p1Flow = parseFloat(document.getElementById('p1').value) || 0;
+            const p2Flow = parseFloat(document.getElementById('p2').value) || 0;
+            
+            document.getElementById('p1AbsoluteFlow').textContent = 
+                `Absolute pressure: ${(p1Flow + atmosphericPressure).toFixed(3)} bar`;
+            document.getElementById('p2AbsoluteFlow').textContent = 
+                `Absolute pressure: ${(p2Flow + atmosphericPressure).toFixed(3)} bar`;
+            
+            // For pressure calculation
+            const p1Pressure = parseFloat(document.getElementById('p1_pressure').value) || 0;
+            
+            document.getElementById('p1AbsolutePressure').textContent = 
+                `Absolute pressure: ${(p1Pressure + atmosphericPressure).toFixed(3)} bar`;
+        }
+
+        function resetForm() {
+            document.getElementById('gasFlowForm').reset();
+            document.getElementById('result').style.display = 'none';
+            updateAbsolutePressureDisplays();
+        }
+
+        // Add event listeners to update absolute pressure when gauge pressure changes
+        document.getElementById('p1').addEventListener('input', updateAbsolutePressureDisplays);
+        document.getElementById('p2').addEventListener('input', updateAbsolutePressureDisplays);
+        document.getElementById('p1_pressure').addEventListener('input', updateAbsolutePressureDisplays);
+
+        function calculate() {
+            // Validate inputs
+            if (!validateInputs()) return;
+            
+            const d = parseFloat(document.getElementById('diameter').value);
+            const L = parseFloat(document.getElementById('length').value);
+            const S = parseFloat(document.getElementById('gasType').value);
+            const e = parseFloat(document.getElementById('pipeType').value);
+            
+            // Constants
+            const Ts = 288, Ps = 1.013, T = 278, Z = 1.0;
+            
+            let resultHTML = '';
+            let warnings = [];
+            let alerts = [];
+            
+            if (calculationType === 'flow') {
+                // Calculate FLOW RATE (Q)
+                const P1_gauge = parseFloat(document.getElementById('p1').value);
+                const P2_gauge = parseFloat(document.getElementById('p2').value);
+                
+                if (P1_gauge <= P2_gauge) {
+                    alert("Inlet pressure must be greater than outlet pressure!");
+                    return;
+                }
+                
+                // Convert to absolute pressure
+                const P1 = P1_gauge + atmosphericPressure;
+                const P2 = P2_gauge + atmosphericPressure;
+                
+                let Q = calculateFlow(P1, P2, d, L, S, e, T, Z, Ts, Ps);
+                const velocity = calculateVelocity(Q, d);
+                const Re = calculateReynolds(Q, d, S);
+                const pressureLossPercent = ((P1_gauge - P2_gauge) / P1_gauge) * 100;
+                
+                // Check pressure loss
+                if (pressureLossPercent > 10) {
+                    alerts.push(`Pressure loss is ${pressureLossPercent.toFixed(1)}% of inlet pressure (exceeds 10% limit)`);
+                } else if (pressureLossPercent > 7) {
+                    warnings.push(`Pressure loss is ${pressureLossPercent.toFixed(1)}% of inlet pressure (exceeds 7% warning threshold)`);
+                }
+                
+                // Check velocity
+                if (velocity > 15) {
+                    alerts.push(`Gas velocity is ${velocity.toFixed(2)} m/s (exceeds 15 m/s limit)`);
+                } else if (velocity > 10) {
+                    warnings.push(`Gas velocity is ${velocity.toFixed(2)} m/s (exceeds 10 m/s warning threshold)`);
+                }
+                
+                resultHTML = `
+                    <p><strong>Gas Flow Rate (Q):</strong> ${Q.toFixed(3)} m³/h</p>
+                    <p><strong>Pressure Loss (ΔP):</strong> ${(P1_gauge - P2_gauge).toFixed(3)} bar (gauge)</p>
+                    <p><strong>Pressure Loss:</strong> ${pressureLossPercent.toFixed(1)}% of inlet pressure</p>
+                    <p><strong>Gas Velocity:</strong> ${velocity.toFixed(2)} m/s</p>
+                    <p><strong>Reynolds Number (Re):</strong> ${Re.toExponential(3)}</p>
+                    <div class="pressure-info">
+                        <p><strong>Pressure Details:</strong></p>
+                        <p>Inlet Pressure: ${P1_gauge.toFixed(3)} bar (gauge) = ${P1.toFixed(3)} bar (absolute)</p>
+                        <p>Outlet Pressure: ${P2_gauge.toFixed(3)} bar (gauge) = ${P2.toFixed(3)} bar (absolute)</p>
+                    </div>
+                `;
+            } else {
+                // Calculate PRESSURE LOSS (P2)
+                const P1_gauge = parseFloat(document.getElementById('p1_pressure').value);
+                const Q_target = parseFloat(document.getElementById('flowRate').value);
+                
+                // Convert to absolute pressure
+                const P1 = P1_gauge + atmosphericPressure;
+                
+                // Iterative search for P2
+                let P2_low = 0.1, P2_high = P1 - 0.1;
+                let P2, Q_calculated;
+                const tolerance = 0.001;
+                let iterations = 0;
+                const maxIterations = 50;
+                
+                for (iterations = 0; iterations < maxIterations; iterations++) {
+                    P2 = (P2_low + P2_high) / 2;
+                    Q_calculated = calculateFlow(P1, P2, d, L, S, e, T, Z, Ts, Ps);
+                    
+                    if (Math.abs(Q_calculated - Q_target) < tolerance) break;
+                    
+                    if (Q_calculated < Q_target) {
+                        P2_high = P2; // Need to decrease P2 (increase pressure drop)
+                    } else {
+                        P2_low = P2; // Need to increase P2 (decrease pressure drop)
+                    }
+                    
+                    // Safety check
+                    if (P2_low >= P2_high) break;
+                }
+                
+                const velocity = calculateVelocity(Q_target, d);
+                const P2_gauge = P2 - atmosphericPressure;
+                const Re = calculateReynolds(Q_target, d, S);
+                const pressureLossPercent = ((P1_gauge - P2_gauge) / P1_gauge) * 100;
+                
+                // Check pressure loss
+                if (pressureLossPercent > 10) {
+                    alerts.push(`Pressure loss is ${pressureLossPercent.toFixed(1)}% of inlet pressure (exceeds 10% limit)`);
+                } else if (pressureLossPercent > 7) {
+                    warnings.push(`Pressure loss is ${pressureLossPercent.toFixed(1)}% of inlet pressure (exceeds 7% warning threshold)`);
+                }
+                
+                // Check velocity
+                if (velocity > 15) {
+                    alerts.push(`Gas velocity is ${velocity.toFixed(2)} m/s (exceeds 15 m/s limit)`);
+                } else if (velocity > 10) {
+                    warnings.push(`Gas velocity is ${velocity.toFixed(2)} m/s (exceeds 10 m/s warning threshold)`);
+                }
+                
+                resultHTML = `
+                    <p><strong>Outlet Pressure (P₂):</strong> ${P2_gauge.toFixed(3)} bar (gauge)</p>
+                    <p><strong>Pressure Loss (ΔP):</strong> ${(P1_gauge - P2_gauge).toFixed(3)} bar (gauge)</p>
+                    <p><strong>Pressure Loss:</strong> ${pressureLossPercent.toFixed(1)}% of inlet pressure</p>
+                    <p><strong>Target Flow Rate (Q):</strong> ${Q_target.toFixed(3)} m³/h</p>
+                    <p><strong>Gas Velocity:</strong> ${velocity.toFixed(2)} m/s</p>
+                    <p><strong>Reynolds Number (Re):</strong> ${Re.toExponential(3)}</p>
+                    <p><strong>Iterations required:</strong> ${iterations}</p>
+                    <div class="pressure-info">
+                        <p><strong>Pressure Details:</strong></p>
+                        <p>Inlet Pressure: ${P1_gauge.toFixed(3)} bar (gauge) = ${P1.toFixed(3)} bar (absolute)</p>
+                        <p>Outlet Pressure: ${P2_gauge.toFixed(3)} bar (gauge) = ${P2.toFixed(3)} bar (absolute)</p>
+                    </div>
+                `;
+            }
+            
+            // Add warnings and alerts to result
+            if (alerts.length > 0) {
+                resultHTML += '<div class="alert"><strong>ALERTS:</strong><ul>';
+                alerts.forEach(alert => {
+                    resultHTML += `<li>${alert}</li>`;
+                });
+                resultHTML += '</ul></div>';
+            }
+            
+            if (warnings.length > 0) {
+                resultHTML += '<div class="warning"><strong>WARNINGS:</strong><ul>';
+                warnings.forEach(warning => {
+                    resultHTML += `<li>${warning}</li>`;
+                });
+                resultHTML += '</ul></div>';
+            }
+            
+            // Add flow regime info based on Reynolds number
+            const Re = calculateReynolds(
+                calculationType === 'flow' ? 
+                calculateFlow(
+                    parseFloat(document.getElementById('p1').value) + atmosphericPressure,
+                    parseFloat(document.getElementById('p2').value) + atmosphericPressure,
+                    d, L, S, e, T, Z, Ts, Ps
+                ) : 
+                parseFloat(document.getElementById('flowRate').value),
+                d, S
+            );
+            
+            let flowRegime = '';
+            if (Re < 2000) {
+                flowRegime = 'Laminar flow';
+            } else if (Re < 4000) {
+                flowRegime = 'Transitional flow';
+            } else {
+                flowRegime = 'Turbulent flow';
+            }
+            
+            resultHTML += `<div class="info"><strong>Flow Regime:</strong> ${flowRegime} (Re = ${Re.toExponential(3)})</div>`;
+            
+            document.getElementById('resultContent').innerHTML = resultHTML;
+            document.getElementById('result').style.display = 'block';
+        }
+
+        function calculateFlow(P1, P2, d, L, S, e, T, Z, Ts, Ps) {
+            let Q_guess = 100;
+            let f, Q, Re, X, f_sp;
+            
+            // Iterative calculation for friction factor
+            for (let i = 0; i < 10; i++) {
+                Re = calculateReynolds(Q_guess, d, S);
+                X = Math.log10(Re) - 5;
+                f_sp = Math.pow(14.7519 + 3.5657 * X + 0.0362 * Math.pow(X, 2), -2);
+                f = f_sp / Math.pow(e, 2);
+                
+                const part1 = Math.pow(P1, 2) - Math.pow(P2, 2);
+                const part2 = Math.pow(d, 5);
+                const part3 = S * T * Z * L * f;
+                
+                Q = 7.574e-4 * (Ts / Ps) * Math.sqrt((part1 * part2) / part3);
+                
+                // Check for convergence
+                if (Math.abs(Q - Q_guess) < 0.001) break;
+                
+                Q_guess = Q;
+            }
+            
+            return Q;
+        }
+
+        function calculateVelocity(Q, d) {
+            const area = Math.PI * Math.pow(d/1000, 2) / 4;
+            const Q_m3s = Q / 3600;
+            return Q_m3s / area;
+        }
+
+        function calculateReynolds(Q, d, S) {
+            // Reynolds number calculation for gas
+            // Using simplified formula: Re = (ρ v d) / μ
+            // For natural gas at standard conditions: ρ ≈ 0.7 kg/m³, μ ≈ 1.1e-5 Pa·s
+            const density = S * 1.2; // Relative to air (air density ≈ 1.2 kg/m³ at standard conditions)
+            const viscosity = 1.1e-5; // Pa·s
+            const velocity = calculateVelocity(Q, d);
+            const d_m = d / 1000; // diameter in meters
+            
+            return (density * velocity * d_m) / viscosity;
+        }
+
+        function validateInputs() {
+            const diameter = parseFloat(document.getElementById('diameter').value);
+            const length = parseFloat(document.getElementById('length').value);
+            
+            if (diameter < 10 || diameter > 1000) {
+                alert("Pipe diameter should be between 10 and 1000 mm");
+                return false;
+            }
+            
+            if (length < 1 || length > 100000) {
+                alert("Pipe length should be between 1 and 100,000 m");
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Initialize absolute pressure displays
+        updateAbsolutePressureDisplays();
+    </script>
+</body>
+</html>
