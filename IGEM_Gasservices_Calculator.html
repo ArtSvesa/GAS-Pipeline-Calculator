@@ -87,6 +87,10 @@
             margin: 20px 0; 
             font-family: monospace;
             font-size: 14px;
+            text-align: center;
+        }
+        .formula sup, .formula sub {
+            font-size: 12px;
         }
         .calculation-type { 
             display: flex; 
@@ -157,6 +161,11 @@
             color: #666;
             margin-top: 2px;
         }
+        .pressure-unit {
+            font-size: 12px;
+            color: #666;
+            margin-left: 5px;
+        }
     </style>
 </head>
 <body>
@@ -165,7 +174,7 @@
         <div class="subtitle">Based on Smooth Pipe Law (Section 4 of IGEM / TD / 4 PE and steel gas services and service pipework)</div>
         
         <div class="formula">
-            Q = 7.574 × 10⁻⁴ × (Tₛ/Pₛ) × √[(P₁² - P₂²) × d⁵ / (S × T × Z × L × f)]
+            Q = 7.574 × 10<sup>-4</sup> × (T<sub>s</sub>/P<sub>s</sub>) × √[(P<sub>1</sub><sup>2</sup> - P<sub>2</sub><sup>2</sup>) × d<sup>5</sup> / (S × T × Z × L × f)]
         </div>
 
         <div class="calculation-type">
@@ -178,11 +187,11 @@
             <div class="input-group">
                 <div class="form-group">
                     <label for="diameter">Pipe Diameter (d), mm:</label>
-                    <input type="number" id="diameter" step="1" required min="10" max="1000" value="100">
+                    <input type="number" id="diameter" step="0.1" required min="10" max="1000" value="51.4">
                 </div>
                 <div class="form-group">
                     <label for="length">Pipe Length (L), m:</label>
-                    <input type="number" id="length" step="1" required min="1" max="100000" value="100">
+                    <input type="number" id="length" step="1" required min="1" max="100000" value="840">
                 </div>
             </div>
 
@@ -190,14 +199,22 @@
             <div id="flowParams">
                 <div class="input-group">
                     <div class="form-group">
-                        <label for="p1">Inlet Pressure (P₁), bar (gauge):</label>
-                        <input type="number" id="p1" step="0.01" required min="0.1" max="100" value="5">
-                        <div class="absolute-pressure" id="p1AbsoluteFlow">Absolute pressure: 6.013 bar</div>
+                        <label for="p1">Inlet Pressure (P<sub>1</sub>):</label>
+                        <input type="number" id="p1" step="0.001" required min="0.01" max="100" value="0.09">
+                        <select id="p1Unit" onchange="updatePressureUnits()" style="width: 100px; margin-top: 5px;">
+                            <option value="bar">bar (gauge)</option>
+                            <option value="mbar">mbar (gauge)</option>
+                        </select>
+                        <div class="absolute-pressure" id="p1AbsoluteFlow">Absolute pressure: 1.103 bar</div>
                     </div>
                     <div class="form-group">
-                        <label for="p2">Outlet Pressure (P₂), bar (gauge):</label>
-                        <input type="number" id="p2" step="0.01" required min="0.1" max="100" value="4.5">
-                        <div class="absolute-pressure" id="p2AbsoluteFlow">Absolute pressure: 5.513 bar</div>
+                        <label for="p2">Outlet Pressure (P<sub>2</sub>):</label>
+                        <input type="number" id="p2" step="0.001" required min="0.01" max="100" value="0.08">
+                        <select id="p2Unit" onchange="updatePressureUnits()" style="width: 100px; margin-top: 5px;">
+                            <option value="bar">bar (gauge)</option>
+                            <option value="mbar">mbar (gauge)</option>
+                        </select>
+                        <div class="absolute-pressure" id="p2AbsoluteFlow">Absolute pressure: 1.093 bar</div>
                     </div>
                 </div>
             </div>
@@ -206,13 +223,17 @@
             <div id="pressureParams" style="display: none;">
                 <div class="input-group">
                     <div class="form-group">
-                        <label for="p1_pressure">Inlet Pressure (P₁), bar (gauge):</label>
-                        <input type="number" id="p1_pressure" step="0.01" required min="0.1" max="100" value="5">
-                        <div class="absolute-pressure" id="p1AbsolutePressure">Absolute pressure: 6.013 bar</div>
+                        <label for="p1_pressure">Inlet Pressure (P<sub>1</sub>):</label>
+                        <input type="number" id="p1_pressure" step="0.001" required min="0.01" max="100" value="0.09">
+                        <select id="p1_pressureUnit" onchange="updatePressureUnits()" style="width: 100px; margin-top: 5px;">
+                            <option value="bar">bar (gauge)</option>
+                            <option value="mbar">mbar (gauge)</option>
+                        </select>
+                        <div class="absolute-pressure" id="p1AbsolutePressure">Absolute pressure: 1.103 bar</div>
                     </div>
                     <div class="form-group">
                         <label for="flowRate">Gas Flow Rate (Q), m³/h:</label>
-                        <input type="number" id="flowRate" step="0.1" required min="1" max="100000" value="1000">
+                        <input type="number" id="flowRate" step="0.1" required min="1" max="100000" value="88">
                     </div>
                 </div>
             </div>
@@ -222,7 +243,7 @@
                     <label for="gasType">Gas Type (Specific Gravity S):</label>
                     <select id="gasType" required>
                         <option value="0.6">Natural Gas (S = 0.6) - Specific Gravity relative to air</option>
-                        <option value="1.5">Propane (S = 1.5) - Specific Gravity relative to air</option>
+                        <option value="1.5" selected>Propane (S = 1.5) - Specific Gravity relative to air</option>
                         <option value="2.0">Butane (S = 2.0) - Specific Gravity relative to air</option>
                     </select>
                     <div class="param-info">S - Specific Gravity (relative to air)</div>
@@ -231,7 +252,7 @@
                     <label for="pipeType">Pipe Type (Efficiency Factor e):</label>
                     <select id="pipeType" required>
                         <option value="0.86">Steel Pipe (e = 0.86) - Efficiency Factor</option>
-                        <option value="0.97">Polyethylene Pipe (e = 0.97) - Efficiency Factor</option>
+                        <option value="0.97" selected>Polyethylene Pipe (e = 0.97) - Efficiency Factor</option>
                     </select>
                     <div class="param-info">e - Efficiency Factor (accounts for pipe roughness)</div>
                 </div>
@@ -248,7 +269,7 @@
         
         <div class="note">
             <p><strong>Note about pressure in the formula:</strong></p>
-            <p>The formula uses <strong>absolute pressure</strong> values (P₁ and P₂).</p>
+            <p>The formula uses <strong>absolute pressure</strong> values (P<sub>1</sub> and P<sub>2</sub>).</p>
             <p>Gauge pressure (shown on pressure gauges) is converted to absolute pressure by adding atmospheric pressure (1.013 bar).</p>
             <p>For example: 5 bar (gauge) = 5 + 1.013 = 6.013 bar (absolute)</p>
         </div>
@@ -285,21 +306,40 @@
             updateAbsolutePressureDisplays();
         }
 
+        function updatePressureUnits() {
+            updateAbsolutePressureDisplays();
+        }
+
+        function getPressureInBar(value, unit) {
+            if (unit === 'mbar') {
+                return value / 1000; // Convert mbar to bar
+            }
+            return value; // Already in bar
+        }
+
         function updateAbsolutePressureDisplays() {
             // For flow calculation
             const p1Flow = parseFloat(document.getElementById('p1').value) || 0;
             const p2Flow = parseFloat(document.getElementById('p2').value) || 0;
+            const p1Unit = document.getElementById('p1Unit').value;
+            const p2Unit = document.getElementById('p2Unit').value;
+            
+            const p1FlowBar = getPressureInBar(p1Flow, p1Unit);
+            const p2FlowBar = getPressureInBar(p2Flow, p2Unit);
             
             document.getElementById('p1AbsoluteFlow').textContent = 
-                `Absolute pressure: ${(p1Flow + atmosphericPressure).toFixed(3)} bar`;
+                `Absolute pressure: ${(p1FlowBar + atmosphericPressure).toFixed(3)} bar`;
             document.getElementById('p2AbsoluteFlow').textContent = 
-                `Absolute pressure: ${(p2Flow + atmosphericPressure).toFixed(3)} bar`;
+                `Absolute pressure: ${(p2FlowBar + atmosphericPressure).toFixed(3)} bar`;
             
             // For pressure calculation
             const p1Pressure = parseFloat(document.getElementById('p1_pressure').value) || 0;
+            const p1PressureUnit = document.getElementById('p1_pressureUnit').value;
+            
+            const p1PressureBar = getPressureInBar(p1Pressure, p1PressureUnit);
             
             document.getElementById('p1AbsolutePressure').textContent = 
-                `Absolute pressure: ${(p1Pressure + atmosphericPressure).toFixed(3)} bar`;
+                `Absolute pressure: ${(p1PressureBar + atmosphericPressure).toFixed(3)} bar`;
         }
 
         function resetForm() {
@@ -322,8 +362,8 @@
             const S = parseFloat(document.getElementById('gasType').value);
             const e = parseFloat(document.getElementById('pipeType').value);
             
-            // Constants
-            const Ts = 288, Ps = 1.013, T = 278, Z = 1.0;
+            // Constants - corrected for low pressure calculations
+            const Ts = 288.15, Ps = 1.01325, T = 288.15, Z = 1.0;
             
             let resultHTML = '';
             let warnings = [];
@@ -331,22 +371,28 @@
             
             if (calculationType === 'flow') {
                 // Calculate FLOW RATE (Q)
-                const P1_gauge = parseFloat(document.getElementById('p1').value);
-                const P2_gauge = parseFloat(document.getElementById('p2').value);
+                const p1Unit = document.getElementById('p1Unit').value;
+                const p2Unit = document.getElementById('p2Unit').value;
                 
-                if (P1_gauge <= P2_gauge) {
+                const P1_gauge = parseFloat(document.getElementById('p1').value) || 0;
+                const P2_gauge = parseFloat(document.getElementById('p2').value) || 0;
+                
+                const P1_gauge_bar = getPressureInBar(P1_gauge, p1Unit);
+                const P2_gauge_bar = getPressureInBar(P2_gauge, p2Unit);
+                
+                if (P1_gauge_bar <= P2_gauge_bar) {
                     alert("Inlet pressure must be greater than outlet pressure!");
                     return;
                 }
                 
                 // Convert to absolute pressure
-                const P1 = P1_gauge + atmosphericPressure;
-                const P2 = P2_gauge + atmosphericPressure;
+                const P1 = P1_gauge_bar + atmosphericPressure;
+                const P2 = P2_gauge_bar + atmosphericPressure;
                 
                 let Q = calculateFlow(P1, P2, d, L, S, e, T, Z, Ts, Ps);
                 const velocity = calculateVelocity(Q, d);
-                const Re = calculateReynolds(Q, d, S);
-                const pressureLossPercent = ((P1_gauge - P2_gauge) / P1_gauge) * 100;
+                const Re = calculateReynolds(Q, d, S, (P1 + P2) / 2, T);
+                const pressureLossPercent = ((P1_gauge_bar - P2_gauge_bar) / P1_gauge_bar) * 100;
                 
                 // Check pressure loss
                 if (pressureLossPercent > 10) {
@@ -364,51 +410,37 @@
                 
                 resultHTML = `
                     <p><strong>Gas Flow Rate (Q):</strong> ${Q.toFixed(3)} m³/h</p>
-                    <p><strong>Pressure Loss (ΔP):</strong> ${(P1_gauge - P2_gauge).toFixed(3)} bar (gauge)</p>
+                    <p><strong>Pressure Loss (ΔP):</strong> ${(P1_gauge_bar - P2_gauge_bar).toFixed(4)} bar (gauge)</p>
                     <p><strong>Pressure Loss:</strong> ${pressureLossPercent.toFixed(1)}% of inlet pressure</p>
                     <p><strong>Gas Velocity:</strong> ${velocity.toFixed(2)} m/s</p>
                     <p><strong>Reynolds Number (Re):</strong> ${Re.toExponential(3)}</p>
                     <div class="pressure-info">
                         <p><strong>Pressure Details:</strong></p>
-                        <p>Inlet Pressure: ${P1_gauge.toFixed(3)} bar (gauge) = ${P1.toFixed(3)} bar (absolute)</p>
-                        <p>Outlet Pressure: ${P2_gauge.toFixed(3)} bar (gauge) = ${P2.toFixed(3)} bar (absolute)</p>
+                        <p>Inlet Pressure: ${P1_gauge_bar.toFixed(4)} bar (gauge) = ${P1.toFixed(4)} bar (absolute)</p>
+                        <p>Outlet Pressure: ${P2_gauge_bar.toFixed(4)} bar (gauge) = ${P2.toFixed(4)} bar (absolute)</p>
                     </div>
                 `;
             } else {
                 // Calculate PRESSURE LOSS (P2)
-                const P1_gauge = parseFloat(document.getElementById('p1_pressure').value);
+                const p1PressureUnit = document.getElementById('p1_pressureUnit').value;
+                const P1_gauge = parseFloat(document.getElementById('p1_pressure').value) || 0;
+                const P1_gauge_bar = getPressureInBar(P1_gauge, p1PressureUnit);
                 const Q_target = parseFloat(document.getElementById('flowRate').value);
                 
                 // Convert to absolute pressure
-                const P1 = P1_gauge + atmosphericPressure;
+                const P1 = P1_gauge_bar + atmosphericPressure;
                 
-                // Iterative search for P2
-                let P2_low = 0.1, P2_high = P1 - 0.1;
-                let P2, Q_calculated;
-                const tolerance = 0.001;
-                let iterations = 0;
-                const maxIterations = 50;
+                // Use direct calculation instead of iterative method for low pressures
+                const P2 = calculateOutletPressure(P1, Q_target, d, L, S, e, T, Z, Ts, Ps);
                 
-                for (iterations = 0; iterations < maxIterations; iterations++) {
-                    P2 = (P2_low + P2_high) / 2;
-                    Q_calculated = calculateFlow(P1, P2, d, L, S, e, T, Z, Ts, Ps);
-                    
-                    if (Math.abs(Q_calculated - Q_target) < tolerance) break;
-                    
-                    if (Q_calculated < Q_target) {
-                        P2_high = P2; // Need to decrease P2 (increase pressure drop)
-                    } else {
-                        P2_low = P2; // Need to increase P2 (decrease pressure drop)
-                    }
-                    
-                    // Safety check
-                    if (P2_low >= P2_high) break;
+                if (P2 < atmosphericPressure) {
+                    alerts.push("Calculated outlet pressure is below atmospheric pressure. This may indicate invalid input parameters or excessive flow rate.");
                 }
                 
-                const velocity = calculateVelocity(Q_target, d);
                 const P2_gauge = P2 - atmosphericPressure;
-                const Re = calculateReynolds(Q_target, d, S);
-                const pressureLossPercent = ((P1_gauge - P2_gauge) / P1_gauge) * 100;
+                const velocity = calculateVelocity(Q_target, d);
+                const Re = calculateReynolds(Q_target, d, S, (P1 + P2) / 2, T);
+                const pressureLossPercent = ((P1_gauge_bar - P2_gauge) / P1_gauge_bar) * 100;
                 
                 // Check pressure loss
                 if (pressureLossPercent > 10) {
@@ -425,17 +457,16 @@
                 }
                 
                 resultHTML = `
-                    <p><strong>Outlet Pressure (P₂):</strong> ${P2_gauge.toFixed(3)} bar (gauge)</p>
-                    <p><strong>Pressure Loss (ΔP):</strong> ${(P1_gauge - P2_gauge).toFixed(3)} bar (gauge)</p>
+                    <p><strong>Outlet Pressure (P<sub>2</sub>):</strong> ${P2_gauge.toFixed(4)} bar (gauge)</p>
+                    <p><strong>Pressure Loss (ΔP):</strong> ${(P1_gauge_bar - P2_gauge).toFixed(4)} bar (gauge)</p>
                     <p><strong>Pressure Loss:</strong> ${pressureLossPercent.toFixed(1)}% of inlet pressure</p>
                     <p><strong>Target Flow Rate (Q):</strong> ${Q_target.toFixed(3)} m³/h</p>
                     <p><strong>Gas Velocity:</strong> ${velocity.toFixed(2)} m/s</p>
                     <p><strong>Reynolds Number (Re):</strong> ${Re.toExponential(3)}</p>
-                    <p><strong>Iterations required:</strong> ${iterations}</p>
                     <div class="pressure-info">
                         <p><strong>Pressure Details:</strong></p>
-                        <p>Inlet Pressure: ${P1_gauge.toFixed(3)} bar (gauge) = ${P1.toFixed(3)} bar (absolute)</p>
-                        <p>Outlet Pressure: ${P2_gauge.toFixed(3)} bar (gauge) = ${P2.toFixed(3)} bar (absolute)</p>
+                        <p>Inlet Pressure: ${P1_gauge_bar.toFixed(4)} bar (gauge) = ${P1.toFixed(4)} bar (absolute)</p>
+                        <p>Outlet Pressure: ${P2_gauge.toFixed(4)} bar (gauge) = ${P2.toFixed(4)} bar (absolute)</p>
                     </div>
                 `;
             }
@@ -461,12 +492,17 @@
             const Re = calculateReynolds(
                 calculationType === 'flow' ? 
                 calculateFlow(
-                    parseFloat(document.getElementById('p1').value) + atmosphericPressure,
-                    parseFloat(document.getElementById('p2').value) + atmosphericPressure,
+                    getPressureInBar(parseFloat(document.getElementById('p1').value) || 0, document.getElementById('p1Unit').value) + atmosphericPressure,
+                    getPressureInBar(parseFloat(document.getElementById('p2').value) || 0, document.getElementById('p2Unit').value) + atmosphericPressure,
                     d, L, S, e, T, Z, Ts, Ps
                 ) : 
                 parseFloat(document.getElementById('flowRate').value),
-                d, S
+                d, S,
+                calculationType === 'flow' ? 
+                (getPressureInBar(parseFloat(document.getElementById('p1').value) || 0, document.getElementById('p1Unit').value) + 
+                 getPressureInBar(parseFloat(document.getElementById('p2').value) || 0, document.getElementById('p2Unit').value) + 2 * atmosphericPressure) / 2 :
+                (getPressureInBar(parseFloat(document.getElementById('p1_pressure').value) || 0, document.getElementById('p1_pressureUnit').value) + atmosphericPressure + atmosphericPressure) / 2,
+                T
             );
             
             let flowRegime = '';
@@ -485,29 +521,45 @@
         }
 
         function calculateFlow(P1, P2, d, L, S, e, T, Z, Ts, Ps) {
-            let Q_guess = 100;
-            let f, Q, Re, X, f_sp;
+            // Direct calculation without iteration for low pressures
+            const Re_approx = 100000; // Initial approximation for Reynolds number
+            const f = calculateFrictionFactor(Re_approx, e);
             
-            // Iterative calculation for friction factor
-            for (let i = 0; i < 10; i++) {
-                Re = calculateReynolds(Q_guess, d, S);
-                X = Math.log10(Re) - 5;
-                f_sp = Math.pow(14.7519 + 3.5657 * X + 0.0362 * Math.pow(X, 2), -2);
-                f = f_sp / Math.pow(e, 2);
-                
-                const part1 = Math.pow(P1, 2) - Math.pow(P2, 2);
-                const part2 = Math.pow(d, 5);
-                const part3 = S * T * Z * L * f;
-                
-                Q = 7.574e-4 * (Ts / Ps) * Math.sqrt((part1 * part2) / part3);
-                
-                // Check for convergence
-                if (Math.abs(Q - Q_guess) < 0.001) break;
-                
-                Q_guess = Q;
-            }
+            const part1 = Math.pow(P1, 2) - Math.pow(P2, 2);
+            const part2 = Math.pow(d, 5);
+            const part3 = S * T * Z * L * f;
+            
+            const Q = 7.574e-4 * (Ts / Ps) * Math.sqrt((part1 * part2) / part3);
             
             return Q;
+        }
+
+        function calculateOutletPressure(P1, Q_target, d, L, S, e, T, Z, Ts, Ps) {
+            // Direct calculation for outlet pressure
+            const Re_approx = 100000; // Initial approximation
+            const f = calculateFrictionFactor(Re_approx, e);
+            
+            const K = 7.574e-4 * (Ts / Ps);
+            const part2 = Math.pow(d, 5);
+            const part3 = S * T * Z * L * f;
+            
+            const P2_squared = Math.pow(P1, 2) - Math.pow(Q_target / K, 2) * (part3 / part2);
+            
+            if (P2_squared < 0) {
+                return atmosphericPressure; // Minimum pressure
+            }
+            
+            return Math.sqrt(P2_squared);
+        }
+
+        function calculateFrictionFactor(Re, e) {
+            // Simplified friction factor calculation for low pressures
+            if (Re < 2000) {
+                return 64 / Re; // Laminar flow
+            } else {
+                // Turbulent flow - using simplified formula
+                return 0.3164 / Math.pow(Re, 0.25) * e; // Blasius equation with efficiency factor
+            }
         }
 
         function calculateVelocity(Q, d) {
@@ -516,12 +568,17 @@
             return Q_m3s / area;
         }
 
-        function calculateReynolds(Q, d, S) {
-            // Reynolds number calculation for gas
-            // Using simplified formula: Re = (ρ v d) / μ
-            // For natural gas at standard conditions: ρ ≈ 0.7 kg/m³, μ ≈ 1.1e-5 Pa·s
-            const density = S * 1.2; // Relative to air (air density ≈ 1.2 kg/m³ at standard conditions)
-            const viscosity = 1.1e-5; // Pa·s
+        function calculateReynolds(Q, d, S, P_avg = 1.013, T = 288.15) {
+            // More accurate Reynolds number calculation
+            const R = 8.314462618; // Universal gas constant J/(mol·K)
+            const M_air = 0.02896; // Molar mass of air kg/mol
+            const M_gas = S * M_air; // Molar mass of gas
+            
+            // Density calculation using ideal gas law: ρ = P * M / (R * T)
+            const P_pa = P_avg * 100000; // Convert bar to Pa
+            const density = (P_pa * M_gas) / (R * T);
+            
+            const viscosity = 1.1e-5; // Pa·s (dynamic viscosity)
             const velocity = calculateVelocity(Q, d);
             const d_m = d / 1000; // diameter in meters
             
