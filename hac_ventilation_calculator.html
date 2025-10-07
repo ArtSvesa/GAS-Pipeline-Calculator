@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HAC and Ventilation Calculator</title>
     <style>
+        /* CSS залишається без змін */
         :root {
             --bg: #0f172a;
             --panel: #111827;
@@ -868,7 +869,12 @@
                         } else if (element.tagName === 'OPTION') {
                             // Options are handled separately
                         } else {
-                            element.textContent = text;
+                            // Handle HTML content for elements that might contain HTML
+                            if (element.hasAttribute('data-contains-html')) {
+                                element.innerHTML = text;
+                            } else {
+                                element.textContent = text;
+                            }
                         }
                     }
                 });
@@ -1101,6 +1107,79 @@
                     pressure += atmosphericPressure;
                 }
                 
+                // Check if pressure is below atmospheric (no flow condition)
+                if (pressure <= atmosphericPressure) {
+                    // No flow condition - pressure is equal to or below atmospheric
+                    const massFlowRate = 0;
+                    const qc = 0;
+                    const massFlowRateKgH = 0;
+                    const qcM3H = 0;
+                    const isChoked = false;
+                    
+                    // Store calculation logs
+                    calculationLogs.releaseRate = {
+                        inputs: {
+                            molarMass,
+                            gamma,
+                            temperature,
+                            holeSize: holeSize * 1e6,
+                            pressure: pressure / 1e5,
+                            cd,
+                            lfl: parseFloat(document.getElementById('lfl').value),
+                            pressureType,
+                            atmosphericPressure: atmosphericPressure / 1e5
+                        },
+                        intermediate: {
+                            betaCrit: Math.pow(2 / (gamma + 1), gamma / (gamma - 1)),
+                            pressureRatio: atmosphericPressure / pressure,
+                            isChoked: false,
+                            gasDensity: 0,
+                            massFlowRate: 0,
+                            qc: 0,
+                            noFlow: true
+                        },
+                        results: {
+                            massFlowRateKgH: 0,
+                            qc: 0,
+                            qcM3H: 0,
+                            isChoked: false,
+                            noFlow: true
+                        }
+                    };
+                    
+                    // Display results
+                    const resultsDiv = document.getElementById('releaseResults');
+                    resultsDiv.innerHTML = `
+                        <div class="result-item">
+                            <span data-en="Flow Type:" data-ua="Тип потоку:">Flow Type:</span>
+                            <span class="result-value">${currentLanguage === 'en' ? 'No Flow' : 'Немає потоку'} 
+                                <span class="pill warn">${currentLanguage === 'en' ? 'No Flow' : 'Немає потоку'}</span></span>
+                        </div>
+                        <div class="result-item">
+                            <span data-en="Mass Flow Rate (ṁ):" data-ua="Масова витрата (ṁ):">Mass Flow Rate (ṁ):</span>
+                            <span class="result-value">${massFlowRateKgH.toFixed(6)} kg/h</span>
+                        </div>
+                        <div class="result-item">
+                            <span data-en="Volumetric Release Characteristic (Q<sub>c</sub>):" data-ua="Характеристика об'ємного викиду (Q<sub>c</sub>):">Volumetric Release Characteristic (Q<sub>c</sub>):</span>
+                            <span class="result-value">${qc.toFixed(6)} m³/s (${qcM3H.toFixed(6)} m³/h)</span>
+                        </div>
+                        <div class="result-details">
+                            <div data-en="System pressure is below or equal to atmospheric pressure. No gas release occurs." data-ua="Тиск у системі нижче або дорівнює атмосферному. Викиду газу не відбувається.">System pressure is below or equal to atmospheric pressure. No gas release occurs.</div>
+                        </div>
+                    `;
+                    
+                    // Update language for results
+                    setLanguage(currentLanguage);
+                    
+                    // Update Qc for zone calculation
+                    document.getElementById('qcForZone').value = qc.toFixed(6);
+                    
+                    // Update summary
+                    updateSummary();
+                    
+                    return { massFlowRate, massFlowRateKgH, qc, qcM3H, isChoked, noFlow: true };
+                }
+                
                 // Calculate critical pressure ratio
                 const betaCrit = Math.pow(2 / (gamma + 1), gamma / (gamma - 1));
                 const pressureRatio = atmosphericPressure / pressure;
@@ -1182,7 +1261,7 @@
                         <span class="result-value">${qc.toFixed(6)} m³/s (${qcM3H.toFixed(6)} m³/h)</span>
                     </div>
                     <div class="result-details">
-                        <div data-en="Used values: S = ${holeSize * 1e6} mm², p = ${pressure/1e5} bar, C<sub>d</sub> = ${cd}, γ = ${gamma}, T = ${temperature} K" data-ua="Використані значення: S = ${holeSize * 1e6} мм², p = ${pressure/1e5} бар, C<sub>d</sub> = ${cd}, γ = ${gamma}, T = ${temperature} K">Used values: S = ${holeSize * 1e6} mm², p = ${pressure/1e5} bar, C<sub>d</sub> = ${cd}, γ = ${gamma}, T = ${temperature} K</div>
+                        <div data-en="Used values: S = ${holeSize * 1e6} mm², p = ${(pressure/1e5).toFixed(3)} bar, C<sub>d</sub> = ${cd}, γ = ${gamma}, T = ${temperature} K" data-ua="Використані значення: S = ${holeSize * 1e6} мм², p = ${(pressure/1e5).toFixed(3)} бар, C<sub>d</sub> = ${cd}, γ = ${gamma}, T = ${temperature} K">Used values: S = ${holeSize * 1e6} mm², p = ${(pressure/1e5).toFixed(3)} bar, C<sub>d</sub> = ${cd}, γ = ${gamma}, T = ${temperature} K</div>
                     </div>
                 `;
                 
@@ -1316,16 +1395,32 @@
                     }
                 }
                 
-                // Determine ventilation and dilution for indoor scenario
-                let ventilationAvailability = currentLanguage === 'en' ? 'Indoor' : 'Внутрішня';
-                let dilutionLevel;
+                // Determine ventilation availability for indoor scenario based on air change frequency
+                let ventilationAvailability;
+                let ventilationAvailabilityKey;
+                if (c >= 0.03) { // More than 0.03 air changes per second (~108 per hour)
+                    ventilationAvailability = currentLanguage === 'en' ? 'Good' : 'Добра';
+                    ventilationAvailabilityKey = 'good';
+                } else if (c >= 0.01) { // More than 0.01 air changes per second (~36 per hour)
+                    ventilationAvailability = currentLanguage === 'en' ? 'Fair' : 'Задовільна';
+                    ventilationAvailabilityKey = 'fair';
+                } else {
+                    ventilationAvailability = currentLanguage === 'en' ? 'Poor' : 'Погана';
+                    ventilationAvailabilityKey = 'poor';
+                }
                 
-                if (c > 0.03) { // More than 0.03 air changes per second (~100 per hour)
+                // Determine dilution level for indoor scenario
+                let dilutionLevel;
+                let dilutionLevelKey;
+                if (c > 0.03) { // More than 0.03 air changes per second (~108 per hour)
                     dilutionLevel = currentLanguage === 'en' ? 'High' : 'Високий';
+                    dilutionLevelKey = 'high';
                 } else if (c > 0.01) { // More than 0.01 air changes per second (~36 per hour)
                     dilutionLevel = currentLanguage === 'en' ? 'Medium' : 'Середній';
+                    dilutionLevelKey = 'medium';
                 } else {
                     dilutionLevel = currentLanguage === 'en' ? 'Low' : 'Низький';
+                    dilutionLevelKey = 'low';
                 }
                 
                 // Store calculation logs
@@ -1353,7 +1448,9 @@
                         backgroundStatusKey,
                         backgroundExplanation,
                         ventilationAvailability,
-                        dilutionLevel
+                        ventilationAvailabilityKey,
+                        dilutionLevel,
+                        dilutionLevelKey
                     }
                 };
                 
@@ -1370,7 +1467,7 @@
                     </div>
                     <div class="result-item">
                         <span data-en="Air Change Frequency (C):" data-ua="Частота повітрообміну (C):">Air Change Frequency (C):</span>
-                        <span class="result-value">${c.toFixed(4)} s⁻¹</span>
+                        <span class="result-value">${c.toFixed(4)} s⁻¹ (${(c * 3600).toFixed(1)} per hour)</span>
                     </div>
                     <div class="result-item">
                         <span data-en="Background Concentration (Xᵦ):" data-ua="Фонова концентрація (Xᵦ):">Background Concentration (Xᵦ):</span>
@@ -1378,11 +1475,11 @@
                     </div>
                     <div class="result-item">
                         <span data-en="Ventilation Availability:" data-ua="Доступність вентиляції:">Ventilation Availability:</span>
-                        <span class="result-value">${ventilationAvailability}</span>
+                        <span class="result-value">${ventilationAvailability} <span class="pill ${ventilationAvailabilityKey === 'good' ? 'ok' : ventilationAvailabilityKey === 'fair' ? 'warn' : 'bad'}">${ventilationAvailability}</span></span>
                     </div>
                     <div class="result-item">
                         <span data-en="Dilution Level:" data-ua="Рівень розведення:">Dilution Level:</span>
-                        <span class="result-value">${dilutionLevel} <span class="pill ${dilutionLevel === (currentLanguage === 'en' ? 'High' : 'Високий') ? 'ok' : dilutionLevel === (currentLanguage === 'en' ? 'Medium' : 'Середній') ? 'warn' : 'bad'}">${dilutionLevel}</span></span>
+                        <span class="result-value">${dilutionLevel} <span class="pill ${dilutionLevelKey === 'high' ? 'ok' : dilutionLevelKey === 'medium' ? 'warn' : 'bad'}">${dilutionLevel}</span></span>
                     </div>
                     <div class="result-details">
                         <div data-en="Used values: A₁ = ${a1} m², A₂ = ${a2} m², U = ${windSpeed} m/s, ΔCₚ = ${deltaCp}, f = ${inefficiency}, V₀ = ${roomVolume} m³" data-ua="Використані значення: A₁ = ${a1} м², A₂ = ${a2} м², U = ${windSpeed} м/с, ΔCₚ = ${deltaCp}, f = ${inefficiency}, V₀ = ${roomVolume} м³">Used values: A₁ = ${a1} m², A₂ = ${a2} m², U = ${windSpeed} m/s, ΔCₚ = ${deltaCp}, f = ${inefficiency}, V₀ = ${roomVolume} m³</div>
@@ -1393,7 +1490,7 @@
                 // Update summary
                 updateSummary();
                 
-                return { ae, qa, c, xb, backgroundStatus, backgroundStatusKey, ventilationAvailability, dilutionLevel };
+                return { ae, qa, c, xb, backgroundStatus, backgroundStatusKey, ventilationAvailability, ventilationAvailabilityKey, dilutionLevel, dilutionLevelKey };
             }
             
             function classifyHazardousArea() {
@@ -1403,30 +1500,54 @@
                 const applyTypicalLimiters = document.getElementById('applyTypicalLimiters').checked;
                 const qcForZone = parseFloat(document.getElementById('qcForZone').value);
                 
-                // Determine zone type based on IEC 60079-10-1 Table D.1
-                let zoneType;
-                let zoneTypeKey;
+                let zoneType, zoneTypeKey, zoneExtent, calculationMethod, calculationDetails;
                 
-                if (releaseGrade === 'continuous') {
-                    zoneTypeKey = 'zone0';
-                    zoneType = currentLanguage === 'en' ? 'Zone 0' : 'Зона 0';
-                } else if (releaseGrade === 'primary') {
-                    zoneTypeKey = 'zone1';
-                    zoneType = currentLanguage === 'en' ? 'Zone 1' : 'Зона 1';
-                } else { // secondary
-                    zoneTypeKey = 'zone2';
-                    zoneType = currentLanguage === 'en' ? 'Zone 2' : 'Зона 2';
+                // Check for indoor scenario with unacceptable background concentration
+                if (calculationLogs.scenario === 'indoor' && 
+                    calculationLogs.indoorAssessment.results && 
+                    calculationLogs.indoorAssessment.results.backgroundStatusKey === 'unacceptable') {
+                    
+                    // For indoor scenarios with unacceptable background concentration, the entire room becomes hazardous
+                    if (releaseGrade === 'continuous') {
+                        zoneTypeKey = 'zone0';
+                        zoneType = currentLanguage === 'en' ? 'Zone 0 (Whole Room)' : 'Зона 0 (Все приміщення)';
+                    } else if (releaseGrade === 'primary') {
+                        zoneTypeKey = 'zone1';
+                        zoneType = currentLanguage === 'en' ? 'Zone 1 (Whole Room)' : 'Зона 1 (Все приміщення)';
+                    } else {
+                        zoneTypeKey = 'zone2';
+                        zoneType = currentLanguage === 'en' ? 'Zone 2 (Whole Room)' : 'Зона 2 (Все приміщення)';
+                    }
+                    
+                    zoneExtent = null; // Whole room
+                    calculationMethod = currentLanguage === 'en' 
+                        ? 'Whole room classification due to inadequate ventilation' 
+                        : 'Класифікація всього приміщення через недостатню вентиляцію';
+                    calculationDetails = currentLanguage === 'en' 
+                        ? `Background concentration exceeds 25% LFL. Entire room classified as ${zoneType}.` 
+                        : `Фонова концентрація перевищує 25% LFL. Все приміщення класифіковано як ${zoneType}.`;
+                } else {
+                    // Standard zone classification
+                    if (releaseGrade === 'continuous') {
+                        zoneTypeKey = 'zone0';
+                        zoneType = currentLanguage === 'en' ? 'Zone 0' : 'Зона 0';
+                    } else if (releaseGrade === 'primary') {
+                        zoneTypeKey = 'zone1';
+                        zoneType = currentLanguage === 'en' ? 'Zone 1' : 'Зона 1';
+                    } else { // secondary
+                        zoneTypeKey = 'zone2';
+                        zoneType = currentLanguage === 'en' ? 'Zone 2' : 'Зона 2';
+                    }
+                    
+                    // Use manual zone extent from Figure D.1
+                    zoneExtent = zoneExtentManual;
+                    calculationMethod = currentLanguage === 'en' 
+                        ? 'Based on Figure D.1 with manual input' 
+                        : 'На основі Рисунка D.1 з ручним введенням';
+                    calculationDetails = currentLanguage === 'en' 
+                        ? `Zone extent manually set to ${zoneExtent} m based on Figure D.1` 
+                        : `Протяжність зони вручну встановлена на ${zoneExtent} м на основі Рисунка D.1`;
                 }
-                
-                // Use manual zone extent from Figure D.1
-                const zoneExtent = zoneExtentManual;
-                const calculationMethod = currentLanguage === 'en' 
-                    ? 'Based on Figure D.1 with manual input' 
-                    : 'На основі Рисунка D.1 з ручним введенням';
-                
-                const calculationDetails = currentLanguage === 'en' 
-                    ? `Zone extent manually set to ${zoneExtent} m based on Figure D.1` 
-                    : `Протяжність зони вручну встановлена на ${zoneExtent} м на основі Рисунка D.1`;
                 
                 // Store calculation logs
                 calculationLogs.zoneClassification = {
@@ -1448,6 +1569,10 @@
                 
                 // Display results
                 const resultsDiv = document.getElementById('classificationResults');
+                let zoneExtentDisplay = zoneExtent === null ? 
+                    (currentLanguage === 'en' ? 'Whole Room' : 'Все приміщення') : 
+                    `${zoneExtent.toFixed(1)} m`;
+                
                 resultsDiv.innerHTML = `
                     <div class="result-item">
                         <span data-en="Zone Type:" data-ua="Тип зони:">Zone Type:</span>
@@ -1455,7 +1580,7 @@
                     </div>
                     <div class="result-item">
                         <span data-en="Zone Extent:" data-ua="Протяжність зони:">Zone Extent:</span>
-                        <span class="result-value">${zoneExtent.toFixed(1)} m</span>
+                        <span class="result-value">${zoneExtentDisplay}</span>
                     </div>
                     <div class="result-item">
                         <span data-en="Calculation Method:" data-ua="Метод розрахунку:">Calculation Method:</span>
@@ -1493,16 +1618,26 @@
                     (currentLanguage === 'en' ? 'Indoor' : 'Внутрішній');
                 
                 document.getElementById('summaryScenario').textContent = scenarioText;
-                document.getElementById('summaryQc').textContent = calculationLogs.releaseRate.results ? 
-                    `${calculationLogs.releaseRate.results.qc.toFixed(6)} m³/s` : '— m³/s';
+                
+                // Update Qc
+                if (calculationLogs.releaseRate.results) {
+                    document.getElementById('summaryQc').textContent = 
+                        `${calculationLogs.releaseRate.results.qc.toFixed(6)} m³/s`;
+                } else {
+                    document.getElementById('summaryQc').textContent = '— m³/s';
+                }
                 
                 // Update ventilation and dilution based on scenario
                 if (scenario === 'outdoor' && calculationLogs.outdoorAssessment.results) {
-                    document.getElementById('summaryVentilation').textContent = calculationLogs.outdoorAssessment.results.ventilationAvailability;
-                    document.getElementById('summaryDilution').textContent = calculationLogs.outdoorAssessment.results.dilutionLevel;
+                    document.getElementById('summaryVentilation').textContent = 
+                        calculationLogs.outdoorAssessment.results.ventilationAvailability;
+                    document.getElementById('summaryDilution').textContent = 
+                        calculationLogs.outdoorAssessment.results.dilutionLevel;
                 } else if (scenario === 'indoor' && calculationLogs.indoorAssessment.results) {
-                    document.getElementById('summaryVentilation').textContent = calculationLogs.indoorAssessment.results.ventilationAvailability;
-                    document.getElementById('summaryDilution').textContent = calculationLogs.indoorAssessment.results.dilutionLevel;
+                    document.getElementById('summaryVentilation').textContent = 
+                        calculationLogs.indoorAssessment.results.ventilationAvailability;
+                    document.getElementById('summaryDilution').textContent = 
+                        calculationLogs.indoorAssessment.results.dilutionLevel;
                 } else {
                     document.getElementById('summaryVentilation').textContent = '—';
                     document.getElementById('summaryDilution').textContent = '—';
@@ -1510,8 +1645,16 @@
                 
                 // Update zone classification
                 if (calculationLogs.zoneClassification.results) {
-                    document.getElementById('summaryZone').textContent = calculationLogs.zoneClassification.results.zoneType;
-                    document.getElementById('summaryExtent').textContent = `${calculationLogs.zoneClassification.results.zoneExtent.toFixed(1)} m`;
+                    document.getElementById('summaryZone').textContent = 
+                        calculationLogs.zoneClassification.results.zoneType;
+                    
+                    if (calculationLogs.zoneClassification.results.zoneExtent === null) {
+                        document.getElementById('summaryExtent').textContent = 
+                            currentLanguage === 'en' ? 'Whole Room' : 'Все приміщення';
+                    } else {
+                        document.getElementById('summaryExtent').textContent = 
+                            `${calculationLogs.zoneClassification.results.zoneExtent.toFixed(1)} m`;
+                    }
                 } else {
                     document.getElementById('summaryZone').textContent = '—';
                     document.getElementById('summaryExtent').textContent = '— m';
@@ -1529,12 +1672,12 @@
             function generateReport() {
                 // Collect all data
                 const releaseData = calculateReleaseRate();
-                const outdoorData = scenario === 'outdoor' ? assessOutdoorConditions() : null;
-                const enclosedData = scenario === 'indoor' ? assessEnclosedSpace() : null;
+                const outdoorData = calculationLogs.scenario === 'outdoor' ? assessOutdoorConditions() : null;
+                const enclosedData = calculationLogs.scenario === 'indoor' ? assessEnclosedSpace() : null;
                 const classificationData = classifyHazardousArea();
                 
                 // Create detailed report content
-                const reportContent = `HAC AND VENTILATION ANALYSIS REPORT
+                let reportContent = `HAC AND VENTILATION ANALYSIS REPORT
 ===================================
 
 SCENARIO: ${calculationLogs.scenario === 'outdoor' ? 'OUTDOOR RELEASE' : 'INDOOR RELEASE'}
@@ -1554,17 +1697,12 @@ Discharge Coefficient: ${calculationLogs.releaseRate.inputs.cd}
 Atmospheric Pressure: ${calculationLogs.releaseRate.inputs.atmosphericPressure} bar
 
 RELEASE RATE CALCULATION DETAILS:
-- Critical pressure ratio (β_crit): ${calculationLogs.releaseRate.intermediate.betaCrit.toFixed(4)}
-- Pressure ratio (p_a/p): ${calculationLogs.releaseRate.intermediate.pressureRatio.toFixed(4)}
+- Critical pressure ratio (β_crit): ${calculationLogs.releaseRate.intermediate.betaCrit ? calculationLogs.releaseRate.intermediate.betaCrit.toFixed(4) : 'N/A'}
+- Pressure ratio (p_a/p): ${calculationLogs.releaseRate.intermediate.pressureRatio ? calculationLogs.releaseRate.intermediate.pressureRatio.toFixed(4) : 'N/A'}
 - Flow type: ${calculationLogs.releaseRate.intermediate.isChoked ? 'Choked' : 'Subsonic'}
-- Gas density: ${calculationLogs.releaseRate.intermediate.gasDensity.toFixed(6)} kg/m³
-- Mass flow rate: ${calculationLogs.releaseRate.results.massFlowRate.toExponential(6)} kg/s
-- Volumetric release characteristic (Qc): ${calculationLogs.releaseRate.results.qc.toExponential(6)} m³/s
-
-Release Results:
-- Flow Type: ${releaseData.isChoked ? 'Choked' : 'Subsonic'}
-- Mass Flow Rate: ${releaseData.massFlowRateKgH.toFixed(6)} kg/h
-- Volumetric Release Characteristic (Qc): ${releaseData.qc.toFixed(6)} m³/s (${releaseData.qcM3H.toFixed(6)} m³/h)
+- Gas density: ${calculationLogs.releaseRate.intermediate.gasDensity ? calculationLogs.releaseRate.intermediate.gasDensity.toFixed(6) : 'N/A'} kg/m³
+- Mass flow rate: ${calculationLogs.releaseRate.results.massFlowRateKgH ? calculationLogs.releaseRate.results.massFlowRateKgH.toFixed(6) : '0.000000'} kg/h
+- Volumetric release characteristic (Qc): ${calculationLogs.releaseRate.results.qc ? calculationLogs.releaseRate.results.qc.toExponential(6) : '0.000000'} m³/s
 
 ${calculationLogs.scenario === 'outdoor' ? `OUTDOOR ASSESSMENT
 ------------------
@@ -1585,17 +1723,17 @@ Ventilation Inefficiency: ${calculationLogs.indoorAssessment.inputs.inefficiency
 Discharge Coefficient (ventilation): ${calculationLogs.indoorAssessment.inputs.cdVent}
 
 VENTILATION CALCULATION DETAILS:
-- Equivalent Area: ${calculationLogs.indoorAssessment.intermediate.ae.toFixed(6)} m²
-- Air Flow Rate: ${calculationLogs.indoorAssessment.intermediate.qa.toFixed(6)} m³/s
-- Air Change Frequency: ${calculationLogs.indoorAssessment.intermediate.c.toFixed(6)} s⁻¹
-- Critical concentration (25% LFL): ${calculationLogs.indoorAssessment.intermediate.xcrit.toFixed(6)}
-- Background concentration: ${calculationLogs.indoorAssessment.results.xb.toFixed(6)}
+- Equivalent Area: ${calculationLogs.indoorAssessment.intermediate.ae ? calculationLogs.indoorAssessment.intermediate.ae.toFixed(6) : 'N/A'} m²
+- Air Flow Rate: ${calculationLogs.indoorAssessment.intermediate.qa ? calculationLogs.indoorAssessment.intermediate.qa.toFixed(6) : 'N/A'} m³/s
+- Air Change Frequency: ${calculationLogs.indoorAssessment.intermediate.c ? calculationLogs.indoorAssessment.intermediate.c.toFixed(6) : 'N/A'} s⁻¹
+- Critical concentration (25% LFL): ${calculationLogs.indoorAssessment.intermediate.xcrit ? calculationLogs.indoorAssessment.intermediate.xcrit.toFixed(6) : 'N/A'}
+- Background concentration: ${calculationLogs.indoorAssessment.results.xb ? calculationLogs.indoorAssessment.results.xb.toFixed(6) : 'N/A'}
 
 Assessment Results:
-- Equivalent Area: ${calculationLogs.indoorAssessment.intermediate.ae.toFixed(6)} m²
-- Air Flow Rate: ${calculationLogs.indoorAssessment.intermediate.qa.toFixed(6)} m³/s
-- Air Change Frequency: ${calculationLogs.indoorAssessment.intermediate.c.toFixed(4)} s⁻¹
-- Background Concentration: ${calculationLogs.indoorAssessment.results.xb.toFixed(6)} (${calculationLogs.indoorAssessment.results.backgroundStatus})
+- Equivalent Area: ${calculationLogs.indoorAssessment.intermediate.ae ? calculationLogs.indoorAssessment.intermediate.ae.toFixed(6) : 'N/A'} m²
+- Air Flow Rate: ${calculationLogs.indoorAssessment.intermediate.qa ? calculationLogs.indoorAssessment.intermediate.qa.toFixed(6) : 'N/A'} m³/s
+- Air Change Frequency: ${calculationLogs.indoorAssessment.intermediate.c ? calculationLogs.indoorAssessment.intermediate.c.toFixed(4) : 'N/A'} s⁻¹
+- Background Concentration: ${calculationLogs.indoorAssessment.results.xb ? calculationLogs.indoorAssessment.results.xb.toFixed(6) : 'N/A'} (${calculationLogs.indoorAssessment.results.backgroundStatus})
 - Ventilation Availability: ${calculationLogs.indoorAssessment.results.ventilationAvailability}
 - Dilution Level: ${calculationLogs.indoorAssessment.results.dilutionLevel}`}
 
@@ -1609,7 +1747,7 @@ Apply Typical Limiters: ${calculationLogs.zoneClassification.inputs.applyTypical
 
 Classification Results:
 - Zone Type: ${classificationData.zoneType}
-- Zone Extent: ${classificationData.zoneExtent.toFixed(1)} m
+- Zone Extent: ${classificationData.zoneExtent === null ? 'Whole Room' : classificationData.zoneExtent.toFixed(1) + ' m'}
 - Calculation Method: ${classificationData.calculationMethod}
 
 RECOMMENDATIONS
