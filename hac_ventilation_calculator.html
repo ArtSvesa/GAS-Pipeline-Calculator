@@ -432,6 +432,96 @@
             color: var(--brand);
         }
         
+        .type-a-opening {
+            background: rgba(34, 211, 238, 0.1);
+            border: 1px solid var(--brand);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .type-a-opening h4 {
+            color: var(--brand);
+            margin-bottom: 10px;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .warning-banner {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            border-radius: 8px;
+            padding: 12px;
+            margin: 10px 0;
+            color: #fecaca;
+            font-size: 0.9rem;
+        }
+        
+        .info-banner {
+            background: rgba(34, 211, 238, 0.15);
+            border: 1px solid rgba(34, 211, 238, 0.35);
+            border-radius: 8px;
+            padding: 12px;
+            margin: 10px 0;
+            color: #a7f3d0;
+            font-size: 0.9rem;
+        }
+        
+        .conservative-mode-toggle {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .conservative-mode-toggle h4 {
+            color: var(--warn);
+            margin-bottom: 8px;
+        }
+        
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .toggle-group label {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+        
+        .toggle-group input[type="checkbox"] {
+            width: auto;
+        }
+        
+        .calculation-log {
+            background: var(--code);
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .log-entry {
+            margin: 5px 0;
+            padding: 3px;
+            border-left: 2px solid var(--brand);
+            padding-left: 8px;
+        }
+        
+        .log-time {
+            color: var(--muted);
+            font-size: 0.7rem;
+        }
+        
         @media (max-width: 768px) {
             .grid {
                 grid-template-columns: 1fr;
@@ -466,6 +556,11 @@
                 flex-direction: column;
                 align-items: center;
             }
+            
+            .toggle-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
@@ -473,7 +568,7 @@
     <div class="container">
         <header>
             <h1 data-en="HAC and Ventilation Calculator" data-ua="Калькулятор HAC та Вентиляції">HAC and Ventilation Calculator</h1>
-            <p class="subtitle" data-en="Based on IEC 60079-10-1, EN 12186, IGEM TD/13, and BS 5925 standards" data-ua="На основі стандартів IEC 60079-10-1, EN 12186, IGEM TD/13 та BS 5925">Based on IEC 60079-10-1, EN 12186, IGEM TD/13, and BS 5925 standards</p>
+            <p class="subtitle" data-en="Based on IEC 60079-10-1:2020, EN 12186:2014, IGEM TD/13 Ed.3, and BS 5925:1991" data-ua="На основі стандартів IEC 60079-10-1:2020, EN 12186:2014, IGEM TD/13 Ed.3 та BS 5925:1991">Based on IEC 60079-10-1:2020, EN 12186:2014, IGEM TD/13 Ed.3, and BS 5925:1991</p>
             
             <div class="language-toggle">
                 <button class="language-btn active" data-lang="en">EN</button>
@@ -499,6 +594,9 @@
                 <li data-en="<strong>Indoor releases:</strong> The entire room may become a hazardous zone if ventilation is inadequate. Zone extent depends on room size, ventilation efficiency, and background concentration of flammable gas." data-ua="<strong>Внутрішні викиди:</strong> Все приміщення може стати небезпечною зоною, якщо вентиляція недостатня. Протяжність зони залежить від розміру приміщення, ефективності вентиляції та фонової концентрації займистого газу.">
                     <strong>Indoor releases:</strong> The entire room may become a hazardous zone if ventilation is inadequate. Zone extent depends on room size, ventilation efficiency, and background concentration of flammable gas.
                 </li>
+                <li data-en="<strong>Type A Openings:</strong> For openings from enclosed spaces (ventilation outlets), the opening is treated as a release point according to IEC 60079-10-1 Article B.8. The volumetric flow rate Q₂ is used as release characteristic." data-ua="<strong>Отвори типу А:</strong> Для отворів із закритих просторів (вентиляційні виходи), отвір розглядається як точка викиду згідно з IEC 60079-10-1 Стаття B.8. Об'ємна витрата Q₂ використовується як характеристика викиду.">
+                    <strong>Type A Openings:</strong> For openings from enclosed spaces (ventilation outlets), the opening is treated as a release point according to IEC 60079-10-1 Article B.8. The volumetric flow rate Q₂ is used as release characteristic.
+                </li>
             </ul>
         </div>
         
@@ -506,6 +604,7 @@
             <div class="tab active" data-tab="gas-properties" data-en="Gas Properties" data-ua="Властивості газу">Gas Properties</div>
             <div class="tab outdoor-only" data-tab="outdoor-assessment" data-en="Outdoor Assessment" data-ua="Оцінка зовнішнього викиду">Outdoor Assessment</div>
             <div class="tab indoor-only" data-tab="indoor-assessment" data-en="Indoor Assessment" data-ua="Оцінка внутрішнього викиду">Indoor Assessment</div>
+            <div class="tab indoor-only" data-tab="standards-check" data-en="Standards Compliance" data-ua="Відповідність стандартам">Standards Compliance</div>
             <div class="tab" data-tab="classification" data-en="Zone Classification" data-ua="Класифікація зони">Zone Classification</div>
         </div>
         
@@ -518,13 +617,22 @@
                     <div class="input-group">
                         <label for="gasType" data-en="Gas Type" data-ua="Тип газу">Gas Type</label>
                         <select id="gasType">
-                            <option value="propane" data-en="Propane (Commercial)" data-ua="Пропан (Комерційний)">Propane (Commercial)</option>
-                            <option value="butane" data-en="Butane (Commercial)" data-ua="Бутан (Комерційний)">Butane (Commercial)</option>
+                            <option value="propane" data-en="Propane" data-ua="Пропан">Propane</option>
+                            <option value="butane" data-en="Butane" data-ua="Бутан">Butane</option>
                             <option value="custom" data-en="Custom" data-ua="Інший">Custom</option>
                         </select>
                         <div class="unit"></div>
                     </div>
-                    <div class="explanation" data-en="Select the type of gas you are working with. Propane and Butane have predefined properties. For other gases, select 'Custom' and enter values manually." data-ua="Виберіть тип газу, з яким працюєте. Пропан та бутан мають попередньо визначені властивості. Для інших газів виберіть 'Інший' та введіть значення вручну.">Select the type of gas you are working with. Propane and Butane have predefined properties. For other gases, select 'Custom' and enter values manually.</div>
+                    
+                    <div class="input-group">
+                        <label for="lflPreset" data-en="LFL Preset" data-ua="Попередній вибір LFL">LFL Preset</label>
+                        <select id="lflPreset">
+                            <option value="common" data-en="Common (2.1%)" data-ua="Загальноприйнятий (2.1%)">Common (2.1%)</option>
+                            <option value="conservative" data-en="Conservative (1.7%)" data-ua="Консервативний (1.7%)">Conservative (1.7%)</option>
+                            <option value="custom" data-en="Custom" data-ua="Власне значення">Custom</option>
+                        </select>
+                        <div class="unit"></div>
+                    </div>
                     
                     <details>
                         <summary data-en="Gas Properties" data-ua="Властивості газу">Gas Properties</summary>
@@ -533,28 +641,24 @@
                             <input type="number" id="molarMass" step="0.0001" value="0.044097">
                             <div class="unit">kg/mol</div>
                         </div>
-                        <div class="explanation" data-en="The mass of one mole of the gas. For propane: 0.044097 kg/mol, for butane: 0.058123 kg/mol." data-ua="Маса одного моля газу. Для пропану: 0.044097 кг/моль, для бутану: 0.058123 кг/моль.">The mass of one mole of the gas. For propane: 0.044097 kg/mol, for butane: 0.058123 kg/mol.</div>
                         
                         <div class="input-group">
                             <label for="gamma" data-en="Specific Heat Ratio (γ)" data-ua="Показник адіабати (γ)">Specific Heat Ratio (γ)</label>
                             <input type="number" id="gamma" step="0.001" value="1.13">
                             <div class="unit">—</div>
                         </div>
-                        <div class="explanation" data-en="Ratio of specific heats (Cp/Cv). For propane: 1.13, for butane: 1.18." data-ua="Відношення питомих теплоємностей (Cp/Cv). Для пропану: 1.13, для бутану: 1.18.">Ratio of specific heats (Cp/Cv). For propane: 1.13, for butane: 1.18.</div>
                         
                         <div class="input-group">
                             <label for="lfl" data-en="Lower Flammable Limit (LFL)" data-ua="Нижча межа займистості (LFL)">Lower Flammable Limit (LFL)</label>
-                            <input type="number" id="lfl" step="0.0001" value="0.017">
+                            <input type="number" id="lfl" step="0.0001" value="0.021">
                             <div class="unit">vol/vol</div>
                         </div>
-                        <div class="explanation" data-en="The lowest concentration of gas in air that can ignite. For propane: 1.7% (0.017), for butane: 1.4% (0.014)." data-ua="Найменша концентрація газу в повітрі, яка може спалахнути. Для пропану: 1.7% (0.017), для бутану: 1.4% (0.014).">The lowest concentration of gas in air that can ignite. For propane: 1.7% (0.017), for butane: 1.4% (0.014).</div>
                         
                         <div class="input-group">
-                            <label for="temp" data-en="Gas Temperature (T)" data-ua="Температура газу (T)">Gas Temperature (T)</label>
+                            <label for="temp" data-en="Gas Temperature (T₀)" data-ua="Температура газу (T₀)">Gas Temperature (T₀)</label>
                             <input type="number" id="temp" step="0.1" value="293.15">
                             <div class="unit">K</div>
                         </div>
-                        <div class="explanation" data-en="Temperature of the gas inside the system. Standard temperature is 20°C (293.15K)." data-ua="Температура газу всередині системи. Стандартна температура 20°C (293.15K).">Temperature of the gas inside the system. Standard temperature is 20°C (293.15K).</div>
                     </details>
                     
                     <div class="input-group">
@@ -589,17 +693,23 @@
                     <div class="explanation" data-en="Coefficient that accounts for flow contraction and friction. Typical values: 0.6-0.65 for sharp-edged orifices, 0.8-0.98 for well-rounded nozzles. Use 0.62 for standard calculations." data-ua="Коефіцієнт, що враховує стиснення потоку та тертя. Типові значення: 0.6-0.65 для отворів з гострими краями, 0.8-0.98 для добре закруглених сопел. Використовуйте 0.62 для стандартних розрахунків.">Coefficient that accounts for flow contraction and friction. Typical values: 0.6-0.65 for sharp-edged orifices, 0.8-0.98 for well-rounded nozzles. Use 0.62 for standard calculations.</div>
                 
                     <div class="formula">
-                        <div class="formula-title" data-en="Release Rate Calculation Formulas" data-ua="Формули розрахунку швидкості викиду">Release Rate Calculation Formulas</div>
+                        <div class="formula-title" data-en="Release Rate Calculation Formulas (IEC 60079-10-1 Annex B.7)" data-ua="Формули розрахунку швидкості викиду (IEC 60079-10-1 Додаток B.7)">Release Rate Calculation Formulas (IEC 60079-10-1 Annex B.7)</div>
                         <div data-en="Mass flow rate (choked flow):" data-ua="Масова витрата (перекритий потік):">Mass flow rate (choked flow):</div>
-                        <div>ṁ = C<sub>d</sub> × S × p × √(γ/(Z×R×T)) × (2/(γ+1))<sup>(γ+1)/(2(γ-1))</sup></div>
+                        <div>ṁ = C<sub>d</sub> × S × p₀ × √(γ/(Z×R×T₀)) × (2/(γ+1))<sup>(γ+1)/(2(γ-1))</sup></div>
                         <div data-en="Mass flow rate (subsonic flow):" data-ua="Масова витрата (дозвуковий потік):">Mass flow rate (subsonic flow):</div>
-                        <div>ṁ = C<sub>d</sub> × S × p × √[(2γ/(Z×R×T×(γ-1))) × ((p<sub>a</sub>/p)<sup>2/γ</sup> - (p<sub>a</sub>/p)<sup>(γ+1)/γ</sup>)]</div>
-                        <div data-en="Volumetric release characteristic (Q<sub>c</sub>):" data-ua="Об'ємна характеристика викиду (Q<sub>c</sub>):">Volumetric release characteristic (Q<sub>c</sub>):</div>
+                        <div>ṁ = C<sub>d</sub> × S × p₀ × √[(2γ/(Z×R×T₀×(γ-1))) × ((p<sub>d</sub>/p₀)<sup>2/γ</sup> - (p<sub>d</sub>/p₀)<sup>(γ+1)/γ</sup>)]</div>
+                        <div data-en="Volumetric gas inflow (Q<sub>g</sub>):" data-ua="Об'ємний приток газу (Q<sub>g</sub>):">Volumetric gas inflow (Q<sub>g</sub>):</div>
+                        <div>Q<sub>g</sub> = ṁ / ρ<sub>g</sub></div>
+                        <div data-en="Volumetric release characteristic (Q<sub>c</sub>):" data-ua="Характеристика об'ємного викиду (Q<sub>c</sub>):">Volumetric release characteristic (Q<sub>c</sub>):</div>
                         <div>Q<sub>c</sub> = ṁ / (ρ<sub>g</sub> × LFL)</div>
-                        <div class="formula-explanation" data-en="Where: C<sub>d</sub> - discharge coefficient, S - hole area, p - system pressure, γ - specific heat ratio, Z - compressibility factor, R - gas constant, T - temperature, p<sub>a</sub> - atmospheric pressure, ρ<sub>g</sub> - gas density, LFL - lower flammable limit" data-ua="Де: C<sub>d</sub> - коефіцієнт витрати, S - площа отвору, p - тиск у системі, γ - показник адіабати, Z - коефіцієнт стисливості, R - газова постійна, T - температура, p<sub>a</sub> - атмосферний тиск, ρ<sub>g</sub> - щільність газу, LFL - нижча межа займистості">Where: C<sub>d</sub> - discharge coefficient, S - hole area, p - system pressure, γ - specific heat ratio, Z - compressibility factor, R - gas constant, T - temperature, p<sub>a</sub> - atmospheric pressure, ρ<sub>g</sub> - gas density, LFL - lower flammable limit</div>
+                        <div class="formula-explanation" data-en="Where: C<sub>d</sub> - discharge coefficient, S - hole area, p₀ - stagnation pressure, γ - specific heat ratio, Z - compressibility factor, R - gas constant, T₀ - stagnation temperature, p<sub>d</sub> - downstream pressure, ρ<sub>g</sub> - gas density at atmospheric pressure, LFL - lower flammable limit" data-ua="Де: C<sub>d</sub> - коефіцієнт витрати, S - площа отвору, p₀ - стагнаційний тиск, γ - показник адіабати, Z - коефіцієнт стисливості, R - газова постійна, T₀ - стагнаційна температура, p<sub>d</sub> - тиск downstream, ρ<sub>g</sub> - щільність газу при атмосферному тиску, LFL - нижча межа займистості">Where: C<sub>d</sub> - discharge coefficient, S - hole area, p₀ - stagnation pressure, γ - specific heat ratio, Z - compressibility factor, R - gas constant, T₀ - stagnation temperature, p<sub>d</sub> - downstream pressure, ρ<sub>g</sub> - gas density at atmospheric pressure, LFL - lower flammable limit</div>
                     </div>
                 
                     <button class="btn" id="calculateRelease" data-en="Calculate Release Rate" data-ua="Розрахувати швидкість викиду">Calculate Release Rate</button>
+                
+                    <div class="calculation-log" id="releaseCalculationLog">
+                        <!-- Log will be populated here -->
+                    </div>
                 
                     <div class="results" id="releaseResults">
                         <!-- Results will be populated here -->
@@ -670,6 +780,22 @@
                 <div class="card">
                     <h2 class="card-title" data-en="3. Indoor Assessment" data-ua="3. Оцінка внутрішнього викиду">3. Indoor Assessment</h2>
                     
+                    <div class="type-a-opening">
+                        <h4 data-en="Type A Opening (Ventilation Outlet) Assessment" data-ua="Оцінка отвору типу А (вентиляційний вихід)">Type A Opening (Ventilation Outlet) Assessment</h4>
+                        <p data-en="According to IEC 60079-10-1 Article B.8, openings from enclosed spaces are classified as Type A openings (fixed ventilation outlets). The volumetric flow rate Q₂ of air/gas mixture leaving the room is used as the release characteristic for zone extent determination." data-ua="Згідно з IEC 60079-10-1 Стаття B.8, отвори з закритих просторів класифікуються як отвори типу А (фіксовані вентиляційні виходи). Об'ємна витрата Q₂ повітряно-газової суміші, що виходить з приміщення, використовується як характеристика викиду для визначення протяжності зони.">
+                            According to IEC 60079-10-1 Article B.8, openings from enclosed spaces are classified as Type A openings (fixed ventilation outlets). The volumetric flow rate Q₂ of air/gas mixture leaving the room is used as the release characteristic for zone extent determination.
+                        </p>
+                    </div>
+                    
+                    <div class="conservative-mode-toggle">
+                        <h4 data-en="Conservative Mode" data-ua="Консервативний режим">Conservative Mode</h4>
+                        <div class="toggle-group">
+                            <input type="checkbox" id="conservativeMode">
+                            <label for="conservativeMode" data-en="Use Qc instead of Qg for background concentration (Xb)" data-ua="Використовувати Qc замість Qg для фонової концентрації (Xb)">Use Qc instead of Qg for background concentration (Xb)</label>
+                        </div>
+                        <div class="explanation" data-en="Use Qc in Xb assessment for maximum conservatism. May result in Xb ≫ 1. Not in line with basic Annex C methodology." data-ua="Використовувати Qc для оцінки Xb для максимальної консервативності. Може призвести до Xb ≫ 1. Не відповідає базовій методиці Додатка C.">Use Qc in Xb assessment for maximum conservatism. May result in Xb ≫ 1. Not in line with basic Annex C methodology.</div>
+                    </div>
+                    
                     <div class="input-group">
                         <label for="a1" data-en="Lower Opening Area (A₁)" data-ua="Площа нижнього отвору (A₁)">Lower Opening Area (A₁)</label>
                         <input type="number" id="a1" step="0.001" value="0.05">
@@ -720,11 +846,13 @@
                         <div>Q<sub>a</sub> = C<sub>d</sub> × A<sub>e</sub> × U × √(ΔC<sub>p</sub>)</div>
                         <div data-en="Air change frequency:" data-ua="Частота повітрообміну:">Air change frequency:</div>
                         <div>C = Q<sub>a</sub> / V₀</div>
-                        <div data-en="Background concentration:" data-ua="Фонова концентрація:">Background concentration:</div>
-                        <div>X<sub>b</sub> = (f × Q<sub>g</sub>) / Q<sub>2</sub></div>
+                        <div data-en="Background concentration (Standard):" data-ua="Фонова концентрація (Стандартна):">Background concentration (Standard):</div>
+                        <div>X<sub>b</sub> = (f × Q<sub>g</sub>) / Q<sub>a</sub></div>
+                        <div data-en="Background concentration (Conservative):" data-ua="Фонова концентрація (Консервативна):">Background concentration (Conservative):</div>
+                        <div>X<sub>b</sub> = (f × Q<sub>c</sub>) / Q<sub>a</sub></div>
                         <div data-en="Critical concentration:" data-ua="Критична концентрація:">Critical concentration:</div>
                         <div>X<sub>crit</sub> = 0.25 × LFL</div>
-                        <div class="formula-explanation" data-en="Where: A₁, A₂ - ventilation opening areas, C<sub>d</sub> - discharge coefficient (typically 0.6), U - wind speed, ΔC<sub>p</sub> - pressure coefficient difference, V₀ - room volume, f - ventilation inefficiency factor, Q<sub>g</sub> - gas release rate, Q<sub>2</sub> - air/gas mixture outflow rate" data-ua="Де: A₁, A₂ - площі вентиляційних отворів, C<sub>d</sub> - коефіцієнт витрати (зазвичай 0.6), U - швидкість вітру, ΔC<sub>p</sub> - різниця коефіцієнтів тиску, V₀ - об'єм приміщення, f - коефіцієнт неефективності вентиляції, Q<sub>g</sub> - швидкість викиду газу, Q<sub>2</sub> - швидкість виходу повітряно-газової суміші">Where: A₁, A₂ - ventilation opening areas, C<sub>d</sub> - discharge coefficient (typically 0.6), U - wind speed, ΔC<sub>p</sub> - pressure coefficient difference, V₀ - room volume, f - ventilation inefficiency factor, Q<sub>g</sub> - gas release rate, Q<sub>2</sub> - air/gas mixture outflow rate</div>
+                        <div class="formula-explanation" data-en="Where: A₁, A₂ - ventilation opening areas, C<sub>d</sub> - discharge coefficient (typically 0.6), U - wind speed, ΔC<sub>p</sub> - pressure coefficient difference, V₀ - room volume, f - ventilation inefficiency factor, Q<sub>g</sub> - volumetric gas inflow, Q<sub>c</sub> - volumetric release characteristic" data-ua="Де: A₁, A₂ - площі вентиляційних отворів, C<sub>d</sub> - коефіцієнт витрати (зазвичай 0.6), U - швидкість вітру, ΔC<sub>p</sub> - різниця коефіцієнтів тиску, V₀ - об'єм приміщення, f - коефіцієнт неефективності вентиляції, Q<sub>g</sub> - об'ємний приток газу, Q<sub>c</sub> - характеристика об'ємного викиду">Where: A₁, A₂ - ventilation opening areas, C<sub>d</sub> - discharge coefficient (typically 0.6), U - wind speed, ΔC<sub>p</sub> - pressure coefficient difference, V₀ - room volume, f - ventilation inefficiency factor, Q<sub>g</sub> - volumetric gas inflow, Q<sub>c</sub> - volumetric release characteristic</div>
                     </div>
                 
                     <button class="btn" id="assessEnclosed" data-en="Assess Indoor Space" data-ua="Оцінити внутрішній простір">Assess Indoor Space</button>
@@ -738,11 +866,48 @@
             </div>
         </div>
         
+        <!-- Standards Compliance Tab -->
+        <div class="tab-content" id="standards-check">
+            <div class="grid">
+                <div class="card">
+                    <h2 class="card-title" data-en="4. Standards Compliance Check" data-ua="4. Перевірка відповідності стандартам">4. Standards Compliance Check</h2>
+                    
+                    <div class="input-group">
+                        <label for="floorArea" data-en="Floor Area" data-ua="Площа підлоги">Floor Area</label>
+                        <input type="number" id="floorArea" step="0.1" value="25.0">
+                        <div class="unit">m²</div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="openingsSameWall" data-en="Openings Location" data-ua="Розташування отворів">Openings Location</label>
+                        <select id="openingsSameWall">
+                            <option value="false" data-en="Different walls" data-ua="Різні стіни">Different walls</option>
+                            <option value="true" data-en="Same wall" data-ua="Одна стіна">Same wall</option>
+                        </select>
+                        <div class="unit"></div>
+                    </div>
+                    
+                    <button class="btn" id="checkStandards" data-en="Check Standards Compliance" data-ua="Перевірити відповідність стандартам">Check Standards Compliance</button>
+                    
+                    <div class="results" id="standardsResults">
+                        <!-- Results will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Zone Classification Tab -->
         <div class="tab-content" id="classification">
             <div class="grid">
                 <div class="card">
-                    <h2 class="card-title" data-en="4. Hazardous Area Classification" data-ua="4. Класифікація небезпечної зони">4. Hazardous Area Classification</h2>
+                    <h2 class="card-title" data-en="5. Hazardous Area Classification" data-ua="5. Класифікація небезпечної зони">5. Hazardous Area Classification</h2>
+                    
+                    <div class="type-a-opening indoor-only">
+                        <h4 data-en="Type A Opening Zone Calculation" data-ua="Розрахунок зони для отвору типу А">Type A Opening Zone Calculation</h4>
+                        <p data-en="For Type A openings (ventilation outlets), use Q₂ (air/gas mixture outflow rate) as the release characteristic for zone extent determination from Figure D.1." data-ua="Для отворів типу А (вентиляційні виходи) використовуйте Q₂ (швидкість виходу повітряно-газової суміші) як характеристику викиду для визначення протяжності зони з Рисунка D.1.">
+                            For Type A openings (ventilation outlets), use Q₂ (air/gas mixture outflow rate) as the release characteristic for zone extent determination from Figure D.1.
+                        </p>
+                    </div>
                     
                     <div class="input-group">
                         <label for="releaseGrade" data-en="Grade of Release" data-ua="Ступінь викиду">Grade of Release</label>
@@ -781,21 +946,14 @@
                         <div class="unit">m</div>
                     </div>
                     <div class="explanation" data-en="Zone extent determined from Figure D.1 based on Qc value." data-ua="Протяжність зони, визначена з Рисунка D.1 на основі значення Qc.">Zone extent determined from Figure D.1 based on Qc value.</div>
-                    
-                    <div class="input-group">
-                        <label for="applyTypicalLimiters" data-en="Apply Typical Limiters" data-ua="Застосувати типові обмежувачі">Apply Typical Limiters</label>
-                        <input type="checkbox" id="applyTypicalLimiters" checked>
-                        <div class="unit"></div>
-                    </div>
-                    <div class="explanation" data-en="Apply typical IEC limiters: ~1 m for jets/diffusive, ~1.5 m for heavy gases." data-ua="Застосувати типові обмежувачі IEC: ~1 м для струменів/дифузійних, ~1.5 м для важких газів.">Apply typical IEC limiters: ~1 m for jets/diffusive, ~1.5 m for heavy gases.</div>
                 
                     <div class="formula">
                         <div class="formula-title" data-en="Zone Extent Determination" data-ua="Визначення протяжності зони">Zone Extent Determination</div>
                         <div data-en="Based on IEC 60079-10-1 Figure D.1:" data-ua="На основі IEC 60079-10-1 Рисунок D.1:">Based on IEC 60079-10-1 Figure D.1:</div>
                         <div data-en="1. Calculate Qc = ṁ / (ρ<sub>g</sub> × LFL) [m³/s]" data-ua="1. Розрахувати Qc = ṁ / (ρ<sub>g</sub> × LFL) [м³/с]">1. Calculate Qc = ṁ / (ρ<sub>g</sub> × LFL) [m³/s]</div>
                         <div data-en="2. Determine zone extent from Figure D.1 based on Qc" data-ua="2. Визначити протяжність зони з Рисунка D.1 на основі Qc">2. Determine zone extent from Figure D.1 based on Qc</div>
-                        <div data-en="3. Apply typical limiters if needed" data-ua="3. Застосувати типові обмежувачі при необхідності">3. Apply typical limiters if needed</div>
-                        <div class="formula-explanation" data-en="Note: The power law formula has been removed. Use Figure D.1 for accurate zone extent determination." data-ua="Примітка: Степеневу формулу видалено. Використовуйте Рисунок D.1 для точного визначення протяжності зони.">Note: The power law formula has been removed. Use Figure D.1 for accurate zone extent determination.</div>
+                        <div data-en="3. Apply 25% LFL rule for indoor spaces" data-ua="3. Застосувати правило 25% LFL для внутрішніх приміщень">3. Apply 25% LFL rule for indoor spaces</div>
+                        <div class="formula-explanation" data-en="Note: Use Figure D.1 for accurate zone extent determination. For Type A openings, use Q₂ as release characteristic." data-ua="Примітка: Використовуйте Рисунок D.1 для точного визначення протяжності зони. Для отворів типу А використовуйте Q₂ як характеристику викиду.">Note: Use Figure D.1 for accurate zone extent determination. For Type A openings, use Q₂ as release characteristic.</div>
                     </div>
                 
                     <button class="btn" id="classifyArea" data-en="Classify Hazardous Area" data-ua="Класифікувати небезпечну зону">Classify Hazardous Area</button>
@@ -808,7 +966,7 @@
                 </div>
             </div>
             
-            <!-- HAC Assessment Summary - MOVED TO CLASSIFICATION TAB -->
+            <!-- HAC Assessment Summary -->
             <div class="summary">
                 <h2 class="summary-title" data-en="HAC Assessment Summary" data-ua="Підсумок оцінки HAC">HAC Assessment Summary</h2>
                 <div class="summary-grid" id="summaryResults">
@@ -817,8 +975,12 @@
                         <p id="summaryScenario">—</p>
                     </div>
                     <div class="summary-item">
-                        <h3 data-en="Release Characteristic (Q<sub>c</sub>)" data-ua="Характеристика викиду (Q<sub>c</sub>)">Release Characteristic (Q<sub>c</sub>)</h3>
+                        <h3 data-en="Release Characteristic" data-ua="Характеристика викиду">Release Characteristic</h3>
                         <p id="summaryQc">— m³/s</p>
+                    </div>
+                    <div class="summary-item indoor-only">
+                        <h3 data-en="Type A Opening Q₂" data-ua="Отвір типу А Q₂">Type A Opening Q₂</h3>
+                        <p id="summaryQ2">— m³/s</p>
                     </div>
                     <div class="summary-item">
                         <h3 data-en="Ventilation Availability" data-ua="Доступність вентиляції">Ventilation Availability</h3>
@@ -836,18 +998,19 @@
                         <h3 data-en="Zone Extent" data-ua="Протяжність зони">Zone Extent</h3>
                         <p id="summaryExtent">— m</p>
                     </div>
-                    <div class="summary-item">
+                    <div class="summary-item indoor-only">
                         <h3 data-en="Background Concentration" data-ua="Фонова концентрація">Background Concentration</h3>
                         <p id="summaryBackground">—</p>
                     </div>
                 </div>
                 
                 <button class="btn secondary" id="generateReport" style="margin-top: 20px;" data-en="Generate Detailed Report" data-ua="Створити детальний звіт">Generate Detailed Report</button>
+                <button class="btn secondary" id="generateDetailedReport" style="margin-top: 10px;" data-en="Download Full Report" data-ua="Завантажити повний звіт">Download Full Report</button>
             </div>
         </div>
         
         <div class="footer">
-            <p data-en="This calculator follows IEC 60079-10-1, EN 12186, IGEM TD/13, and BS 5925 standards" data-ua="Цей калькулятор відповідає стандартам IEC 60079-10-1, EN 12186, IGEM TD/13 та BS 5925">This calculator follows IEC 60079-10-1, EN 12186, IGEM TD/13, and BS 5925 standards</p>
+            <p data-en="This calculator follows IEC 60079-10-1:2020, EN 12186:2014, IGEM TD/13 Ed.3, and BS 5925:1991 standards" data-ua="Цей калькулятор відповідає стандартам IEC 60079-10-1:2020, EN 12186:2014, IGEM TD/13 Ed.3 та BS 5925:1991">This calculator follows IEC 60079-10-1:2020, EN 12186:2014, IGEM TD/13 Ed.3, and BS 5925:1991 standards</p>
             <p data-en="All results must be verified by a competent engineer before implementation" data-ua="Усі результати повинні бути перевірені компетентним інженером перед впровадженням">All results must be verified by a competent engineer before implementation</p>
         </div>
     </div>
@@ -859,10 +1022,897 @@
             releaseRate: {},
             outdoorAssessment: {},
             indoorAssessment: {},
-            zoneClassification: {}
+            zoneClassification: {},
+            standardsCheck: {},
+            typeAOpening: {},
+            conservativeMode: false,
+            calculatorVersion: '2.1',
+            calculationDateTime: null,
+            calculationSteps: []
         };
 
+        // Функция для форматирования чисел
+        function formatNumber(num, decimals = 6) {
+            if (num === null || num === undefined || isNaN(num)) return '—';
+            if (num === 0) return '0';
+            
+            // Для очень маленьких чисел используем научную нотацию
+            if (Math.abs(num) < 0.001) {
+                return num.toExponential(3);
+            }
+            
+            // Для обычных чисел используем фиксированное количество знаков
+            return Number(num.toFixed(decimals)).toString();
+        }
+
+        // Функция для добавления записи в лог
+        function addCalculationLog(step, description, value = null) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = {
+                timestamp,
+                step,
+                description,
+                value
+            };
+            calculationLogs.calculationSteps.push(logEntry);
+            
+            // Обновление UI лога
+            const logContainer = document.getElementById('releaseCalculationLog');
+            if (logContainer) {
+                const logElement = document.createElement('div');
+                logElement.className = 'log-entry';
+                logElement.innerHTML = `<span class="log-time">[${timestamp}]</span> ${step}: ${description} ${value !== null ? `= ${formatNumber(value)}` : ''}`;
+                logContainer.appendChild(logElement);
+                logContainer.scrollTop = logContainer.scrollHeight;
+            }
+        }
+
+        // Функция для переключения языка
+        function updateLanguage(lang) {
+            // Обновляем все элементы с атрибутами data-en и data-ua
+            document.querySelectorAll('[data-en], [data-ua]').forEach(element => {
+                if (element.hasAttribute(`data-${lang}`)) {
+                    const text = element.getAttribute(`data-${lang}`);
+                    if (element.tagName === 'INPUT' || element.tagName === 'SELECT') {
+                        if (element.placeholder !== undefined) {
+                            element.placeholder = text;
+                        }
+                    } else {
+                        element.textContent = text;
+                    }
+                }
+            });
+            
+            // Обновляем активные кнопки языка
+            document.querySelectorAll('.language-btn').forEach(btn => {
+                if (btn.getAttribute('data-lang') === lang) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            console.log('Language updated to:', lang);
+        }
+
+        // Функция для проверки валидности входных данных
+        function validateInputs() {
+            const errors = [];
+            
+            // Проверка свойств газа
+            const lfl = parseFloat(document.getElementById('lfl').value);
+            if (lfl <= 0 || lfl >= 0.1) {
+                errors.push('LFL must be between 0 and 0.1 vol/vol');
+            }
+            
+            // Проверка параметров вентиляции (для indoor)
+            if (calculationLogs.scenario === 'indoor') {
+                const a1 = parseFloat(document.getElementById('a1').value);
+                const a2 = parseFloat(document.getElementById('a2').value);
+                const roomVolume = parseFloat(document.getElementById('roomVolume').value);
+                const windSpeed = parseFloat(document.getElementById('windSpeedEnclosed').value);
+                const deltaCp = parseFloat(document.getElementById('deltaCp').value);
+                const inefficiency = parseFloat(document.getElementById('inefficiency').value);
+                
+                if (a1 <= 0 || a2 <= 0) errors.push('Ventilation opening areas must be > 0');
+                if (roomVolume <= 0) errors.push('Room volume must be > 0');
+                if (windSpeed <= 0) errors.push('Wind speed must be > 0');
+                if (deltaCp <= 0) errors.push('Pressure coefficient must be > 0');
+                if (inefficiency < 1 || inefficiency > 10) errors.push('Ventilation inefficiency must be between 1 and 10');
+                
+                // Проверка маленьких помещений
+                if (roomVolume < 5) {
+                    errors.push('Warning: Room volume < 5 m³ may lead to unrealistic results');
+                }
+                
+                // Проверка низкой скорости ветра
+                if (windSpeed < 0.1) {
+                    errors.push('Warning: Wind speed < 0.1 m/s may indicate inadequate ventilation');
+                }
+            }
+            
+            return errors;
+        }
+
+        // Основные функции калькулятора
+        function calculateReleaseRate() {
+            console.log('Calculate Release Rate called');
+            addCalculationLog('START', 'Release rate calculation started');
+            
+            // Собираем данные
+            const molarMass = parseFloat(document.getElementById('molarMass').value);
+            const gamma = parseFloat(document.getElementById('gamma').value);
+            const lfl = parseFloat(document.getElementById('lfl').value);
+            const temp = parseFloat(document.getElementById('temp').value);
+            const holeSize = parseFloat(document.getElementById('holeSize').value) * 1e-6; // convert mm² to m²
+            const pressure = parseFloat(document.getElementById('pressure').value);
+            const pressureType = document.querySelector('input[name="pressureType"]:checked').value;
+            const cd = parseFloat(document.getElementById('cd').value);
+            
+            addCalculationLog('INPUT', 'Gas properties', {molarMass, gamma, lfl, temp, holeSize, pressure, pressureType, cd});
+            
+            // Константы
+            const R = 8.314; // универсальная газовая постоянная J/(mol·K)
+            const atmosphericPressure = 1.01325; // bar
+            
+            // Расчет абсолютного давления
+            let p0, pd;
+            if (pressureType === 'gauge') {
+                p0 = pressure + atmosphericPressure;
+                pd = atmosphericPressure;
+            } else {
+                p0 = pressure;
+                pd = atmosphericPressure;
+            }
+            
+            const p0_pa = p0 * 1e5; // convert bar to Pa
+            const pd_pa = pd * 1e5;
+            const Z = 1; // коэффициент сжимаемости (упрощенно)
+            const R_specific = R / molarMass; // удельная газовая постоянная
+            
+            addCalculationLog('PRESSURE', 'Absolute pressures calculated', {p0, pd});
+            
+            // Проверка на критический поток
+            const p_critical = p0 * Math.pow(2/(gamma+1), gamma/(gamma-1));
+            const isChoked = p_critical > pd;
+            
+            addCalculationLog('FLOW_CHECK', `Critical pressure ratio: ${p_critical.toFixed(3)} bar`, isChoked ? 'CHOKED' : 'SUBSONIC');
+            
+            let massFlowRate;
+            if (isChoked) {
+                // Критический поток с исправленной формулой
+                const criticalFactor = Math.pow(2/(gamma+1), (gamma+1)/(2*(gamma-1)));
+                massFlowRate = cd * holeSize * p0_pa * Math.sqrt(gamma/(Z * R_specific * temp)) * criticalFactor;
+                addCalculationLog('CHOKED_FLOW', 'Choked flow calculation', massFlowRate);
+            } else {
+                // Дозвуковой поток с правильными давлениями
+                const pressureRatio = pd / p0;
+                const flowFactor = Math.sqrt((2*gamma/((gamma-1)*R_specific*temp)) * 
+                    (Math.pow(pressureRatio, 2/gamma) - Math.pow(pressureRatio, (gamma+1)/gamma)));
+                massFlowRate = cd * holeSize * p0_pa * flowFactor;
+                addCalculationLog('SUBSONIC_FLOW', 'Subsonic flow calculation', massFlowRate);
+            }
+            
+            // Расчет плотности газа при атмосферном давлении
+            const gasDensity_atmospheric = (atmosphericPressure * 1e5 * molarMass) / (R * temp);
+            
+            // Расчет Qg и Qc
+            const qg = massFlowRate / gasDensity_atmospheric;
+            const qc = massFlowRate / (gasDensity_atmospheric * lfl);
+            
+            addCalculationLog('RESULTS', 'Volumetric flows calculated', {qg, qc});
+            
+            // Сохраняем результаты
+            calculationLogs.releaseRate = {
+                massFlowRate: massFlowRate,
+                massFlowRateKgH: massFlowRate * 3600,
+                qg: qg,
+                qgM3H: qg * 3600,
+                qc: qc,
+                qcM3H: qc * 3600,
+                isChoked: isChoked,
+                gasDensity: gasDensity_atmospheric,
+                pressureRatio: p0 / pd
+            };
+            
+            // Обновляем UI
+            updateReleaseResults();
+            updateJetTypeFromCalculation();
+            addCalculationLog('COMPLETE', 'Release rate calculation completed');
+            
+            return calculationLogs.releaseRate;
+        }
+
+        function updateReleaseResults() {
+            const resultsDiv = document.getElementById('releaseResults');
+            const data = calculationLogs.releaseRate;
+            
+            if (!data.massFlowRate) {
+                resultsDiv.innerHTML = '<div class="result-item">No calculation performed</div>';
+                return;
+            }
+            
+            resultsDiv.innerHTML = `
+                <div class="result-item">
+                    <span>Mass Flow Rate:</span>
+                    <span class="result-value">${formatNumber(data.massFlowRate)} kg/s</span>
+                </div>
+                <div class="result-item">
+                    <span>Mass Flow Rate:</span>
+                    <span class="result-value">${formatNumber(data.massFlowRateKgH)} kg/h</span>
+                </div>
+                <div class="result-item">
+                    <span>Volumetric Gas Inflow (Q<sub>g</sub>):</span>
+                    <span class="result-value">${formatNumber(data.qg)} m³/s</span>
+                </div>
+                <div class="result-item">
+                    <span>Volumetric Gas Inflow (Q<sub>g</sub>):</span>
+                    <span class="result-value">${formatNumber(data.qgM3H)} m³/h</span>
+                </div>
+                <div class="result-item">
+                    <span>Release Characteristic (Q<sub>c</sub>):</span>
+                    <span class="result-value">${formatNumber(data.qc)} m³/s</span>
+                </div>
+                <div class="result-item">
+                    <span>Release Characteristic (Q<sub>c</sub>):</span>
+                    <span class="result-value">${formatNumber(data.qcM3H)} m³/h</span>
+                </div>
+                <div class="result-item">
+                    <span>Flow Type:</span>
+                    <span class="result-value">${data.isChoked ? 'Choked' : 'Subsonic'}</span>
+                </div>
+                <div class="result-details">
+                    Q<sub>g</sub> = ṁ/ρ<sub>g</sub> (for X<sub>b</sub> calculation), Q<sub>c</sub> = ṁ/(ρ<sub>g</sub>×LFL) (for zone extent)
+                </div>
+            `;
+        }
+
+        function assessOutdoorConditions() {
+            console.log('Assess Outdoor Conditions called');
+            
+            const windSpeed = parseFloat(document.getElementById('windSpeed').value);
+            const obstruction = document.getElementById('obstruction').value;
+            const elevation = document.getElementById('elevation').value;
+            
+            // Определение уровня вентиляции
+            let ventilationAvailability, dilutionLevel;
+            
+            if (windSpeed >= 0.5) {
+                ventilationAvailability = 'Good';
+                dilutionLevel = 'High';
+            } else if (windSpeed >= 0.25) {
+                ventilationAvailability = 'Fair';
+                dilutionLevel = 'Medium';
+            } else {
+                ventilationAvailability = 'Poor';
+                dilutionLevel = 'Low';
+            }
+            
+            // Сохраняем результаты
+            calculationLogs.outdoorAssessment = {
+                windSpeed: windSpeed,
+                obstruction: obstruction,
+                elevation: elevation,
+                ventilationAvailability: ventilationAvailability,
+                dilutionLevel: dilutionLevel
+            };
+            
+            // Обновляем UI
+            updateOutdoorResults();
+            
+            return calculationLogs.outdoorAssessment;
+        }
+
+        function updateOutdoorResults() {
+            const resultsDiv = document.getElementById('outdoorResults');
+            const data = calculationLogs.outdoorAssessment;
+            
+            if (!data.ventilationAvailability) {
+                resultsDiv.innerHTML = '<div class="result-item">No assessment performed</div>';
+                return;
+            }
+            
+            let availabilityClass = 'pill ok';
+            if (data.ventilationAvailability === 'Fair') availabilityClass = 'pill warn';
+            if (data.ventilationAvailability === 'Poor') availabilityClass = 'pill bad';
+            
+            let dilutionClass = 'pill ok';
+            if (data.dilutionLevel === 'Medium') dilutionClass = 'pill warn';
+            if (data.dilutionLevel === 'Low') dilutionClass = 'pill bad';
+            
+            resultsDiv.innerHTML = `
+                <div class="result-item">
+                    <span>Wind Speed:</span>
+                    <span class="result-value">${formatNumber(data.windSpeed, 2)} m/s</span>
+                </div>
+                <div class="result-item">
+                    <span>Obstruction Level:</span>
+                    <span class="result-value">${data.obstruction}</span>
+                </div>
+                <div class="result-item">
+                    <span>Elevation:</span>
+                    <span class="result-value">${data.elevation} m</span>
+                </div>
+                <div class="result-item">
+                    <span>Ventilation Availability:</span>
+                    <span class="result-value ${availabilityClass}">${data.ventilationAvailability}</span>
+                </div>
+                <div class="result-item">
+                    <span>Dilution Level:</span>
+                    <span class="result-value ${dilutionClass}">${data.dilutionLevel}</span>
+                </div>
+            `;
+        }
+
+        function assessEnclosedSpace() {
+            console.log('Assess Enclosed Space called');
+            
+            // Валидация входных данных
+            const validationErrors = validateInputs();
+            if (validationErrors.length > 0) {
+                alert('Validation errors:\n' + validationErrors.join('\n'));
+                return;
+            }
+            
+            const a1 = parseFloat(document.getElementById('a1').value);
+            const a2 = parseFloat(document.getElementById('a2').value);
+            const roomVolume = parseFloat(document.getElementById('roomVolume').value);
+            const windSpeed = parseFloat(document.getElementById('windSpeedEnclosed').value);
+            const deltaCp = parseFloat(document.getElementById('deltaCp').value);
+            const inefficiency = parseFloat(document.getElementById('inefficiency').value);
+            const conservativeMode = document.getElementById('conservativeMode').checked;
+            
+            calculationLogs.conservativeMode = conservativeMode;
+            
+            // Расчеты для закрытого пространства
+            const equivalentArea = (a1 * a2) / Math.sqrt(a1*a1 + a2*a2);
+            const airFlowRate = 0.6 * equivalentArea * windSpeed * Math.sqrt(deltaCp);
+            const airChangeFrequency = airFlowRate / roomVolume;
+            
+            // Расчет Q2 для Type A Opening
+            const q2 = airFlowRate;
+            
+            // Расчет фоновой концентрации в зависимости от режима
+            let xb, xbNote;
+            if (conservativeMode) {
+                // Консервативный режим: используем Qc
+                xb = (inefficiency * calculationLogs.releaseRate.qc) / airFlowRate;
+                xbNote = 'Conservative mode: Xb estimated with Qc';
+            } else {
+                // Стандартный режим: используем Qg
+                xb = (inefficiency * calculationLogs.releaseRate.qg) / airFlowRate;
+                xbNote = 'Standard mode: Xb estimated with Qg';
+            }
+            
+            // Расчет критической концентрации
+            const lfl = parseFloat(document.getElementById('lfl').value);
+            const xCrit = 0.25 * lfl;
+            
+            // Правило 25% LFL - автоматическое снижение степени разбавления
+            let dilutionLevel = 'High';
+            if (xb >= xCrit) {
+                dilutionLevel = 'Low';
+                xbNote += ' (25% LFL rule applied: Low dilution)';
+            }
+            
+            // Проверка на нефизичные значения
+            let xbWarning = '';
+            if (xb > 1) {
+                xbWarning = 'Non-physical Xb > 1. Check inputs/assumptions.';
+            }
+            
+            // Сохраняем результаты
+            calculationLogs.indoorAssessment = {
+                equivalentArea: equivalentArea,
+                airFlowRate: airFlowRate,
+                airChangeFrequency: airChangeFrequency,
+                q2: q2,
+                xb: xb,
+                xbNote: xbNote,
+                xbWarning: xbWarning,
+                xCrit: xCrit,
+                dilutionLevel: dilutionLevel,
+                conservativeMode: conservativeMode
+            };
+            
+            calculationLogs.typeAOpening = {
+                q2: q2
+            };
+            
+            // Обновляем UI
+            updateEnclosedResults();
+            
+            return calculationLogs.indoorAssessment;
+        }
+
+        function updateEnclosedResults() {
+            const resultsDiv = document.getElementById('enclosedResults');
+            const data = calculationLogs.indoorAssessment;
+            
+            if (!data.airFlowRate) {
+                resultsDiv.innerHTML = '<div class="result-item">No assessment performed</div>';
+                return;
+            }
+            
+            let warningHTML = '';
+            if (data.xbWarning) {
+                warningHTML = `<div class="warning-banner">${data.xbWarning}</div>`;
+            }
+            
+            if (data.conservativeMode) {
+                warningHTML += `<div class="info-banner">Conservative mode: Xb estimated with Qc; results are intentionally conservative</div>`;
+            }
+            
+            // Форматирование кратности воздухообмена
+            const airChangePerHour = data.airChangeFrequency * 3600;
+            let airChangeDisplay = `${formatNumber(data.airChangeFrequency)} s⁻¹`;
+            if (airChangePerHour >= 0.001) {
+                airChangeDisplay += ` (${formatNumber(airChangePerHour)} h⁻¹)`;
+            } else {
+                airChangeDisplay += ` (${airChangePerHour.toExponential(3)} h⁻¹)`;
+            }
+            
+            // Расчет процента от LFL
+            const lfl = parseFloat(document.getElementById('lfl').value);
+            const xbPercentLFL = (data.xb / lfl) * 100;
+            const xCritPercentLFL = (data.xCrit / lfl) * 100;
+            
+            let dilutionClass = 'pill ok';
+            if (data.dilutionLevel === 'Medium') dilutionClass = 'pill warn';
+            if (data.dilutionLevel === 'Low') dilutionClass = 'pill bad';
+            
+            resultsDiv.innerHTML = `
+                ${warningHTML}
+                <div class="result-item">
+                    <span>Equivalent Area (A<sub>e</sub>):</span>
+                    <span class="result-value">${formatNumber(data.equivalentArea)} m²</span>
+                </div>
+                <div class="result-item">
+                    <span>Air Flow Rate (Q<sub>a</sub>):</span>
+                    <span class="result-value">${formatNumber(data.airFlowRate)} m³/s</span>
+                </div>
+                <div class="result-item">
+                    <span>Air Change Frequency (C):</span>
+                    <span class="result-value">${airChangeDisplay}</span>
+                </div>
+                <div class="result-item">
+                    <span>Type A Opening Q₂:</span>
+                    <span class="result-value">${formatNumber(data.q2)} m³/s</span>
+                </div>
+                <div class="result-item">
+                    <span>Background Concentration (X<sub>b</sub>):</span>
+                    <span class="result-value">${formatNumber(data.xb)}</span>
+                </div>
+                <div class="result-item">
+                    <span>X<sub>b</sub> relative to LFL:</span>
+                    <span class="result-value">${formatNumber(xbPercentLFL, 2)}%</span>
+                </div>
+                <div class="result-item">
+                    <span>Critical Concentration (X<sub>crit</sub>):</span>
+                    <span class="result-value">${formatNumber(data.xCrit)} (= ${formatNumber(xCritPercentLFL, 1)}% LFL)</span>
+                </div>
+                <div class="result-item">
+                    <span>Dilution Level:</span>
+                    <span class="result-value ${dilutionClass}">${data.dilutionLevel}</span>
+                </div>
+                <div class="result-details">
+                    ${data.xbNote}
+                </div>
+            `;
+        }
+
+        function checkVentilationStandardsCompliance() {
+            console.log('Check Standards Compliance called');
+            
+            const floorArea = parseFloat(document.getElementById('floorArea').value);
+            const openingsSameWall = document.getElementById('openingsSameWall').value === 'true';
+            const a1 = parseFloat(document.getElementById('a1').value);
+            const a2 = parseFloat(document.getElementById('a2').value);
+            
+            const totalVentArea = a1 + a2;
+            const ventAreaPercentage = totalVentArea / floorArea;
+            
+            // Проверка EN 12186 (1% minimum)
+            const en12186Min = 0.01;
+            const en12186Pass = ventAreaPercentage >= en12186Min;
+            
+            // Проверка IGEM TD/13 (2% или 3% если на одной стене)
+            const igemMin = openingsSameWall ? 0.03 : 0.02;
+            const igemPass = ventAreaPercentage >= igemMin;
+            
+            // Сохраняем результаты
+            calculationLogs.standardsCheck = {
+                floorArea: floorArea,
+                totalVentArea: totalVentArea,
+                ventAreaPercentage: ventAreaPercentage,
+                openingsSameWall: openingsSameWall,
+                en12186: {
+                    minPercentage: en12186Min,
+                    pass: en12186Pass,
+                    message: en12186Pass ? 
+                        `PASS: Meets EN 12186 (≥ ${(en12186Min * 100).toFixed(1)}%)` :
+                        `FAIL: EN 12186 requires ≥ ${(en12186Min * 100).toFixed(1)}% (${(floorArea * en12186Min).toFixed(3)} m²)`
+                },
+                igemTd13: {
+                    minPercentage: igemMin,
+                    pass: igemPass,
+                    message: igemPass ? 
+                        `PASS: Meets IGEM TD/13 (≥ ${(igemMin * 100).toFixed(1)}% - ${openingsSameWall ? 'same wall' : 'different walls'})` :
+                        `FAIL: IGEM TD/13 requires ≥ ${(igemMin * 100).toFixed(1)}% (${(floorArea * igemMin).toFixed(3)} m²)`
+                }
+            };
+            
+            // Обновляем UI
+            updateStandardsResults();
+            
+            return calculationLogs.standardsCheck;
+        }
+
+        function updateStandardsResults() {
+            const resultsDiv = document.getElementById('standardsResults');
+            const data = calculationLogs.standardsCheck;
+            
+            if (!data.floorArea) {
+                resultsDiv.innerHTML = '<div class="result-item">No assessment performed</div>';
+                return;
+            }
+            
+            resultsDiv.innerHTML = `
+                <div class="result-item">
+                    <span>Floor Area:</span>
+                    <span class="result-value">${formatNumber(data.floorArea, 2)} m²</span>
+                </div>
+                <div class="result-item">
+                    <span>Total Ventilation Area:</span>
+                    <span class="result-value">${formatNumber(data.totalVentArea, 3)} m²</span>
+                </div>
+                <div class="result-item">
+                    <span>Ventilation Area Percentage:</span>
+                    <span class="result-value">${(data.ventAreaPercentage * 100).toFixed(2)}%</span>
+                </div>
+                <div class="result-item">
+                    <span>EN 12186:2014 Compliance:</span>
+                    <span class="result-value ${data.en12186.pass ? 'pill ok' : 'pill bad'}">${data.en12186.pass ? 'PASS' : 'FAIL'}</span>
+                </div>
+                <div class="result-item">
+                    <span>IGEM TD/13 Ed.3 Compliance:</span>
+                    <span class="result-value ${data.igemTd13.pass ? 'pill ok' : 'pill bad'}">${data.igemTd13.pass ? 'PASS' : 'FAIL'}</span>
+                </div>
+                <div class="result-details">
+                    ${data.en12186.message}<br>
+                    ${data.igemTd13.message}
+                </div>
+            `;
+        }
+
+        function classifyHazardousArea() {
+            console.log('Classify Hazardous Area called');
+            
+            const releaseGrade = document.getElementById('releaseGrade').value;
+            const jetType = document.getElementById('jetType').value;
+            
+            // Определяем Qc для расчета зоны
+            let qcForZone;
+            if (calculationLogs.scenario === 'indoor' && calculationLogs.typeAOpening.q2) {
+                // Для Type A Opening используем Q2
+                qcForZone = calculationLogs.typeAOpening.q2;
+            } else if (calculationLogs.releaseRate.qc) {
+                // Для обычных выбросов используем Qc
+                qcForZone = calculationLogs.releaseRate.qc;
+            } else {
+                qcForZone = 0;
+            }
+            
+            // Обновляем поле Qc
+            document.getElementById('qcForZone').value = formatNumber(qcForZone);
+            
+            // Получаем протяженность зоны из поля ввода
+            const zoneExtent = parseFloat(document.getElementById('zoneExtentManual').value);
+            
+            // Определяем тип зоны на основе степени выброса
+            let zoneType;
+            switch(releaseGrade) {
+                case 'continuous':
+                    zoneType = 'Zone 0';
+                    break;
+                case 'primary':
+                    zoneType = 'Zone 1';
+                    break;
+                case 'secondary':
+                    zoneType = 'Zone 2';
+                    break;
+                default:
+                    zoneType = 'Zone 2';
+            }
+            
+            // Применяем правило 25% LFL для indoor помещений
+            let finalExtent = zoneExtent;
+            if (calculationLogs.scenario === 'indoor' && calculationLogs.indoorAssessment.xb >= calculationLogs.indoorAssessment.xCrit) {
+                // Если фоновая концентрация превышает 25% LFL, увеличиваем зону
+                finalExtent = Math.max(zoneExtent, 3.0); // Минимум 3 метра для плохой вентиляции
+            }
+            
+            // Сохраняем результаты
+            calculationLogs.zoneClassification = {
+                releaseGrade: releaseGrade,
+                jetType: jetType,
+                qcForZone: qcForZone,
+                zoneType: zoneType,
+                zoneExtent: finalExtent
+            };
+            
+            // Обновляем UI
+            updateClassificationResults();
+            updateSummary();
+            
+            return calculationLogs.zoneClassification;
+        }
+
+        function updateClassificationResults() {
+            const resultsDiv = document.getElementById('classificationResults');
+            const data = calculationLogs.zoneClassification;
+            
+            if (!data.zoneType) {
+                resultsDiv.innerHTML = '<div class="result-item">No classification performed</div>';
+                return;
+            }
+            
+            let methodNote = '';
+            if (calculationLogs.scenario === 'indoor') {
+                methodNote = `<div class="result-details">Method note: Zone extent from Figure D.1 uses ${calculationLogs.typeAOpening.q2 ? 'Q₂ (Type A Opening)' : 'Qc'}; Xb is computed from ${calculationLogs.conservativeMode ? 'Qc (Conservative mode)' : 'Qg (Standard mode)'}</div>`;
+                
+                if (calculationLogs.indoorAssessment.xb >= calculationLogs.indoorAssessment.xCrit) {
+                    methodNote += `<div class="warning-banner">25% LFL rule applied: Background concentration exceeds 25% LFL, zone extent adjusted</div>`;
+                }
+            }
+            
+            resultsDiv.innerHTML = `
+                <div class="result-item">
+                    <span>Grade of Release:</span>
+                    <span class="result-value">${data.releaseGrade}</span>
+                </div>
+                <div class="result-item">
+                    <span>Jet Type:</span>
+                    <span class="result-value">${data.jetType}</span>
+                </div>
+                <div class="result-item">
+                    <span>Qc for Zone Calculation:</span>
+                    <span class="result-value">${formatNumber(data.qcForZone)} m³/s</span>
+                </div>
+                <div class="result-item">
+                    <span>Hazardous Zone Type:</span>
+                    <span class="result-value">${data.zoneType}</span>
+                </div>
+                <div class="result-item">
+                    <span>Zone Extent:</span>
+                    <span class="result-value">${formatNumber(data.zoneExtent, 2)} m</span>
+                </div>
+                ${methodNote}
+            `;
+        }
+
+        function updateJetTypeFromCalculation() {
+            const releaseData = calculationLogs.releaseRate;
+            const jetTypeSelect = document.getElementById('jetType');
+            
+            if (!releaseData.isChoked) {
+                return; // Не обновляем если нет данных
+            }
+            
+            // Улучшенное автоматическое определение типа струи
+            const gasDensity = releaseData.gasDensity;
+            const airDensity = 1.2; // kg/m³
+            
+            if (releaseData.isChoked && releaseData.pressureRatio > 1.9) {
+                jetTypeSelect.value = 'unimpeded';
+            } else if (gasDensity > airDensity * 1.5) {
+                jetTypeSelect.value = 'heavy';
+            } else {
+                jetTypeSelect.value = 'diffusive';
+            }
+        }
+
+        function updateSummary() {
+            // Обновляем сводку на основе всех расчетов
+            document.getElementById('summaryScenario').textContent = 
+                calculationLogs.scenario === 'outdoor' ? 'Outdoor Release' : 'Indoor Release';
+            
+            document.getElementById('summaryQc').textContent = 
+                calculationLogs.releaseRate.qc ? 
+                formatNumber(calculationLogs.releaseRate.qc) + ' m³/s' : '—';
+            
+            document.getElementById('summaryQ2').textContent = 
+                calculationLogs.typeAOpening.q2 ? 
+                formatNumber(calculationLogs.typeAOpening.q2) + ' m³/s' : '—';
+            
+            document.getElementById('summaryVentilation').textContent = 
+                calculationLogs.outdoorAssessment.ventilationAvailability || 
+                (calculationLogs.indoorAssessment.airFlowRate ? 'Available' : '—');
+            
+            document.getElementById('summaryDilution').textContent = 
+                calculationLogs.outdoorAssessment.dilutionLevel || 
+                calculationLogs.indoorAssessment.dilutionLevel || '—';
+            
+            document.getElementById('summaryZone').textContent = 
+                calculationLogs.zoneClassification.zoneType || '—';
+            
+            document.getElementById('summaryExtent').textContent = 
+                calculationLogs.zoneClassification.zoneExtent ? 
+                formatNumber(calculationLogs.zoneClassification.zoneExtent, 2) + ' m' : '—';
+            
+            document.getElementById('summaryBackground').textContent = 
+                calculationLogs.indoorAssessment.xb ? 
+                formatNumber(calculationLogs.indoorAssessment.xb) + (calculationLogs.conservativeMode ? ' (Conservative)' : '') : '—';
+        }
+
+        function generateReport() {
+            // Устанавливаем дату и время расчета
+            calculationLogs.calculationDateTime = new Date();
+            
+            // Создаем подробный отчет
+            let report = "HAC AND VENTILATION ASSESSMENT REPORT\n";
+            report += "========================================\n\n";
+            
+            report += "CALCULATION METADATA\n";
+            report += "-------------------\n";
+            report += `Calculator Version: ${calculationLogs.calculatorVersion}\n`;
+            report += `Calculation Date: ${calculationLogs.calculationDateTime.toISOString()}\n`;
+            report += `Scenario: ${calculationLogs.scenario.toUpperCase()}\n`;
+            report += `Standards: IEC 60079-10-1:2020, EN 12186:2014, IGEM TD/13 Ed.3, BS 5925:1991\n\n`;
+            
+            report += "GAS PROPERTIES\n";
+            report += "-------------\n";
+            report += `Gas Type: ${document.getElementById('gasType').options[document.getElementById('gasType').selectedIndex].text}\n`;
+            report += `Molar Mass: ${document.getElementById('molarMass').value} kg/mol\n`;
+            report += `Specific Heat Ratio (γ): ${document.getElementById('gamma').value}\n`;
+            report += `LFL: ${(document.getElementById('lfl').value * 100).toFixed(2)}%\n`;
+            report += `Temperature: ${document.getElementById('temp').value} K\n\n`;
+            
+            if (calculationLogs.releaseRate.massFlowRate) {
+                report += "RELEASE RATE CALCULATION (IEC 60079-10-1 Annex B.7)\n";
+                report += "-----------------------------------\n";
+                report += `Hole Size: ${document.getElementById('holeSize').value} mm²\n`;
+                report += `System Pressure: ${document.getElementById('pressure').value} bar ${document.querySelector('input[name="pressureType"]:checked').value}\n`;
+                report += `Discharge Coefficient (Cₕ): ${document.getElementById('cd').value}\n`;
+                report += `Mass Flow Rate: ${formatNumber(calculationLogs.releaseRate.massFlowRate)} kg/s\n`;
+                report += `Volumetric Gas Inflow (Q₉): ${formatNumber(calculationLogs.releaseRate.qg)} m³/s\n`;
+                report += `Release Characteristic (Q꜀): ${formatNumber(calculationLogs.releaseRate.qc)} m³/s\n`;
+                report += `Flow Type: ${calculationLogs.releaseRate.isChoked ? 'Choked' : 'Subsonic'}\n\n`;
+            }
+            
+            if (calculationLogs.outdoorAssessment.ventilationAvailability) {
+                report += "OUTDOOR ASSESSMENT (IEC 60079-10-1 Annex C)\n";
+                report += "-------------------------------------------\n";
+                report += `Wind Speed: ${formatNumber(calculationLogs.outdoorAssessment.windSpeed, 2)} m/s\n`;
+                report += `Ventilation Availability: ${calculationLogs.outdoorAssessment.ventilationAvailability}\n`;
+                report += `Dilution Level: ${calculationLogs.outdoorAssessment.dilutionLevel}\n\n`;
+            }
+            
+            if (calculationLogs.indoorAssessment.airFlowRate) {
+                report += "INDOOR ASSESSMENT (IEC 60079-10-1 Annex C)\n";
+                report += "------------------------------------------\n";
+                report += `Air Flow Rate: ${formatNumber(calculationLogs.indoorAssessment.airFlowRate)} m³/s\n`;
+                report += `Air Change Frequency: ${formatNumber(calculationLogs.indoorAssessment.airChangeFrequency)} s⁻¹\n`;
+                report += `Type A Opening Q₂: ${formatNumber(calculationLogs.typeAOpening.q2)} m³/s\n`;
+                report += `Background Concentration (Xb): ${formatNumber(calculationLogs.indoorAssessment.xb)}\n`;
+                report += `Xb Calculation: ${calculationLogs.indoorAssessment.xbNote}\n`;
+                report += `Dilution Level: ${calculationLogs.indoorAssessment.dilutionLevel}\n`;
+                if (calculationLogs.indoorAssessment.xbWarning) {
+                    report += `WARNING: ${calculationLogs.indoorAssessment.xbWarning}\n`;
+                }
+                report += `\n`;
+            }
+            
+            if (calculationLogs.standardsCheck.floorArea && calculationLogs.scenario === 'indoor') {
+                report += "STANDARDS COMPLIANCE CHECK\n";
+                report += "-------------------------\n";
+                report += `EN 12186:2014: ${calculationLogs.standardsCheck.en12186.message}\n`;
+                report += `IGEM TD/13 Ed.3: ${calculationLogs.standardsCheck.igemTd13.message}\n\n`;
+            }
+            
+            if (calculationLogs.zoneClassification.zoneType) {
+                report += "ZONE CLASSIFICATION (IEC 60079-10-1 Annex D)\n";
+                report += "--------------------------------------------\n";
+                report += `Zone Type: ${calculationLogs.zoneClassification.zoneType}\n`;
+                report += `Zone Extent: ${formatNumber(calculationLogs.zoneClassification.zoneExtent, 2)} m\n`;
+                report += `Grade of Release: ${calculationLogs.zoneClassification.releaseGrade}\n`;
+                report += `Jet Type: ${calculationLogs.zoneClassification.jetType}\n`;
+                report += `Qc for Zone: ${formatNumber(calculationLogs.zoneClassification.qcForZone)} m³/s\n`;
+                if (calculationLogs.scenario === 'indoor') {
+                    report += `Method Note: Zone extent from Figure D.1 uses ${calculationLogs.typeAOpening.q2 ? 'Q₂ (Type A Opening)' : 'Qc'}; Xb computed from ${calculationLogs.conservativeMode ? 'Qc' : 'Qg'}\n`;
+                }
+            }
+            
+            if (calculationLogs.conservativeMode) {
+                report += `\nASSUMPTIONS:\n`;
+                report += `- Conservative mode active: Xb estimated with Qc for maximum conservatism\n`;
+                report += `- Results may be intentionally conservative and not reflect base Annex C methodology\n`;
+            }
+            
+            report += `\nCALCULATION STEPS:\n`;
+            report += `-----------------\n`;
+            calculationLogs.calculationSteps.forEach(step => {
+                report += `[${step.timestamp}] ${step.step}: ${step.description} ${step.value !== null ? `= ${formatNumber(step.value)}` : ''}\n`;
+            });
+            
+            return report;
+        }
+
+        function generateDetailedReport() {
+            const report = generateReport();
+            
+            // Создание downloadable отчета
+            const blob = new Blob([report], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `HAC_Report_${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function showReport() {
+            const report = generateReport();
+            alert(report);
+        }
+
+        function toggleScenarioVisibility(scenario) {
+            const outdoorTab = document.querySelector('.tab[data-tab="outdoor-assessment"]');
+            const indoorTab = document.querySelector('.tab[data-tab="indoor-assessment"]');
+            const standardsTab = document.querySelector('.tab[data-tab="standards-check"]');
+            const outdoorContent = document.getElementById('outdoor-assessment');
+            const indoorContent = document.getElementById('indoor-assessment');
+            const standardsContent = document.getElementById('standards-check');
+            
+            // Показываем/скрываем элементы с классами outdoor-only и indoor-only
+            document.querySelectorAll('.outdoor-only').forEach(el => {
+                el.classList.toggle('hidden', scenario !== 'outdoor');
+            });
+            document.querySelectorAll('.indoor-only').forEach(el => {
+                el.classList.toggle('hidden', scenario !== 'indoor');
+            });
+            
+            if (scenario === 'outdoor') {
+                outdoorTab.classList.remove('hidden');
+                outdoorContent.classList.remove('hidden');
+                indoorTab.classList.add('hidden');
+                indoorContent.classList.add('hidden');
+                standardsTab.classList.add('hidden');
+                standardsContent.classList.add('hidden');
+                
+                // Активируем вкладку outdoor если indoor была активна
+                if (indoorTab.classList.contains('active') || standardsTab.classList.contains('active')) {
+                    indoorTab.classList.remove('active');
+                    indoorContent.classList.remove('active');
+                    standardsTab.classList.remove('active');
+                    standardsContent.classList.remove('active');
+                    outdoorTab.classList.add('active');
+                    outdoorContent.classList.add('active');
+                }
+            } else {
+                outdoorTab.classList.add('hidden');
+                outdoorContent.classList.add('hidden');
+                indoorTab.classList.remove('hidden');
+                indoorContent.classList.remove('hidden');
+                standardsTab.classList.remove('hidden');
+                standardsContent.classList.remove('hidden');
+                
+                // Активируем вкладку indoor если outdoor была активна
+                if (outdoorTab.classList.contains('active')) {
+                    outdoorTab.classList.remove('active');
+                    outdoorContent.classList.remove('active');
+                    indoorTab.classList.add('active');
+                    indoorContent.classList.add('active');
+                }
+            }
+        }
+
+        // Инициализация после загрузки DOM
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded - initializing calculator');
+            
             // Language switching functionality
             const languageButtons = document.querySelectorAll('.language-btn');
             let currentLanguage = 'en';
@@ -870,48 +1920,10 @@
             languageButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     const lang = this.getAttribute('data-lang');
-                    setLanguage(lang);
                     currentLanguage = lang;
-                    
-                    // Update active button
-                    languageButtons.forEach(btn => {
-                        btn.classList.remove('active');
-                    });
-                    this.classList.add('active');
+                    updateLanguage(lang);
                 });
             });
-            
-            function setLanguage(lang) {
-                // Update all elements with data attributes
-                document.querySelectorAll('[data-en], [data-ua]').forEach(element => {
-                    if (element.hasAttribute(`data-${lang}`)) {
-                        const text = element.getAttribute(`data-${lang}`);
-                        if (element.tagName === 'INPUT' && element.type === 'button') {
-                            element.value = text;
-                        } else if (element.tagName === 'OPTION') {
-                            // Options are handled separately
-                        } else {
-                            // Handle HTML content for elements that might contain HTML
-                            if (element.hasAttribute('data-contains-html')) {
-                                element.innerHTML = text;
-                            } else {
-                                element.textContent = text;
-                            }
-                        }
-                    }
-                });
-                
-                // Handle option elements separately
-                document.querySelectorAll('option').forEach(option => {
-                    if (option.hasAttribute(`data-${lang}`)) {
-                        option.textContent = option.getAttribute(`data-${lang}`);
-                    }
-                });
-            }
-            
-            // Set initial language
-            setLanguage('en');
-            document.querySelector('.language-btn[data-lang="en"]').classList.add('active');
             
             // Scenario selection functionality
             const scenarioButtons = document.querySelectorAll('.scenario-btn');
@@ -919,61 +1931,20 @@
             scenarioButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     const scenario = this.getAttribute('data-scenario');
-                    setScenario(scenario);
+                    calculationLogs.scenario = scenario;
                     
                     // Update active button
                     scenarioButtons.forEach(btn => {
                         btn.classList.remove('active');
                     });
                     this.classList.add('active');
+                    
+                    // Toggle visibility of tabs
+                    toggleScenarioVisibility(scenario);
+                    
+                    console.log('Scenario changed to:', scenario);
                 });
             });
-            
-            function setScenario(scenario) {
-                calculationLogs.scenario = scenario;
-                
-                // Show/hide tabs based on scenario
-                const outdoorTabs = document.querySelectorAll('.outdoor-only');
-                const indoorTabs = document.querySelectorAll('.indoor-only');
-                
-                if (scenario === 'outdoor') {
-                    outdoorTabs.forEach(tab => tab.style.display = 'block');
-                    indoorTabs.forEach(tab => tab.style.display = 'none');
-                    
-                    // Activate outdoor assessment tab if indoor was active
-                    const activeTab = document.querySelector('.tab.active');
-                    if (activeTab && activeTab.classList.contains('indoor-only')) {
-                        activeTab.classList.remove('active');
-                        document.querySelector('.tab.outdoor-only').classList.add('active');
-                        
-                        document.querySelectorAll('.tab-content').forEach(content => {
-                            content.classList.remove('active');
-                        });
-                        document.getElementById('outdoor-assessment').classList.add('active');
-                    }
-                } else {
-                    outdoorTabs.forEach(tab => tab.style.display = 'none');
-                    indoorTabs.forEach(tab => tab.style.display = 'block');
-                    
-                    // Activate indoor assessment tab if outdoor was active
-                    const activeTab = document.querySelector('.tab.active');
-                    if (activeTab && activeTab.classList.contains('outdoor-only')) {
-                        activeTab.classList.remove('active');
-                        document.querySelector('.tab.indoor-only').classList.add('active');
-                        
-                        document.querySelectorAll('.tab-content').forEach(content => {
-                            content.classList.remove('active');
-                        });
-                        document.getElementById('indoor-assessment').classList.add('active');
-                    }
-                }
-                
-                // Update summary
-                updateSummary();
-            }
-            
-            // Set initial scenario
-            setScenario('outdoor');
             
             // Tab functionality
             const tabs = document.querySelectorAll('.tab');
@@ -981,8 +1952,6 @@
             
             tabs.forEach(tab => {
                 tab.addEventListener('click', function() {
-                    if (this.style.display === 'none') return;
-                    
                     const tabId = this.getAttribute('data-tab');
                     
                     // Remove active class from all tabs and contents
@@ -992,922 +1961,103 @@
                     // Add active class to current tab and content
                     this.classList.add('active');
                     document.getElementById(tabId).classList.add('active');
+                    
+                    console.log('Tab changed to:', tabId);
                 });
             });
             
-            // Pressure type conversion
-            const pressureInput = document.getElementById('pressure');
-            const pressureTypeRadios = document.querySelectorAll('input[name="pressureType"]');
-            
-            function updatePressureDisplay() {
-                const pressureValue = parseFloat(pressureInput.value);
-                const pressureType = document.querySelector('input[name="pressureType"]:checked').value;
-                
-                if (pressureType === 'gauge') {
-                    // Convert to absolute for display
-                    pressureInput.value = (pressureValue + 1.01325).toFixed(5);
-                } else {
-                    // Convert to gauge for display
-                    pressureInput.value = (pressureValue - 1.01325).toFixed(5);
-                }
-            }
-            
-            pressureTypeRadios.forEach(radio => {
-                radio.addEventListener('change', updatePressureDisplay);
-            });
-            
-            // Gas type selector
-            const gasType = document.getElementById('gasType');
-            gasType.addEventListener('change', function() {
-                if (this.value === 'propane') {
-                    document.getElementById('molarMass').value = '0.044097';
-                    document.getElementById('gamma').value = '1.13';
-                    document.getElementById('lfl').value = '0.017';
-                } else if (this.value === 'butane') {
-                    document.getElementById('molarMass').value = '0.058123';
-                    document.getElementById('gamma').value = '1.18';
-                    document.getElementById('lfl').value = '0.014';
-                }
-            });
-            
-            // Release rate calculation
+            // Основные кнопки калькулятора
             document.getElementById('calculateRelease').addEventListener('click', function() {
+                console.log('Calculate Release button clicked');
                 calculateReleaseRate();
             });
             
-            // Outdoor assessment
             document.getElementById('assessOutdoor').addEventListener('click', function() {
+                console.log('Assess Outdoor button clicked');
                 assessOutdoorConditions();
             });
             
-            // Enclosed space assessment
             document.getElementById('assessEnclosed').addEventListener('click', function() {
+                console.log('Assess Enclosed button clicked');
                 assessEnclosedSpace();
             });
             
-            // Hazardous area classification
+            document.getElementById('checkStandards').addEventListener('click', function() {
+                console.log('Check Standards button clicked');
+                checkVentilationStandardsCompliance();
+            });
+            
             document.getElementById('classifyArea').addEventListener('click', function() {
+                console.log('Classify Area button clicked');
                 classifyHazardousArea();
             });
             
-            // Generate report
             document.getElementById('generateReport').addEventListener('click', function() {
-                generateReport();
+                console.log('Generate Report button clicked');
+                showReport();
             });
             
-            // Apply typical limiters checkbox handler
-            document.getElementById('applyTypicalLimiters').addEventListener('change', function() {
-                updateZoneExtentFromTypicalLimiters();
+            document.getElementById('generateDetailedReport').addEventListener('click', function() {
+                console.log('Generate Detailed Report button clicked');
+                generateDetailedReport();
+            });
+            
+            // Gas type selector
+            document.getElementById('gasType').addEventListener('change', function() {
+                const gasType = this.value;
+                if (gasType === 'propane') {
+                    document.getElementById('molarMass').value = '0.044097';
+                    document.getElementById('gamma').value = '1.13';
+                    document.getElementById('lflPreset').value = 'common';
+                    document.getElementById('lfl').value = '0.021';
+                } else if (gasType === 'butane') {
+                    document.getElementById('molarMass').value = '0.058123';
+                    document.getElementById('gamma').value = '1.18';
+                    document.getElementById('lflPreset').value = 'common';
+                    document.getElementById('lfl').value = '0.015';
+                }
+                console.log('Gas type changed to:', this.value);
+            });
+            
+            // LFL preset selector
+            document.getElementById('lflPreset').addEventListener('change', function() {
+                const preset = this.value;
+                if (preset === 'common') {
+                    // Для пропана 2.1%, для бутана 1.5%
+                    const gasType = document.getElementById('gasType').value;
+                    document.getElementById('lfl').value = gasType === 'propane' ? '0.021' : '0.015';
+                } else if (preset === 'conservative') {
+                    // Консервативные значения
+                    const gasType = document.getElementById('gasType').value;
+                    document.getElementById('lfl').value = gasType === 'propane' ? '0.017' : '0.014';
+                }
+                // Для 'custom' значение не меняется
+                console.log('LFL preset changed to:', this.value);
+            });
+            
+            // Pressure type conversion
+            const pressureTypeRadios = document.querySelectorAll('input[name="pressureType"]');
+            pressureTypeRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    console.log('Pressure type changed to:', this.value);
+                });
             });
             
             // Jet type change handler
             document.getElementById('jetType').addEventListener('change', function() {
-                if (document.getElementById('applyTypicalLimiters').checked) {
-                    updateZoneExtentFromTypicalLimiters();
-                }
+                console.log('Jet type changed to:', this.value);
             });
             
-            function updateZoneExtentFromTypicalLimiters() {
-                if (document.getElementById('applyTypicalLimiters').checked) {
-                    const jetType = document.getElementById('jetType').value;
-                    let typicalExtent;
-                    if (jetType === 'heavy') {
-                        typicalExtent = 1.5;
-                    } else {
-                        typicalExtent = 1.0;
-                    }
-                    document.getElementById('zoneExtentManual').value = typicalExtent;
-                }
-            }
-            
-            // Auto-calculate when inputs change
-            document.querySelectorAll('input, select').forEach(element => {
-                element.addEventListener('change', function() {
-                    // Recalculate relevant sections
-                    if (this.id === 'gasType' || this.id === 'molarMass' || this.id === 'gamma' || 
-                        this.id === 'lfl' || this.id === 'temp' || this.id === 'holeSize' || 
-                        this.id === 'pressure' || this.id === 'cd') {
-                        calculateReleaseRate();
-                    }
-                    
-                    if (this.id === 'windSpeed' || this.id === 'obstruction' || this.id === 'elevation') {
-                        assessOutdoorConditions();
-                    }
-                    
-                    if (this.id === 'a1' || this.id === 'a2' || this.id === 'roomVolume' || 
-                        this.id === 'windSpeedEnclosed' || this.id === 'deltaCp' || this.id === 'inefficiency') {
-                        assessEnclosedSpace();
-                    }
-                    
-                    if (this.id === 'releaseGrade' || this.id === 'jetType' || this.id === 'zoneExtentManual') {
-                        classifyHazardousArea();
-                    }
-                });
+            // Conservative mode handler
+            document.getElementById('conservativeMode').addEventListener('change', function() {
+                console.log('Conservative mode changed to:', this.checked);
+                calculationLogs.conservativeMode = this.checked;
             });
             
-            // Initial calculation
-            calculateReleaseRate();
-            assessOutdoorConditions();
-            assessEnclosedSpace();
-            classifyHazardousArea();
+            // Инициализация видимости сценариев
+            toggleScenarioVisibility('outdoor');
             
-            // Functions
-            function calculateReleaseRate() {
-                // Get input values
-                const molarMass = parseFloat(document.getElementById('molarMass').value);
-                const gamma = parseFloat(document.getElementById('gamma').value);
-                const temperature = parseFloat(document.getElementById('temp').value);
-                const holeSize = parseFloat(document.getElementById('holeSize').value) * 1e-6; // Convert to m²
-                let pressure = parseFloat(document.getElementById('pressure').value) * 1e5; // Convert to Pa
-                const cd = parseFloat(document.getElementById('cd').value);
-                const atmosphericPressure = 101325; // Pa
-                const gasConstant = 8.314462618; // J/(mol·K)
-                
-                // Adjust pressure based on type
-                const pressureType = document.querySelector('input[name="pressureType"]:checked').value;
-                if (pressureType === 'gauge') {
-                    pressure += atmosphericPressure;
-                }
-                
-                // Check if pressure is below atmospheric (no flow condition)
-                if (pressure <= atmosphericPressure) {
-                    // No flow condition - pressure is equal to or below atmospheric
-                    const massFlowRate = 0;
-                    const qc = 0;
-                    const massFlowRateKgH = 0;
-                    const qcM3H = 0;
-                    const isChoked = false;
-                    
-                    // Store calculation logs
-                    calculationLogs.releaseRate = {
-                        inputs: {
-                            molarMass,
-                            gamma,
-                            temperature,
-                            holeSize: holeSize * 1e6,
-                            pressure: pressure / 1e5,
-                            cd,
-                            lfl: parseFloat(document.getElementById('lfl').value),
-                            pressureType,
-                            atmosphericPressure: atmosphericPressure / 1e5
-                        },
-                        intermediate: {
-                            betaCrit: Math.pow(2 / (gamma + 1), gamma / (gamma - 1)),
-                            pressureRatio: atmosphericPressure / pressure,
-                            isChoked: false,
-                            gasDensity: 0,
-                            massFlowRate: 0,
-                            qc: 0,
-                            noFlow: true
-                        },
-                        results: {
-                            massFlowRateKgH: 0,
-                            qc: 0,
-                            qcM3H: 0,
-                            isChoked: false,
-                            noFlow: true
-                        }
-                    };
-                    
-                    // Display results
-                    const resultsDiv = document.getElementById('releaseResults');
-                    resultsDiv.innerHTML = `
-                        <div class="result-item">
-                            <span data-en="Flow Type:" data-ua="Тип потоку:">Flow Type:</span>
-                            <span class="result-value">${currentLanguage === 'en' ? 'No Flow' : 'Немає потоку'} 
-                                <span class="pill warn">${currentLanguage === 'en' ? 'No Flow' : 'Немає потоку'}</span></span>
-                        </div>
-                        <div class="result-item">
-                            <span data-en="Mass Flow Rate (ṁ):" data-ua="Масова витрата (ṁ):">Mass Flow Rate (ṁ):</span>
-                            <span class="result-value">${massFlowRateKgH.toFixed(6)} kg/h</span>
-                        </div>
-                        <div class="result-item">
-                            <span data-en="Volumetric Release Characteristic (Q<sub>c</sub>):" data-ua="Характеристика об'ємного викиду (Q<sub>c</sub>):">Volumetric Release Characteristic (Q<sub>c</sub>):</span>
-                            <span class="result-value">${qc.toFixed(6)} m³/s (${qcM3H.toFixed(6)} m³/h)</span>
-                        </div>
-                        <div class="result-details">
-                            <div data-en="System pressure is below or equal to atmospheric pressure. No gas release occurs." data-ua="Тиск у системі нижче або дорівнює атмосферному. Викиду газу не відбувається.">System pressure is below or equal to atmospheric pressure. No gas release occurs.</div>
-                        </div>
-                    `;
-                    
-                    // Update language for results
-                    setLanguage(currentLanguage);
-                    
-                    // Update Qc for zone calculation
-                    document.getElementById('qcForZone').value = qc.toFixed(6);
-                    
-                    // Update jet type detection
-                    updateJetTypeFromCalculation();
-                    
-                    // Update summary
-                    updateSummary();
-                    
-                    return { massFlowRate, massFlowRateKgH, qc, qcM3H, isChoked, noFlow: true };
-                }
-                
-                // Calculate critical pressure ratio
-                const betaCrit = Math.pow(2 / (gamma + 1), gamma / (gamma - 1));
-                const pressureRatio = atmosphericPressure / pressure;
-                
-                // Determine if flow is choked
-                const isChoked = pressureRatio <= betaCrit;
-                
-                // Calculate mass flow rate
-                let massFlowRate;
-                if (isChoked) {
-                    const term = Math.sqrt(gamma / (gasConstant * temperature));
-                    const expTerm = Math.pow(2 / (gamma + 1), (gamma + 1) / (2 * (gamma - 1)));
-                    massFlowRate = cd * holeSize * pressure * term * expTerm;
-                } else {
-                    const term = (2 * gamma) / (gasConstant * temperature * (gamma - 1));
-                    const r2g = Math.pow(atmosphericPressure / pressure, 2 / gamma);
-                    const rg1g = Math.pow(atmosphericPressure / pressure, (gamma + 1) / gamma);
-                    const inside = r2g - rg1g;
-                    massFlowRate = cd * holeSize * pressure * Math.sqrt(term * Math.max(inside, 0));
-                }
-                
-                // Calculate volumetric release characteristic (Qc) in m³/s
-                const lfl = parseFloat(document.getElementById('lfl').value);
-                const ambientTemperature = 293.15; // K
-                const gasDensity = (atmosphericPressure * molarMass) / (gasConstant * ambientTemperature);
-                const qc = massFlowRate / (gasDensity * lfl);
-                
-                // Convert to more readable units
-                const massFlowRateKgH = massFlowRate * 3600; // kg/h
-                const qcM3H = qc * 3600; // m³/h
-                
-                // Store calculation logs with detailed steps
-                calculationLogs.releaseRate = {
-                    inputs: {
-                        molarMass,
-                        gamma,
-                        temperature,
-                        holeSize: holeSize * 1e6, // Back to mm² for display
-                        pressure: pressure / 1e5, // Back to bar for display
-                        cd,
-                        lfl,
-                        pressureType,
-                        atmosphericPressure: atmosphericPressure / 1e5 // bar
-                    },
-                    intermediate: {
-                        betaCrit,
-                        pressureRatio,
-                        isChoked,
-                        gasDensity,
-                        massFlowRate,
-                        qc,
-                        calculationSteps: [
-                            `Step 1: Calculate critical pressure ratio β_crit = (2/(γ+1))^(γ/(γ-1)) = (2/(${gamma}+1))^(${gamma}/(${gamma}-1)) = ${betaCrit.toFixed(4)}`,
-                            `Step 2: Calculate pressure ratio p_a/p = ${atmosphericPressure/1e5}/${pressure/1e5} = ${pressureRatio.toFixed(4)}`,
-                            `Step 3: Flow type = ${isChoked ? 'Choked (p_a/p ≤ β_crit)' : 'Subsonic (p_a/p > β_crit)'}`,
-                            `Step 4: Calculate mass flow rate using ${isChoked ? 'choked flow' : 'subsonic flow'} formula`,
-                            `Step 5: Calculate gas density ρ_g = (p_a × M) / (R × T) = (${atmosphericPressure/1e5} × ${molarMass}) / (8.314 × ${ambientTemperature}) = ${gasDensity.toFixed(6)} kg/m³`,
-                            `Step 6: Calculate Qc = ṁ / (ρ_g × LFL) = ${massFlowRate.toExponential(4)} / (${gasDensity.toFixed(6)} × ${lfl}) = ${qc.toExponential(4)} m³/s`
-                        ]
-                    },
-                    results: {
-                        massFlowRateKgH,
-                        qc,
-                        qcM3H,
-                        isChoked
-                    }
-                };
-                
-                // Display results
-                const resultsDiv = document.getElementById('releaseResults');
-                resultsDiv.innerHTML = `
-                    <div class="result-item">
-                        <span data-en="Flow Type:" data-ua="Тип потоку:">Flow Type:</span>
-                        <span class="result-value">${isChoked ? 
-                            (currentLanguage === 'en' ? 'Choked' : 'Перекритий') : 
-                            (currentLanguage === 'en' ? 'Subsonic' : 'Дозвуковий')} 
-                            <span class="pill ${isChoked ? 'warn' : 'ok'}">${isChoked ? 
-                            (currentLanguage === 'en' ? 'Choked' : 'Перекритий') : 
-                            (currentLanguage === 'en' ? 'Subsonic' : 'Дозвуковий')}</span></span>
-                    </div>
-                    <div class="result-item">
-                        <span data-en="Mass Flow Rate (ṁ):" data-ua="Масова витрата (ṁ):">Mass Flow Rate (ṁ):</span>
-                        <span class="result-value">${massFlowRateKgH.toFixed(6)} kg/h</span>
-                    </div>
-                    <div class="result-item">
-                        <span data-en="Volumetric Release Characteristic (Q<sub>c</sub>):" data-ua="Характеристика об'ємного викиду (Q<sub>c</sub>):">Volumetric Release Characteristic (Q<sub>c</sub>):</span>
-                        <span class="result-value">${qc.toFixed(6)} m³/s (${qcM3H.toFixed(6)} m³/h)</span>
-                    </div>
-                    <div class="calculation-steps">
-                        <div class="formula-title" data-en="Calculation Steps" data-ua="Кроки розрахунку">Calculation Steps</div>
-                        ${calculationLogs.releaseRate.intermediate.calculationSteps.map(step => 
-                            `<div class="calculation-step"><span class="step-number">→</span> ${step}</div>`
-                        ).join('')}
-                    </div>
-                    <div class="result-details">
-                        <div data-en="Used values: S = ${holeSize * 1e6} mm², p = ${(pressure/1e5).toFixed(3)} bar, C<sub>d</sub> = ${cd}, γ = ${gamma}, T = ${temperature} K" data-ua="Використані значення: S = ${holeSize * 1e6} мм², p = ${(pressure/1e5).toFixed(3)} бар, C<sub>d</sub> = ${cd}, γ = ${gamma}, T = ${temperature} K">Used values: S = ${holeSize * 1e6} mm², p = ${(pressure/1e5).toFixed(3)} bar, C<sub>d</sub> = ${cd}, γ = ${gamma}, T = ${temperature} K</div>
-                    </div>
-                `;
-                
-                // Update language for results
-                setLanguage(currentLanguage);
-                
-                // Update Qc for zone calculation
-                document.getElementById('qcForZone').value = qc.toFixed(6);
-                
-                // Update jet type detection
-                updateJetTypeFromCalculation();
-                
-                // Update summary
-                updateSummary();
-                
-                return { massFlowRate, massFlowRateKgH, qc, qcM3H, isChoked };
-            }
-            
-            function autoDetectJetType() {
-                if (!calculationLogs.releaseRate.results) return 'diffusive';
-                
-                const releaseData = calculationLogs.releaseRate;
-                const inputs = releaseData.inputs;
-                const results = releaseData.results;
-                
-                // If no flow, return diffusive
-                if (results.noFlow) {
-                    return 'diffusive';
-                }
-                
-                // Calculate gas density for heavy gas detection
-                const atmosphericPressure = 101325; // Pa
-                const gasConstant = 8.314462618;
-                const ambientTemperature = 293.15;
-                const gasDensity = (atmosphericPressure * inputs.molarMass) / (gasConstant * ambientTemperature);
-                const airDensity = 1.2; // kg/m³
-                
-                // Check for heavy gas (density > 1.5× air)
-                if (gasDensity > airDensity * 1.5) {
-                    return 'heavy';
-                }
-                
-                // Check for unimpeded jet (choked flow or high pressure > 2 bar absolute)
-                if (results.isChoked || inputs.pressure > 2.0) {
-                    return 'unimpeded';
-                }
-                
-                // Default to diffusive jet
-                return 'diffusive';
-            }
-            
-            function updateJetTypeFromCalculation() {
-                const jetTypeSelect = document.getElementById('jetType');
-                if (jetTypeSelect.value === 'auto') {
-                    const detectedType = autoDetectJetType();
-                    
-                    // Update select value without triggering change event
-                    jetTypeSelect.value = detectedType;
-                    
-                    // Add visual indication that this was auto-detected
-                    const options = jetTypeSelect.querySelectorAll('option');
-                    options.forEach(opt => {
-                        if (opt.textContent.includes('(Auto)')) {
-                            opt.textContent = opt.textContent.replace(' (Auto)', '');
-                        }
-                    });
-                    
-                    const selectedOption = jetTypeSelect.querySelector(`option[value="${detectedType}"]`);
-                    if (selectedOption) {
-                        const originalText = selectedOption.getAttribute(`data-${currentLanguage}`) || selectedOption.textContent.replace(' (Auto)', '');
-                        selectedOption.textContent = originalText + ' (Auto)';
-                    }
-                }
-            }
-            
-            function assessOutdoorConditions() {
-                const windSpeed = parseFloat(document.getElementById('windSpeed').value);
-                const obstruction = document.getElementById('obstruction').value;
-                const elevation = document.getElementById('elevation').value;
-                
-                // Determine ventilation availability based on obstruction
-                let ventilationAvailability;
-                let ventilationAvailabilityKey;
-                if (obstruction === 'unobstructed') {
-                    ventilationAvailability = windSpeed >= 0.5 ? 
-                        (currentLanguage === 'en' ? 'Good' : 'Добра') : 
-                        (currentLanguage === 'en' ? 'Fair' : 'Задовільна');
-                    ventilationAvailabilityKey = windSpeed >= 0.5 ? 'good' : 'fair';
-                } else {
-                    ventilationAvailability = windSpeed >= 0.5 ? 
-                        (currentLanguage === 'en' ? 'Fair' : 'Задовільна') : 
-                        (currentLanguage === 'en' ? 'Poor' : 'Погана');
-                    ventilationAvailabilityKey = windSpeed >= 0.5 ? 'fair' : 'poor';
-                }
-                
-                // Determine dilution level based on wind speed and conditions
-                let dilutionLevel;
-                let dilutionLevelKey;
-                if (windSpeed > 1.0) {
-                    dilutionLevel = currentLanguage === 'en' ? 'High' : 'Високий';
-                    dilutionLevelKey = 'high';
-                } else if (windSpeed > 0.3) {
-                    dilutionLevel = currentLanguage === 'en' ? 'Medium' : 'Середній';
-                    dilutionLevelKey = 'medium';
-                } else {
-                    dilutionLevel = currentLanguage === 'en' ? 'Low' : 'Низький';
-                    dilutionLevelKey = 'low';
-                }
-                
-                // Store calculation logs with steps
-                calculationLogs.outdoorAssessment = {
-                    inputs: {
-                        windSpeed,
-                        obstruction,
-                        elevation
-                    },
-                    intermediate: {
-                        calculationSteps: [
-                            `Step 1: Wind speed U = ${windSpeed} m/s`,
-                            `Step 2: Obstruction level = ${obstruction}`,
-                            `Step 3: Elevation = ${elevation} m`,
-                            `Step 4: Determine ventilation availability based on obstruction and wind speed`,
-                            `Step 5: Determine dilution level based on wind speed`
-                        ]
-                    },
-                    results: {
-                        ventilationAvailability,
-                        ventilationAvailabilityKey,
-                        dilutionLevel,
-                        dilutionLevelKey
-                    }
-                };
-                
-                // Display results
-                const resultsDiv = document.getElementById('outdoorResults');
-                resultsDiv.innerHTML = `
-                    <div class="result-item">
-                        <span data-en="Ventilation Availability:" data-ua="Доступність вентиляції:">Ventilation Availability:</span>
-                        <span class="result-value">${ventilationAvailability} <span class="pill ${ventilationAvailabilityKey === 'good' ? 'ok' : ventilationAvailabilityKey === 'fair' ? 'warn' : 'bad'}">${ventilationAvailability}</span></span>
-                    </div>
-                    <div class="result-item">
-                        <span data-en="Dilution Level:" data-ua="Рівень розведення:">Dilution Level:</span>
-                        <span class="result-value">${dilutionLevel} <span class="pill ${dilutionLevelKey === 'high' ? 'ok' : dilutionLevelKey === 'medium' ? 'warn' : 'bad'}">${dilutionLevel}</span></span>
-                    </div>
-                    <div class="calculation-steps">
-                        <div class="formula-title" data-en="Calculation Steps" data-ua="Кроки розрахунку">Calculation Steps</div>
-                        ${calculationLogs.outdoorAssessment.intermediate.calculationSteps.map(step => 
-                            `<div class="calculation-step"><span class="step-number">→</span> ${step}</div>`
-                        ).join('')}
-                    </div>
-                    <div class="result-details">
-                        <div data-en="Used values: U = ${windSpeed} m/s, Obstruction = ${obstruction}, Elevation = ${elevation} m" data-ua="Використані значення: U = ${windSpeed} м/с, Перешкоди = ${obstruction}, Висота = ${elevation} м">Used values: U = ${windSpeed} m/s, Obstruction = ${obstruction}, Elevation = ${elevation} m</div>
-                    </div>
-                `;
-                
-                // Update summary
-                updateSummary();
-                
-                return { ventilationAvailability, ventilationAvailabilityKey, dilutionLevel, dilutionLevelKey };
-            }
-            
-            function assessEnclosedSpace() {
-                const a1 = parseFloat(document.getElementById('a1').value);
-                const a2 = parseFloat(document.getElementById('a2').value);
-                const roomVolume = parseFloat(document.getElementById('roomVolume').value);
-                const windSpeed = parseFloat(document.getElementById('windSpeedEnclosed').value);
-                const deltaCp = parseFloat(document.getElementById('deltaCp').value);
-                const inefficiency = parseFloat(document.getElementById('inefficiency').value);
-                const cdVent = 0.6; // Typical value for ventilation openings
-                
-                // Calculate equivalent area
-                const ae = (a1 * a2) / Math.sqrt(a1 * a1 + a2 * a2);
-                
-                // Calculate air flow rate
-                const qa = cdVent * ae * windSpeed * Math.sqrt(deltaCp);
-                
-                // Calculate air change frequency
-                const c = qa / roomVolume;
-                
-                // Calculate background concentration
-                const releaseData = calculateReleaseRate();
-                const qg = releaseData.qc;
-                const q2 = qa; // Outflow rate
-                
-                let xb = 0;
-                let backgroundStatus = 'N/A';
-                let backgroundExplanation = '';
-                let backgroundStatusKey = 'acceptable';
-                
-                if (q2 > 0) {
-                    xb = (inefficiency * qg) / q2;
-                    const xcrit = 0.25 * parseFloat(document.getElementById('lfl').value);
-                    
-                    if (xb <= xcrit) {
-                        backgroundStatus = currentLanguage === 'en' ? 'Acceptable' : 'Прийнятна';
-                        backgroundExplanation = currentLanguage === 'en' 
-                            ? 'Background concentration is below critical level (25% of LFL). Ventilation provides medium dilution.' 
-                            : 'Фонова концентрація нижче критичного рівня (25% від LFL). Вентиляція забезпечує середнє розведення.';
-                        backgroundStatusKey = 'acceptable';
-                    } else {
-                        backgroundStatus = currentLanguage === 'en' ? 'Unacceptable' : 'Неприйнятна';
-                        backgroundExplanation = currentLanguage === 'en' 
-                            ? 'Background concentration exceeds critical level (25% of LFL). Ventilation provides low dilution. Consider improving ventilation.' 
-                            : 'Фонова концентрація перевищує критичний рівень (25% від LFL). Вентиляція забезпечує низьке розведення. Розгляньте поліпшення вентиляції.';
-                        backgroundStatusKey = 'unacceptable';
-                    }
-                }
-                
-                // Determine ventilation and dilution for indoor scenario
-                let ventilationAvailability = currentLanguage === 'en' ? 'Indoor' : 'Внутрішня';
-                let dilutionLevel;
-                
-                if (c > 0.03) { // More than 0.03 air changes per second (~100 per hour)
-                    dilutionLevel = currentLanguage === 'en' ? 'High' : 'Високий';
-                } else if (c > 0.01) { // More than 0.01 air changes per second (~36 per hour)
-                    dilutionLevel = currentLanguage === 'en' ? 'Medium' : 'Середній';
-                } else {
-                    dilutionLevel = currentLanguage === 'en' ? 'Low' : 'Низький';
-                }
-                
-                // Store calculation logs with steps
-                calculationLogs.indoorAssessment = {
-                    inputs: {
-                        a1,
-                        a2,
-                        roomVolume,
-                        windSpeed,
-                        deltaCp,
-                        inefficiency,
-                        cdVent
-                    },
-                    intermediate: {
-                        ae,
-                        qa,
-                        c,
-                        qg,
-                        q2,
-                        xcrit: 0.25 * parseFloat(document.getElementById('lfl').value),
-                        calculationSteps: [
-                            `Step 1: Calculate equivalent area Aₑ = (A₁ × A₂) / √(A₁² + A₂²) = (${a1} × ${a2}) / √(${a1}² + ${a2}²) = ${ae.toFixed(6)} m²`,
-                            `Step 2: Calculate air flow rate Qₐ = C_d × Aₑ × U × √(ΔC_p) = ${cdVent} × ${ae.toFixed(6)} × ${windSpeed} × √(${deltaCp}) = ${qa.toFixed(6)} m³/s`,
-                            `Step 3: Calculate air change frequency C = Qₐ / V₀ = ${qa.toFixed(6)} / ${roomVolume} = ${c.toFixed(6)} s⁻¹`,
-                            `Step 4: Calculate background concentration X_b = (f × Q_g) / Q₂ = (${inefficiency} × ${qg.toExponential(4)}) / ${qa.toFixed(6)} = ${xb.toExponential(4)}`,
-                            `Step 5: Compare with critical concentration X_crit = 0.25 × LFL = 0.25 × ${parseFloat(document.getElementById('lfl').value)} = ${(0.25 * parseFloat(document.getElementById('lfl').value)).toFixed(6)}`,
-                            `Step 6: Background concentration is ${xb <= (0.25 * parseFloat(document.getElementById('lfl').value)) ? 'below' : 'above'} critical level`
-                        ]
-                    },
-                    results: {
-                        xb,
-                        backgroundStatus,
-                        backgroundStatusKey,
-                        backgroundExplanation,
-                        ventilationAvailability,
-                        dilutionLevel
-                    }
-                };
-                
-                // Display results
-                const resultsDiv = document.getElementById('enclosedResults');
-                resultsDiv.innerHTML = `
-                    <div class="result-item">
-                        <span data-en="Equivalent Area (Aₑ):" data-ua="Еквівалентна площа (Aₑ):">Equivalent Area (Aₑ):</span>
-                        <span class="result-value">${ae.toFixed(6)} m²</span>
-                    </div>
-                    <div class="result-item">
-                        <span data-en="Air Flow Rate (Qₐ):" data-ua="Витрата повітря (Qₐ):">Air Flow Rate (Qₐ):</span>
-                        <span class="result-value">${qa.toFixed(6)} m³/s</span>
-                    </div>
-                    <div class="result-item">
-                        <span data-en="Air Change Frequency (C):" data-ua="Частота повітрообміну (C):">Air Change Frequency (C):</span>
-                        <span class="result-value">${c.toFixed(4)} s⁻¹ (${(c * 3600).toFixed(1)} per hour)</span>
-                    </div>
-                    <div class="result-item">
-                        <span data-en="Background Concentration (Xᵦ):" data-ua="Фонова концентрація (Xᵦ):">Background Concentration (Xᵦ):</span>
-                        <span class="result-value">${xb.toFixed(6)} <span class="pill ${backgroundStatusKey === 'acceptable' ? 'ok' : 'bad'}">${backgroundStatus}</span></span>
-                    </div>
-                    <div class="result-item">
-                        <span data-en="Ventilation Availability:" data-ua="Доступність вентиляції:">Ventilation Availability:</span>
-                        <span class="result-value">${ventilationAvailability}</span>
-                    </div>
-                    <div class="result-item">
-                        <span data-en="Dilution Level:" data-ua="Рівень розведення:">Dilution Level:</span>
-                        <span class="result-value">${dilutionLevel} <span class="pill ${dilutionLevel === (currentLanguage === 'en' ? 'High' : 'Високий') ? 'ok' : dilutionLevel === (currentLanguage === 'en' ? 'Medium' : 'Середній') ? 'warn' : 'bad'}">${dilutionLevel}</span></span>
-                    </div>
-                    <div class="calculation-steps">
-                        <div class="formula-title" data-en="Calculation Steps" data-ua="Кроки розрахунку">Calculation Steps</div>
-                        ${calculationLogs.indoorAssessment.intermediate.calculationSteps.map(step => 
-                            `<div class="calculation-step"><span class="step-number">→</span> ${step}</div>`
-                        ).join('')}
-                    </div>
-                    <div class="result-details">
-                        <div data-en="Used values: A₁ = ${a1} m², A₂ = ${a2} m², U = ${windSpeed} m/s, ΔCₚ = ${deltaCp}, f = ${inefficiency}, V₀ = ${roomVolume} m³" data-ua="Використані значення: A₁ = ${a1} м², A₂ = ${a2} м², U = ${windSpeed} м/с, ΔCₚ = ${deltaCp}, f = ${inefficiency}, V₀ = ${roomVolume} м³">Used values: A₁ = ${a1} m², A₂ = ${a2} m², U = ${windSpeed} m/s, ΔCₚ = ${deltaCp}, f = ${inefficiency}, V₀ = ${roomVolume} m³</div>
-                        <div>${backgroundExplanation}</div>
-                    </div>
-                `;
-                
-                // Update summary
-                updateSummary();
-                
-                return { ae, qa, c, xb, backgroundStatus, backgroundStatusKey, ventilationAvailability, dilutionLevel };
-            }
-            
-            function classifyHazardousArea() {
-                const releaseGrade = document.getElementById('releaseGrade').value;
-                const jetTypeSelect = document.getElementById('jetType');
-                const jetType = jetTypeSelect.value === 'auto' ? autoDetectJetType() : jetTypeSelect.value;
-                const zoneExtentManual = parseFloat(document.getElementById('zoneExtentManual').value);
-                const applyTypicalLimiters = document.getElementById('applyTypicalLimiters').checked;
-                const qcForZone = parseFloat(document.getElementById('qcForZone').value);
-                
-                let zoneType, zoneTypeKey, zoneExtent, calculationMethod, calculationDetails;
-                
-                // Check for indoor scenario with unacceptable background concentration
-                if (calculationLogs.scenario === 'indoor' && 
-                    calculationLogs.indoorAssessment.results && 
-                    calculationLogs.indoorAssessment.results.backgroundStatusKey === 'unacceptable') {
-                    
-                    // For indoor scenarios with unacceptable background concentration, the entire room becomes hazardous
-                    if (releaseGrade === 'continuous') {
-                        zoneTypeKey = 'zone0';
-                        zoneType = currentLanguage === 'en' ? 'Zone 0 (Whole Room)' : 'Зона 0 (Все приміщення)';
-                    } else if (releaseGrade === 'primary') {
-                        zoneTypeKey = 'zone1';
-                        zoneType = currentLanguage === 'en' ? 'Zone 1 (Whole Room)' : 'Зона 1 (Все приміщення)';
-                    } else {
-                        zoneTypeKey = 'zone2';
-                        zoneType = currentLanguage === 'en' ? 'Zone 2 (Whole Room)' : 'Зона 2 (Все приміщення)';
-                    }
-                    
-                    zoneExtent = null; // Whole room
-                    calculationMethod = currentLanguage === 'en' 
-                        ? 'Whole room classification due to inadequate ventilation' 
-                        : 'Класифікація всього приміщення через недостатню вентиляцію';
-                    calculationDetails = currentLanguage === 'en' 
-                        ? `Background concentration exceeds 25% LFL. Entire room classified as ${zoneType}.` 
-                        : `Фонова концентрація перевищує 25% LFL. Все приміщення класифіковано як ${zoneType}.`;
-                } else {
-                    // Standard zone classification
-                    if (releaseGrade === 'continuous') {
-                        zoneTypeKey = 'zone0';
-                        zoneType = currentLanguage === 'en' ? 'Zone 0' : 'Зона 0';
-                    } else if (releaseGrade === 'primary') {
-                        zoneTypeKey = 'zone1';
-                        zoneType = currentLanguage === 'en' ? 'Zone 1' : 'Зона 1';
-                    } else { // secondary
-                        zoneTypeKey = 'zone2';
-                        zoneType = currentLanguage === 'en' ? 'Zone 2' : 'Зона 2';
-                    }
-                    
-                    // Use manual zone extent from Figure D.1
-                    zoneExtent = zoneExtentManual;
-                    calculationMethod = currentLanguage === 'en' 
-                        ? 'Based on Figure D.1 with manual input' 
-                        : 'На основі Рисунка D.1 з ручним введенням';
-                    calculationDetails = currentLanguage === 'en' 
-                        ? `Zone extent manually set to ${zoneExtent} m based on Figure D.1` 
-                        : `Протяжність зони вручну встановлена на ${zoneExtent} м на основі Рисунка D.1`;
-                }
-                
-                // Store calculation logs with steps
-                const jetTypeDetection = jetTypeSelect.value === 'auto' ? 
-                    `Auto-detected jet type: ${autoDetectJetType()} (based on gas properties and flow conditions)` :
-                    `Manually selected jet type: ${jetType}`;
-                
-                calculationLogs.zoneClassification = {
-                    inputs: {
-                        releaseGrade,
-                        jetType: jetTypeSelect.value,
-                        jetTypeDetected: jetType,
-                        zoneExtentManual,
-                        applyTypicalLimiters,
-                        qcForZone
-                    },
-                    intermediate: {
-                        calculationSteps: [
-                            `Step 1: Grade of release = ${releaseGrade}`,
-                            `Step 2: ${jetTypeDetection}`,
-                            `Step 3: Qc for zone calculation = ${qcForZone} m³/s`,
-                            `Step 4: Zone extent from Figure D.1 = ${zoneExtentManual} m`,
-                            `Step 5: Apply typical limiters = ${applyTypicalLimiters ? 'Yes' : 'No'}`,
-                            `Step 6: Determine zone type based on grade of release`,
-                            `Step 7: ${calculationDetails}`
-                        ]
-                    },
-                    results: {
-                        zoneType,
-                        zoneTypeKey,
-                        zoneExtent,
-                        calculationMethod,
-                        calculationDetails
-                    }
-                };
-                
-                // Display results
-                const resultsDiv = document.getElementById('classificationResults');
-                let zoneExtentDisplay = zoneExtent === null ? 
-                    (currentLanguage === 'en' ? 'Whole Room' : 'Все приміщення') : 
-                    `${zoneExtent.toFixed(1)} m`;
-                
-                resultsDiv.innerHTML = `
-                    <div class="result-item">
-                        <span data-en="Zone Type:" data-ua="Тип зони:">Zone Type:</span>
-                        <span class="result-value">${zoneType} <span class="pill ${zoneTypeKey === 'zone0' ? 'bad' : zoneTypeKey === 'zone1' ? 'warn' : 'ok'}">${zoneType}</span></span>
-                    </div>
-                    <div class="result-item">
-                        <span data-en="Zone Extent:" data-ua="Протяжність зони:">Zone Extent:</span>
-                        <span class="result-value">${zoneExtentDisplay}</span>
-                    </div>
-                    <div class="result-item">
-                        <span data-en="Jet Type:" data-ua="Тип струменя:">Jet Type:</span>
-                        <span class="result-value">${jetTypeSelect.value === 'auto' ? jetType + ' (Auto)' : jetType}</span>
-                    </div>
-                    <div class="result-item">
-                        <span data-en="Calculation Method:" data-ua="Метод розрахунку:">Calculation Method:</span>
-                        <span class="result-value">${calculationMethod}</span>
-                    </div>
-                    <div class="calculation-steps">
-                        <div class="formula-title" data-en="Calculation Steps" data-ua="Кроки розрахунку">Calculation Steps</div>
-                        ${calculationLogs.zoneClassification.intermediate.calculationSteps.map(step => 
-                            `<div class="calculation-step"><span class="step-number">→</span> ${step}</div>`
-                        ).join('')}
-                    </div>
-                    <div class="result-details">
-                        <div>${calculationDetails}</div>
-                    </div>
-                    <div class="result-item">
-                        <span data-en="Recommendation:" data-ua="Рекомендація:">Recommendation:</span>
-                        <span class="result-value">${getZoneRecommendation(zoneTypeKey)}</span>
-                    </div>
-                `;
-                
-                // Update summary
-                updateSummary();
-                
-                return { zoneType, zoneTypeKey, zoneExtent, calculationMethod, jetType };
-            }
-            
-            function getZoneRecommendation(zoneTypeKey) {
-                if (zoneTypeKey === 'zone0') {
-                    return currentLanguage === 'en' ? 'Use Category 1 equipment' : 'Використовуйте обладнання Категорії 1';
-                } else if (zoneTypeKey === 'zone1') {
-                    return currentLanguage === 'en' ? 'Use Category 2 equipment' : 'Використовуйте обладнання Категорії 2';
-                } else {
-                    return currentLanguage === 'en' ? 'Use Category 3 equipment' : 'Використовуйте обладнання Категорії 3';
-                }
-            }
-            
-            function updateSummary() {
-                const scenario = calculationLogs.scenario;
-                const scenarioText = scenario === 'outdoor' ? 
-                    (currentLanguage === 'en' ? 'Outdoor' : 'Зовнішній') : 
-                    (currentLanguage === 'en' ? 'Indoor' : 'Внутрішній');
-                
-                document.getElementById('summaryScenario').textContent = scenarioText;
-                
-                // Update Qc
-                if (calculationLogs.releaseRate.results) {
-                    document.getElementById('summaryQc').textContent = 
-                        `${calculationLogs.releaseRate.results.qc.toFixed(6)} m³/s`;
-                } else {
-                    document.getElementById('summaryQc').textContent = '— m³/s';
-                }
-                
-                // Update ventilation and dilution based on scenario
-                if (scenario === 'outdoor' && calculationLogs.outdoorAssessment.results) {
-                    document.getElementById('summaryVentilation').textContent = 
-                        calculationLogs.outdoorAssessment.results.ventilationAvailability;
-                    document.getElementById('summaryDilution').textContent = 
-                        calculationLogs.outdoorAssessment.results.dilutionLevel;
-                } else if (scenario === 'indoor' && calculationLogs.indoorAssessment.results) {
-                    document.getElementById('summaryVentilation').textContent = 
-                        calculationLogs.indoorAssessment.results.ventilationAvailability;
-                    document.getElementById('summaryDilution').textContent = 
-                        calculationLogs.indoorAssessment.results.dilutionLevel;
-                } else {
-                    document.getElementById('summaryVentilation').textContent = '—';
-                    document.getElementById('summaryDilution').textContent = '—';
-                }
-                
-                // Update zone classification
-                if (calculationLogs.zoneClassification.results) {
-                    document.getElementById('summaryZone').textContent = 
-                        calculationLogs.zoneClassification.results.zoneType;
-                    
-                    if (calculationLogs.zoneClassification.results.zoneExtent === null) {
-                        document.getElementById('summaryExtent').textContent = 
-                            currentLanguage === 'en' ? 'Whole Room' : 'Все приміщення';
-                    } else {
-                        document.getElementById('summaryExtent').textContent = 
-                            `${calculationLogs.zoneClassification.results.zoneExtent.toFixed(1)} m`;
-                    }
-                } else {
-                    document.getElementById('summaryZone').textContent = '—';
-                    document.getElementById('summaryExtent').textContent = '— m';
-                }
-                
-                // Update background concentration
-                if (scenario === 'indoor' && calculationLogs.indoorAssessment.results) {
-                    document.getElementById('summaryBackground').textContent = 
-                        `${calculationLogs.indoorAssessment.results.xb.toFixed(6)} (${calculationLogs.indoorAssessment.results.backgroundStatus})`;
-                } else {
-                    document.getElementById('summaryBackground').textContent = '—';
-                }
-            }
-            
-            function generateReport() {
-                // Collect all data
-                const releaseData = calculateReleaseRate();
-                const outdoorData = calculationLogs.scenario === 'outdoor' ? assessOutdoorConditions() : null;
-                const enclosedData = calculationLogs.scenario === 'indoor' ? assessEnclosedSpace() : null;
-                const classificationData = classifyHazardousArea();
-                
-                // Create detailed report content with all calculation steps
-                let reportContent = `HAC AND VENTILATION ANALYSIS REPORT
-===================================
-
-SCENARIO: ${calculationLogs.scenario === 'outdoor' ? 'OUTDOOR RELEASE' : 'INDOOR RELEASE'}
-
-Calculation timestamp: ${new Date().toLocaleString()}
-
-GAS PROPERTIES & RELEASE SOURCE
--------------------------------
-Gas Type: ${document.getElementById('gasType').options[document.getElementById('gasType').selectedIndex].text}
-Molar Mass: ${calculationLogs.releaseRate.inputs.molarMass} kg/mol
-Specific Heat Ratio: ${calculationLogs.releaseRate.inputs.gamma}
-LFL: ${calculationLogs.releaseRate.inputs.lfl} vol/vol
-Gas Temperature: ${calculationLogs.releaseRate.inputs.temperature} K
-Hole Size: ${calculationLogs.releaseRate.inputs.holeSize} mm²
-System Pressure: ${calculationLogs.releaseRate.inputs.pressure} bar (${calculationLogs.releaseRate.inputs.pressureType})
-Discharge Coefficient: ${calculationLogs.releaseRate.inputs.cd}
-Atmospheric Pressure: ${calculationLogs.releaseRate.inputs.atmosphericPressure} bar
-
-RELEASE RATE CALCULATION:
-${calculationLogs.releaseRate.intermediate.calculationSteps ? calculationLogs.releaseRate.intermediate.calculationSteps.join('\n') : 'No calculation steps available'}
-
-Release Results:
-- Flow Type: ${releaseData.isChoked ? 'Choked' : 'Subsonic'}
-- Mass Flow Rate: ${releaseData.massFlowRateKgH.toFixed(6)} kg/h
-- Volumetric Release Characteristic (Qc): ${releaseData.qc.toFixed(6)} m³/s (${releaseData.qcM3H.toFixed(6)} m³/h)
-
-${calculationLogs.scenario === 'outdoor' ? `OUTDOOR ASSESSMENT
-------------------
-Wind Speed: ${calculationLogs.outdoorAssessment.inputs.windSpeed} m/s
-Obstruction: ${calculationLogs.outdoorAssessment.inputs.obstruction}
-Elevation: ${calculationLogs.outdoorAssessment.inputs.elevation} m
-
-CALCULATION STEPS:
-${calculationLogs.outdoorAssessment.intermediate.calculationSteps ? calculationLogs.outdoorAssessment.intermediate.calculationSteps.join('\n') : 'No calculation steps available'}
-
-Assessment Results:
-- Ventilation Availability: ${calculationLogs.outdoorAssessment.results.ventilationAvailability}
-- Dilution Level: ${calculationLogs.outdoorAssessment.results.dilutionLevel}` : `INDOOR ASSESSMENT
--------------------------
-Lower Opening Area: ${calculationLogs.indoorAssessment.inputs.a1} m²
-Upper Opening Area: ${calculationLogs.indoorAssessment.inputs.a2} m²
-Room Volume: ${calculationLogs.indoorAssessment.inputs.roomVolume} m³
-Wind Speed: ${calculationLogs.indoorAssessment.inputs.windSpeed} m/s
-Pressure Coefficient: ${calculationLogs.indoorAssessment.inputs.deltaCp}
-Ventilation Inefficiency: ${calculationLogs.indoorAssessment.inputs.inefficiency}
-
-CALCULATION STEPS:
-${calculationLogs.indoorAssessment.intermediate.calculationSteps ? calculationLogs.indoorAssessment.intermediate.calculationSteps.join('\n') : 'No calculation steps available'}
-
-Assessment Results:
-- Equivalent Area: ${calculationLogs.indoorAssessment.intermediate.ae ? calculationLogs.indoorAssessment.intermediate.ae.toFixed(6) : 'N/A'} m²
-- Air Flow Rate: ${calculationLogs.indoorAssessment.intermediate.qa ? calculationLogs.indoorAssessment.intermediate.qa.toFixed(6) : 'N/A'} m³/s
-- Air Change Frequency: ${calculationLogs.indoorAssessment.intermediate.c ? calculationLogs.indoorAssessment.intermediate.c.toFixed(4) : 'N/A'} s⁻¹
-- Background Concentration: ${calculationLogs.indoorAssessment.results.xb ? calculationLogs.indoorAssessment.results.xb.toFixed(6) : 'N/A'} (${calculationLogs.indoorAssessment.results.backgroundStatus})
-- Ventilation Availability: ${calculationLogs.indoorAssessment.results.ventilationAvailability}
-- Dilution Level: ${calculationLogs.indoorAssessment.results.dilutionLevel}`}
-
-HAZARDOUS AREA CLASSIFICATION
------------------------------
-Grade of Release: ${calculationLogs.zoneClassification.inputs.releaseGrade}
-Jet Type: ${calculationLogs.zoneClassification.inputs.jetType === 'auto' ? calculationLogs.zoneClassification.inputs.jetTypeDetected + ' (Auto-detected)' : calculationLogs.zoneClassification.inputs.jetType}
-Qc for Zone Calculation: ${calculationLogs.zoneClassification.inputs.qcForZone} m³/s
-Zone Extent from Figure D.1: ${calculationLogs.zoneClassification.inputs.zoneExtentManual} m
-Apply Typical Limiters: ${calculationLogs.zoneClassification.inputs.applyTypicalLimiters ? 'Yes' : 'No'}
-
-CALCULATION STEPS:
-${calculationLogs.zoneClassification.intermediate.calculationSteps ? calculationLogs.zoneClassification.intermediate.calculationSteps.join('\n') : 'No calculation steps available'}
-
-Classification Results:
-- Zone Type: ${classificationData.zoneType}
-- Zone Extent: ${classificationData.zoneExtent === null ? 'Whole Room' : classificationData.zoneExtent.toFixed(1) + ' m'}
-- Calculation Method: ${classificationData.calculationMethod}
-
-RECOMMENDATIONS
----------------
-${getZoneRecommendation(classificationData.zoneTypeKey)}
-
-END OF REPORT
--------------
-This report was generated on ${new Date().toLocaleString()}
-All results must be verified by a competent engineer before implementation.`;
-
-                // Create and download report with proper encoding
-                const blob = new Blob(['\uFEFF' + reportContent], { type: 'text/plain; charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `HAC_Report_${calculationLogs.scenario}_${new Date().toISOString().slice(0, 10)}.txt`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            }
+            console.log('Calculator initialized successfully');
         });
     </script>
 </body>
