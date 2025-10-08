@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HAC and Ventilation Calculator</title>
     <style>
-        /* CSS залишається без змін */
         :root {
             --bg: #0f172a;
             --panel: #111827;
@@ -410,6 +409,28 @@
             color: #cbd5e1;
             font-weight: 600;
         }
+
+        .calculation-steps {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+        }
+        
+        .calculation-step {
+            margin: 8px 0;
+            padding: 5px;
+            border-left: 3px solid var(--brand);
+            padding-left: 10px;
+        }
+        
+        .step-number {
+            font-weight: bold;
+            color: var(--brand);
+        }
         
         @media (max-width: 768px) {
             .grid {
@@ -737,13 +758,14 @@
                     <div class="input-group">
                         <label for="jetType" data-en="Jet Type" data-ua="Тип струменя">Jet Type</label>
                         <select id="jetType">
+                            <option value="auto" data-en="Auto-detect" data-ua="Автовизначення">Auto-detect</option>
                             <option value="unimpeded" data-en="Unimpeded Jet" data-ua="Неперешкоджений струмінь">Unimpeded Jet</option>
                             <option value="diffusive" data-en="Diffusive Jet" data-ua="Дифузійний струмінь">Diffusive Jet</option>
                             <option value="heavy" data-en="Heavy Gas" data-ua="Важкий газ">Heavy Gas</option>
                         </select>
                         <div class="unit"></div>
                     </div>
-                    <div class="explanation" data-en="Type of gas release: Unimpeded Jet (high velocity, freely discharged), Diffusive Jet (low velocity or obstructed), Heavy Gas (liquid release forming pools)." data-ua="Тип викиду газу: Неперешкоджений струмінь (висока швидкість, вільний викид), Дифузійний струмінь (низька швидкість або перешкоджений), Важкий газ (викид рідини з утворенням луж).">Type of gas release: Unimpeded Jet (high velocity, freely discharged), Diffusive Jet (low velocity or obstructed), Heavy Gas (liquid release forming pools).</div>
+                    <div class="explanation" data-en="Type of gas release: Unimpeded Jet (high velocity, freely discharged), Diffusive Jet (low velocity or obstructed), Heavy Gas (liquid release forming pools). Auto-detect uses: Choked flow/high pressure = Unimpeded Jet, Low pressure = Diffusive Jet, Heavy gas density = Heavy Gas" data-ua="Тип викиду газу: Неперешкоджений струмінь (висока швидкість, вільний викид), Дифузійний струмінь (низька швидкість або перешкоджений), Важкий газ (викид рідини з утворенням луж). Автовизначення використовує: Перекритий потік/високий тиск = Неперешкоджений струмінь, Низький тиск = Дифузійний струмінь, Висока щільність газу = Важкий газ">Type of gas release: Unimpeded Jet (high velocity, freely discharged), Diffusive Jet (low velocity or obstructed), Heavy Gas (liquid release forming pools). Auto-detect uses: Choked flow/high pressure = Unimpeded Jet, Low pressure = Diffusive Jet, Heavy gas density = Heavy Gas</div>
                     
                     <!-- Zone Extent Calculation based on Figure D.1 -->
                     <div class="input-group">
@@ -1174,6 +1196,9 @@
                     // Update Qc for zone calculation
                     document.getElementById('qcForZone').value = qc.toFixed(6);
                     
+                    // Update jet type detection
+                    updateJetTypeFromCalculation();
+                    
                     // Update summary
                     updateSummary();
                     
@@ -1211,7 +1236,7 @@
                 const massFlowRateKgH = massFlowRate * 3600; // kg/h
                 const qcM3H = qc * 3600; // m³/h
                 
-                // Store calculation logs
+                // Store calculation logs with detailed steps
                 calculationLogs.releaseRate = {
                     inputs: {
                         molarMass,
@@ -1230,7 +1255,15 @@
                         isChoked,
                         gasDensity,
                         massFlowRate,
-                        qc
+                        qc,
+                        calculationSteps: [
+                            `Step 1: Calculate critical pressure ratio β_crit = (2/(γ+1))^(γ/(γ-1)) = (2/(${gamma}+1))^(${gamma}/(${gamma}-1)) = ${betaCrit.toFixed(4)}`,
+                            `Step 2: Calculate pressure ratio p_a/p = ${atmosphericPressure/1e5}/${pressure/1e5} = ${pressureRatio.toFixed(4)}`,
+                            `Step 3: Flow type = ${isChoked ? 'Choked (p_a/p ≤ β_crit)' : 'Subsonic (p_a/p > β_crit)'}`,
+                            `Step 4: Calculate mass flow rate using ${isChoked ? 'choked flow' : 'subsonic flow'} formula`,
+                            `Step 5: Calculate gas density ρ_g = (p_a × M) / (R × T) = (${atmosphericPressure/1e5} × ${molarMass}) / (8.314 × ${ambientTemperature}) = ${gasDensity.toFixed(6)} kg/m³`,
+                            `Step 6: Calculate Qc = ṁ / (ρ_g × LFL) = ${massFlowRate.toExponential(4)} / (${gasDensity.toFixed(6)} × ${lfl}) = ${qc.toExponential(4)} m³/s`
+                        ]
                     },
                     results: {
                         massFlowRateKgH,
@@ -1260,6 +1293,12 @@
                         <span data-en="Volumetric Release Characteristic (Q<sub>c</sub>):" data-ua="Характеристика об'ємного викиду (Q<sub>c</sub>):">Volumetric Release Characteristic (Q<sub>c</sub>):</span>
                         <span class="result-value">${qc.toFixed(6)} m³/s (${qcM3H.toFixed(6)} m³/h)</span>
                     </div>
+                    <div class="calculation-steps">
+                        <div class="formula-title" data-en="Calculation Steps" data-ua="Кроки розрахунку">Calculation Steps</div>
+                        ${calculationLogs.releaseRate.intermediate.calculationSteps.map(step => 
+                            `<div class="calculation-step"><span class="step-number">→</span> ${step}</div>`
+                        ).join('')}
+                    </div>
                     <div class="result-details">
                         <div data-en="Used values: S = ${holeSize * 1e6} mm², p = ${(pressure/1e5).toFixed(3)} bar, C<sub>d</sub> = ${cd}, γ = ${gamma}, T = ${temperature} K" data-ua="Використані значення: S = ${holeSize * 1e6} мм², p = ${(pressure/1e5).toFixed(3)} бар, C<sub>d</sub> = ${cd}, γ = ${gamma}, T = ${temperature} K">Used values: S = ${holeSize * 1e6} mm², p = ${(pressure/1e5).toFixed(3)} bar, C<sub>d</sub> = ${cd}, γ = ${gamma}, T = ${temperature} K</div>
                     </div>
@@ -1271,10 +1310,70 @@
                 // Update Qc for zone calculation
                 document.getElementById('qcForZone').value = qc.toFixed(6);
                 
+                // Update jet type detection
+                updateJetTypeFromCalculation();
+                
                 // Update summary
                 updateSummary();
                 
                 return { massFlowRate, massFlowRateKgH, qc, qcM3H, isChoked };
+            }
+            
+            function autoDetectJetType() {
+                if (!calculationLogs.releaseRate.results) return 'diffusive';
+                
+                const releaseData = calculationLogs.releaseRate;
+                const inputs = releaseData.inputs;
+                const results = releaseData.results;
+                
+                // If no flow, return diffusive
+                if (results.noFlow) {
+                    return 'diffusive';
+                }
+                
+                // Calculate gas density for heavy gas detection
+                const atmosphericPressure = 101325; // Pa
+                const gasConstant = 8.314462618;
+                const ambientTemperature = 293.15;
+                const gasDensity = (atmosphericPressure * inputs.molarMass) / (gasConstant * ambientTemperature);
+                const airDensity = 1.2; // kg/m³
+                
+                // Check for heavy gas (density > 1.5× air)
+                if (gasDensity > airDensity * 1.5) {
+                    return 'heavy';
+                }
+                
+                // Check for unimpeded jet (choked flow or high pressure > 2 bar absolute)
+                if (results.isChoked || inputs.pressure > 2.0) {
+                    return 'unimpeded';
+                }
+                
+                // Default to diffusive jet
+                return 'diffusive';
+            }
+            
+            function updateJetTypeFromCalculation() {
+                const jetTypeSelect = document.getElementById('jetType');
+                if (jetTypeSelect.value === 'auto') {
+                    const detectedType = autoDetectJetType();
+                    
+                    // Update select value without triggering change event
+                    jetTypeSelect.value = detectedType;
+                    
+                    // Add visual indication that this was auto-detected
+                    const options = jetTypeSelect.querySelectorAll('option');
+                    options.forEach(opt => {
+                        if (opt.textContent.includes('(Auto)')) {
+                            opt.textContent = opt.textContent.replace(' (Auto)', '');
+                        }
+                    });
+                    
+                    const selectedOption = jetTypeSelect.querySelector(`option[value="${detectedType}"]`);
+                    if (selectedOption) {
+                        const originalText = selectedOption.getAttribute(`data-${currentLanguage}`) || selectedOption.textContent.replace(' (Auto)', '');
+                        selectedOption.textContent = originalText + ' (Auto)';
+                    }
+                }
             }
             
             function assessOutdoorConditions() {
@@ -1311,12 +1410,21 @@
                     dilutionLevelKey = 'low';
                 }
                 
-                // Store calculation logs
+                // Store calculation logs with steps
                 calculationLogs.outdoorAssessment = {
                     inputs: {
                         windSpeed,
                         obstruction,
                         elevation
+                    },
+                    intermediate: {
+                        calculationSteps: [
+                            `Step 1: Wind speed U = ${windSpeed} m/s`,
+                            `Step 2: Obstruction level = ${obstruction}`,
+                            `Step 3: Elevation = ${elevation} m`,
+                            `Step 4: Determine ventilation availability based on obstruction and wind speed`,
+                            `Step 5: Determine dilution level based on wind speed`
+                        ]
                     },
                     results: {
                         ventilationAvailability,
@@ -1336,6 +1444,12 @@
                     <div class="result-item">
                         <span data-en="Dilution Level:" data-ua="Рівень розведення:">Dilution Level:</span>
                         <span class="result-value">${dilutionLevel} <span class="pill ${dilutionLevelKey === 'high' ? 'ok' : dilutionLevelKey === 'medium' ? 'warn' : 'bad'}">${dilutionLevel}</span></span>
+                    </div>
+                    <div class="calculation-steps">
+                        <div class="formula-title" data-en="Calculation Steps" data-ua="Кроки розрахунку">Calculation Steps</div>
+                        ${calculationLogs.outdoorAssessment.intermediate.calculationSteps.map(step => 
+                            `<div class="calculation-step"><span class="step-number">→</span> ${step}</div>`
+                        ).join('')}
                     </div>
                     <div class="result-details">
                         <div data-en="Used values: U = ${windSpeed} m/s, Obstruction = ${obstruction}, Elevation = ${elevation} m" data-ua="Використані значення: U = ${windSpeed} м/с, Перешкоди = ${obstruction}, Висота = ${elevation} м">Used values: U = ${windSpeed} m/s, Obstruction = ${obstruction}, Elevation = ${elevation} m</div>
@@ -1395,35 +1509,19 @@
                     }
                 }
                 
-                // Determine ventilation availability for indoor scenario based on air change frequency
-                let ventilationAvailability;
-                let ventilationAvailabilityKey;
-                if (c >= 0.03) { // More than 0.03 air changes per second (~108 per hour)
-                    ventilationAvailability = currentLanguage === 'en' ? 'Good' : 'Добра';
-                    ventilationAvailabilityKey = 'good';
-                } else if (c >= 0.01) { // More than 0.01 air changes per second (~36 per hour)
-                    ventilationAvailability = currentLanguage === 'en' ? 'Fair' : 'Задовільна';
-                    ventilationAvailabilityKey = 'fair';
-                } else {
-                    ventilationAvailability = currentLanguage === 'en' ? 'Poor' : 'Погана';
-                    ventilationAvailabilityKey = 'poor';
-                }
-                
-                // Determine dilution level for indoor scenario
+                // Determine ventilation and dilution for indoor scenario
+                let ventilationAvailability = currentLanguage === 'en' ? 'Indoor' : 'Внутрішня';
                 let dilutionLevel;
-                let dilutionLevelKey;
-                if (c > 0.03) { // More than 0.03 air changes per second (~108 per hour)
+                
+                if (c > 0.03) { // More than 0.03 air changes per second (~100 per hour)
                     dilutionLevel = currentLanguage === 'en' ? 'High' : 'Високий';
-                    dilutionLevelKey = 'high';
                 } else if (c > 0.01) { // More than 0.01 air changes per second (~36 per hour)
                     dilutionLevel = currentLanguage === 'en' ? 'Medium' : 'Середній';
-                    dilutionLevelKey = 'medium';
                 } else {
                     dilutionLevel = currentLanguage === 'en' ? 'Low' : 'Низький';
-                    dilutionLevelKey = 'low';
                 }
                 
-                // Store calculation logs
+                // Store calculation logs with steps
                 calculationLogs.indoorAssessment = {
                     inputs: {
                         a1,
@@ -1440,7 +1538,15 @@
                         c,
                         qg,
                         q2,
-                        xcrit: 0.25 * parseFloat(document.getElementById('lfl').value)
+                        xcrit: 0.25 * parseFloat(document.getElementById('lfl').value),
+                        calculationSteps: [
+                            `Step 1: Calculate equivalent area Aₑ = (A₁ × A₂) / √(A₁² + A₂²) = (${a1} × ${a2}) / √(${a1}² + ${a2}²) = ${ae.toFixed(6)} m²`,
+                            `Step 2: Calculate air flow rate Qₐ = C_d × Aₑ × U × √(ΔC_p) = ${cdVent} × ${ae.toFixed(6)} × ${windSpeed} × √(${deltaCp}) = ${qa.toFixed(6)} m³/s`,
+                            `Step 3: Calculate air change frequency C = Qₐ / V₀ = ${qa.toFixed(6)} / ${roomVolume} = ${c.toFixed(6)} s⁻¹`,
+                            `Step 4: Calculate background concentration X_b = (f × Q_g) / Q₂ = (${inefficiency} × ${qg.toExponential(4)}) / ${qa.toFixed(6)} = ${xb.toExponential(4)}`,
+                            `Step 5: Compare with critical concentration X_crit = 0.25 × LFL = 0.25 × ${parseFloat(document.getElementById('lfl').value)} = ${(0.25 * parseFloat(document.getElementById('lfl').value)).toFixed(6)}`,
+                            `Step 6: Background concentration is ${xb <= (0.25 * parseFloat(document.getElementById('lfl').value)) ? 'below' : 'above'} critical level`
+                        ]
                     },
                     results: {
                         xb,
@@ -1448,9 +1554,7 @@
                         backgroundStatusKey,
                         backgroundExplanation,
                         ventilationAvailability,
-                        ventilationAvailabilityKey,
-                        dilutionLevel,
-                        dilutionLevelKey
+                        dilutionLevel
                     }
                 };
                 
@@ -1475,11 +1579,17 @@
                     </div>
                     <div class="result-item">
                         <span data-en="Ventilation Availability:" data-ua="Доступність вентиляції:">Ventilation Availability:</span>
-                        <span class="result-value">${ventilationAvailability} <span class="pill ${ventilationAvailabilityKey === 'good' ? 'ok' : ventilationAvailabilityKey === 'fair' ? 'warn' : 'bad'}">${ventilationAvailability}</span></span>
+                        <span class="result-value">${ventilationAvailability}</span>
                     </div>
                     <div class="result-item">
                         <span data-en="Dilution Level:" data-ua="Рівень розведення:">Dilution Level:</span>
-                        <span class="result-value">${dilutionLevel} <span class="pill ${dilutionLevelKey === 'high' ? 'ok' : dilutionLevelKey === 'medium' ? 'warn' : 'bad'}">${dilutionLevel}</span></span>
+                        <span class="result-value">${dilutionLevel} <span class="pill ${dilutionLevel === (currentLanguage === 'en' ? 'High' : 'Високий') ? 'ok' : dilutionLevel === (currentLanguage === 'en' ? 'Medium' : 'Середній') ? 'warn' : 'bad'}">${dilutionLevel}</span></span>
+                    </div>
+                    <div class="calculation-steps">
+                        <div class="formula-title" data-en="Calculation Steps" data-ua="Кроки розрахунку">Calculation Steps</div>
+                        ${calculationLogs.indoorAssessment.intermediate.calculationSteps.map(step => 
+                            `<div class="calculation-step"><span class="step-number">→</span> ${step}</div>`
+                        ).join('')}
                     </div>
                     <div class="result-details">
                         <div data-en="Used values: A₁ = ${a1} m², A₂ = ${a2} m², U = ${windSpeed} m/s, ΔCₚ = ${deltaCp}, f = ${inefficiency}, V₀ = ${roomVolume} m³" data-ua="Використані значення: A₁ = ${a1} м², A₂ = ${a2} м², U = ${windSpeed} м/с, ΔCₚ = ${deltaCp}, f = ${inefficiency}, V₀ = ${roomVolume} м³">Used values: A₁ = ${a1} m², A₂ = ${a2} m², U = ${windSpeed} m/s, ΔCₚ = ${deltaCp}, f = ${inefficiency}, V₀ = ${roomVolume} m³</div>
@@ -1490,12 +1600,13 @@
                 // Update summary
                 updateSummary();
                 
-                return { ae, qa, c, xb, backgroundStatus, backgroundStatusKey, ventilationAvailability, ventilationAvailabilityKey, dilutionLevel, dilutionLevelKey };
+                return { ae, qa, c, xb, backgroundStatus, backgroundStatusKey, ventilationAvailability, dilutionLevel };
             }
             
             function classifyHazardousArea() {
                 const releaseGrade = document.getElementById('releaseGrade').value;
-                const jetType = document.getElementById('jetType').value;
+                const jetTypeSelect = document.getElementById('jetType');
+                const jetType = jetTypeSelect.value === 'auto' ? autoDetectJetType() : jetTypeSelect.value;
                 const zoneExtentManual = parseFloat(document.getElementById('zoneExtentManual').value);
                 const applyTypicalLimiters = document.getElementById('applyTypicalLimiters').checked;
                 const qcForZone = parseFloat(document.getElementById('qcForZone').value);
@@ -1549,14 +1660,30 @@
                         : `Протяжність зони вручну встановлена на ${zoneExtent} м на основі Рисунка D.1`;
                 }
                 
-                // Store calculation logs
+                // Store calculation logs with steps
+                const jetTypeDetection = jetTypeSelect.value === 'auto' ? 
+                    `Auto-detected jet type: ${autoDetectJetType()} (based on gas properties and flow conditions)` :
+                    `Manually selected jet type: ${jetType}`;
+                
                 calculationLogs.zoneClassification = {
                     inputs: {
                         releaseGrade,
-                        jetType,
+                        jetType: jetTypeSelect.value,
+                        jetTypeDetected: jetType,
                         zoneExtentManual,
                         applyTypicalLimiters,
                         qcForZone
+                    },
+                    intermediate: {
+                        calculationSteps: [
+                            `Step 1: Grade of release = ${releaseGrade}`,
+                            `Step 2: ${jetTypeDetection}`,
+                            `Step 3: Qc for zone calculation = ${qcForZone} m³/s`,
+                            `Step 4: Zone extent from Figure D.1 = ${zoneExtentManual} m`,
+                            `Step 5: Apply typical limiters = ${applyTypicalLimiters ? 'Yes' : 'No'}`,
+                            `Step 6: Determine zone type based on grade of release`,
+                            `Step 7: ${calculationDetails}`
+                        ]
                     },
                     results: {
                         zoneType,
@@ -1583,8 +1710,18 @@
                         <span class="result-value">${zoneExtentDisplay}</span>
                     </div>
                     <div class="result-item">
+                        <span data-en="Jet Type:" data-ua="Тип струменя:">Jet Type:</span>
+                        <span class="result-value">${jetTypeSelect.value === 'auto' ? jetType + ' (Auto)' : jetType}</span>
+                    </div>
+                    <div class="result-item">
                         <span data-en="Calculation Method:" data-ua="Метод розрахунку:">Calculation Method:</span>
                         <span class="result-value">${calculationMethod}</span>
+                    </div>
+                    <div class="calculation-steps">
+                        <div class="formula-title" data-en="Calculation Steps" data-ua="Кроки розрахунку">Calculation Steps</div>
+                        ${calculationLogs.zoneClassification.intermediate.calculationSteps.map(step => 
+                            `<div class="calculation-step"><span class="step-number">→</span> ${step}</div>`
+                        ).join('')}
                     </div>
                     <div class="result-details">
                         <div>${calculationDetails}</div>
@@ -1598,7 +1735,7 @@
                 // Update summary
                 updateSummary();
                 
-                return { zoneType, zoneTypeKey, zoneExtent, calculationMethod };
+                return { zoneType, zoneTypeKey, zoneExtent, calculationMethod, jetType };
             }
             
             function getZoneRecommendation(zoneTypeKey) {
@@ -1676,7 +1813,7 @@
                 const enclosedData = calculationLogs.scenario === 'indoor' ? assessEnclosedSpace() : null;
                 const classificationData = classifyHazardousArea();
                 
-                // Create detailed report content
+                // Create detailed report content with all calculation steps
                 let reportContent = `HAC AND VENTILATION ANALYSIS REPORT
 ===================================
 
@@ -1696,19 +1833,22 @@ System Pressure: ${calculationLogs.releaseRate.inputs.pressure} bar (${calculati
 Discharge Coefficient: ${calculationLogs.releaseRate.inputs.cd}
 Atmospheric Pressure: ${calculationLogs.releaseRate.inputs.atmosphericPressure} bar
 
-RELEASE RATE CALCULATION DETAILS:
-- Critical pressure ratio (β_crit): ${calculationLogs.releaseRate.intermediate.betaCrit ? calculationLogs.releaseRate.intermediate.betaCrit.toFixed(4) : 'N/A'}
-- Pressure ratio (p_a/p): ${calculationLogs.releaseRate.intermediate.pressureRatio ? calculationLogs.releaseRate.intermediate.pressureRatio.toFixed(4) : 'N/A'}
-- Flow type: ${calculationLogs.releaseRate.intermediate.isChoked ? 'Choked' : 'Subsonic'}
-- Gas density: ${calculationLogs.releaseRate.intermediate.gasDensity ? calculationLogs.releaseRate.intermediate.gasDensity.toFixed(6) : 'N/A'} kg/m³
-- Mass flow rate: ${calculationLogs.releaseRate.results.massFlowRateKgH ? calculationLogs.releaseRate.results.massFlowRateKgH.toFixed(6) : '0.000000'} kg/h
-- Volumetric release characteristic (Qc): ${calculationLogs.releaseRate.results.qc ? calculationLogs.releaseRate.results.qc.toExponential(6) : '0.000000'} m³/s
+RELEASE RATE CALCULATION:
+${calculationLogs.releaseRate.intermediate.calculationSteps ? calculationLogs.releaseRate.intermediate.calculationSteps.join('\n') : 'No calculation steps available'}
+
+Release Results:
+- Flow Type: ${releaseData.isChoked ? 'Choked' : 'Subsonic'}
+- Mass Flow Rate: ${releaseData.massFlowRateKgH.toFixed(6)} kg/h
+- Volumetric Release Characteristic (Qc): ${releaseData.qc.toFixed(6)} m³/s (${releaseData.qcM3H.toFixed(6)} m³/h)
 
 ${calculationLogs.scenario === 'outdoor' ? `OUTDOOR ASSESSMENT
 ------------------
 Wind Speed: ${calculationLogs.outdoorAssessment.inputs.windSpeed} m/s
 Obstruction: ${calculationLogs.outdoorAssessment.inputs.obstruction}
 Elevation: ${calculationLogs.outdoorAssessment.inputs.elevation} m
+
+CALCULATION STEPS:
+${calculationLogs.outdoorAssessment.intermediate.calculationSteps ? calculationLogs.outdoorAssessment.intermediate.calculationSteps.join('\n') : 'No calculation steps available'}
 
 Assessment Results:
 - Ventilation Availability: ${calculationLogs.outdoorAssessment.results.ventilationAvailability}
@@ -1720,14 +1860,9 @@ Room Volume: ${calculationLogs.indoorAssessment.inputs.roomVolume} m³
 Wind Speed: ${calculationLogs.indoorAssessment.inputs.windSpeed} m/s
 Pressure Coefficient: ${calculationLogs.indoorAssessment.inputs.deltaCp}
 Ventilation Inefficiency: ${calculationLogs.indoorAssessment.inputs.inefficiency}
-Discharge Coefficient (ventilation): ${calculationLogs.indoorAssessment.inputs.cdVent}
 
-VENTILATION CALCULATION DETAILS:
-- Equivalent Area: ${calculationLogs.indoorAssessment.intermediate.ae ? calculationLogs.indoorAssessment.intermediate.ae.toFixed(6) : 'N/A'} m²
-- Air Flow Rate: ${calculationLogs.indoorAssessment.intermediate.qa ? calculationLogs.indoorAssessment.intermediate.qa.toFixed(6) : 'N/A'} m³/s
-- Air Change Frequency: ${calculationLogs.indoorAssessment.intermediate.c ? calculationLogs.indoorAssessment.intermediate.c.toFixed(6) : 'N/A'} s⁻¹
-- Critical concentration (25% LFL): ${calculationLogs.indoorAssessment.intermediate.xcrit ? calculationLogs.indoorAssessment.intermediate.xcrit.toFixed(6) : 'N/A'}
-- Background concentration: ${calculationLogs.indoorAssessment.results.xb ? calculationLogs.indoorAssessment.results.xb.toFixed(6) : 'N/A'}
+CALCULATION STEPS:
+${calculationLogs.indoorAssessment.intermediate.calculationSteps ? calculationLogs.indoorAssessment.intermediate.calculationSteps.join('\n') : 'No calculation steps available'}
 
 Assessment Results:
 - Equivalent Area: ${calculationLogs.indoorAssessment.intermediate.ae ? calculationLogs.indoorAssessment.intermediate.ae.toFixed(6) : 'N/A'} m²
@@ -1740,10 +1875,13 @@ Assessment Results:
 HAZARDOUS AREA CLASSIFICATION
 -----------------------------
 Grade of Release: ${calculationLogs.zoneClassification.inputs.releaseGrade}
-Jet Type: ${calculationLogs.zoneClassification.inputs.jetType}
+Jet Type: ${calculationLogs.zoneClassification.inputs.jetType === 'auto' ? calculationLogs.zoneClassification.inputs.jetTypeDetected + ' (Auto-detected)' : calculationLogs.zoneClassification.inputs.jetType}
 Qc for Zone Calculation: ${calculationLogs.zoneClassification.inputs.qcForZone} m³/s
 Zone Extent from Figure D.1: ${calculationLogs.zoneClassification.inputs.zoneExtentManual} m
 Apply Typical Limiters: ${calculationLogs.zoneClassification.inputs.applyTypicalLimiters ? 'Yes' : 'No'}
+
+CALCULATION STEPS:
+${calculationLogs.zoneClassification.intermediate.calculationSteps ? calculationLogs.zoneClassification.intermediate.calculationSteps.join('\n') : 'No calculation steps available'}
 
 Classification Results:
 - Zone Type: ${classificationData.zoneType}
