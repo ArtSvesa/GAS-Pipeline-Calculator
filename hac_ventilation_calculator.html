@@ -1,7 +1,8 @@
-<html lang="uk"><head>
+<html lang="uk">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HAC &amp; Ventilation Calculator - Professional Edition</title>
+    <title>HAC & Ventilation Calculator - Professional Edition</title>
     <style>
         :root {
             --ink: #e5e7eb;
@@ -74,24 +75,6 @@
         .lang button.active {
             background: #fff;
             color: #1a6fb0;
-        }
-
-        .download-btn {
-            position: absolute;
-            top: 0;
-            right: 120px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
-            padding: 6px 12px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: 700;
-            transition: all 0.3s ease;
-        }
-
-        .download-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
         }
 
         .tabs {
@@ -447,12 +430,6 @@
                 margin-top: 10px;
             }
             
-            .download-btn {
-                position: relative;
-                right: 0;
-                margin-top: 10px;
-            }
-            
             .tooltip .tooltiptext {
                 width: 250px;
                 margin-left: -125px;
@@ -484,15 +461,13 @@
 <body>
     <div class="wrap">
         <header>
-            <h1 id="t_title">HAC &amp; Ventilation Calculator</h1>
+            <h1 id="t_title">HAC & Ventilation Calculator</h1>
             <p class="hint" id="t_sub">Professional calculator for hazardous area classification and ventilation analysis according to I.S. EN IEC 60079-10-1</p>
             
             <div class="lang">
                 <button id="btnEN" class="active">EN</button>
                 <button id="btnUA">UA</button>
             </div>
-            
-            <button class="download-btn" id="downloadBtn">Download Calculator</button>
         </header>
 
         <div class="tabs">
@@ -923,7 +898,7 @@
                     </label>
                     <select id="enc_release_type">
                         <option value="primary">Primary</option>
-                        <option value="secondary" selected="">Secondary</option>
+                        <option value="secondary" selected>Secondary</option>
                     </select>
                 </div>
             </div>
@@ -980,7 +955,7 @@
                                 For complex geometries, calculate manually.
                             </span>
                         </label>
-                        <input type="number" id="enc_volume" step="any" value="6.6" readonly="">
+                        <input type="number" id="enc_volume" step="any" value="6.6" readonly>
                         <span class="u">m³</span>
                     </div>
                 </div>
@@ -1085,136 +1060,7 @@
             <button class="btn" id="btnEnclosed">Calculate Enclosed Scenario</button>
 
             <div class="results" id="resEnclosed">
-                <div class="section-title">Detailed Calculation Results</div>
-                
-                <div class="section-title">Critical Pressure Analysis</div>
-                <div class="calculation-steps">
-                    <p><strong>Critical pressure formula (IEC 60079-10-1:2015):</strong></p>
-                    <p class="formula">P<sub>crit</sub> = P<sub>a</sub> × [(γ+1)/2]<sup>γ/(γ-1)</sup></p>
-                    
-                    <p><strong>Calculation:</strong></p>
-                    <p class="formula">
-                        P<sub>crit</sub> = 101325 × [(1.13+1)/2]<sup>1.13/(1.13-1)</sup> = <strong>175165.2 Pa (1.752 bar abs)</strong>
-                    </p>
-                </div>
-                
-                <div class="section-title">Gas Properties</div>
-                <div class="row">
-                    <span>Gas density ρ<sub>g</sub></span>
-                    <span class="val">1.833157 kg/m³</span>
-                </div>
-                
-                <div class="section-title">Release Calculations</div>
-                <div class="row">
-                    <span>Upstream pressure P₀</span>
-                    <span class="val">150000 Pa (1.5 bar abs)</span>
-                </div>
-                <div class="flow-info subsonic">
-                    <div class="row">
-                        <span>Flow type</span>
-                        <span class="val">Subsonic</span>
-                    </div>
-                </div>
-                <div class="row">
-                    <span>Mass flow rate ṁ</span>
-                    <span class="val">9.7741172085 × 10^-5 kg/s</span>
-                </div>
-                <div class="row">
-                    <span>Q<sub>g</sub> (gas volumetric flow)</span>
-                    <span class="val">5.3318499854 × 10^-5 m³/s</span>
-                </div>
-                <div class="row">
-                    <span>Q<sub>c</sub> (release characteristic)</span>
-                    <span class="val">0.0031363823 m³/s</span>
-                </div>
-                
-                <div class="section-title">Ventilation Analysis</div>
-                <div class="calculation-steps">
-                    <p><strong>Air flow rate calculation:</strong></p>
-                    <p class="formula">Q<sub>a</sub> = C<sub>d</sub> × A<sub>e</sub> × u<sub>w</sub> × √ΔC<sub>p</sub></p>
-                    <p class="formula">
-                        Q<sub>a</sub> = 0.75 × 0.014142 × 1 × √0.25<br>
-                        = 0.75 × 0.014142 × 1 × 0.5<br>
-                        = <strong>0.005303 m³/s</strong>
-                    </p>
-                </div>
-                <div class="row">
-                    <span>Effective ventilation area A<sub>e</sub></span>
-                    <span class="val">0.014142 m²</span>
-                </div>
-                <div class="row">
-                    <span>Wind speed u<sub>w</sub></span>
-                    <span class="val">1 m/s</span>
-                </div>
-                <div class="row">
-                    <span>Air flow rate Q<sub>a</sub></span>
-                    <span class="val">0.005303 m³/s</span>
-                </div>
-                
-                <div class="calculation-steps">
-                    <p><strong>Ventilation velocity calculation:</strong></p>
-                    <p class="formula">u<sub>w</sub>(indoor) = Q<sub>a</sub> / (L × H)</p>
-                    <p class="formula">
-                        u<sub>w</sub> = 0.005303 / (2 × 2.2)<br>
-                        = 0.005303 / 4.4<br>
-                        = <strong>0.001205 m/s</strong>
-                    </p>
-                </div>
-                <div class="row">
-                    <span>Ventilation velocity u<sub>w</sub></span>
-                    <span class="val">0.001205 m/s</span>
-                </div>
-                
-                <div class="calculation-steps">
-                    <p><strong>Air change rate calculation:</strong></p>
-                    <p class="formula">C = Q<sub>a</sub> / V<sub>0</sub></p>
-                    <p class="formula">
-                        C = 0.005303 / 6.6<br>
-                        = <strong>0.000804 s⁻¹ (2.89 h⁻¹)</strong>
-                    </p>
-                </div>
-                <div class="row">
-                    <span>Air change rate C</span>
-                    <span class="val">0.000804 s⁻¹ (2.89 h⁻¹)</span>
-                </div>
-                
-                <div class="row">
-                    <span>Background concentration X<sub>b</sub></span>
-                    <span class="val">0.019908 vol/vol</span>
-                </div>
-                <div class="row">
-                    <span>Critical concentration X<sub>crit</sub></span>
-                    <span class="val">0.00425 vol/vol</span>
-                </div>
-                <div class="row">
-                    <span>Dilution level</span>
-                    <span class="val">Low ⚠️</span>
-                </div>
-                
-                <div class="final-classification">
-                    <div class="section-title">Final Zone Classification</div>
-                    
-                    <div class="grid">
-                        <div>
-                            <div class="input">
-                                <label>Ventilation Availability</label>
-                                <select id="enc_final_ventilation">
-                                    <option value="Good">Good</option>
-                                    <option value="Fair" selected="">Fair</option>
-                                    <option value="Poor">Poor</option>
-                                </select>
-                            </div>
-                            <div class="input">
-                                <label>Zone Extent (m)</label>
-                                <input type="number" step="any" id="enc_final_extent" value="1.0">
-                            </div>
-                            <div class="row">
-                                <span>Zone Type</span>
-                                <span class="val" id="enc_final_zone">Zone 1 and even Zone 0 (1 m)</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <p>Results will appear here after calculation...</p>
             </div>
         </div>
 
@@ -1309,12 +1155,12 @@
                                 <td>0.15 m/s</td>
                             </tr>
                             <tr>
-                                <td>&gt; 2 m up to 5 m</td>
+                                <td>> 2 m up to 5 m</td>
                                 <td>0.6 m/s</td>
                                 <td>0.3 m/s</td>
                             </tr>
                             <tr>
-                                <td>&gt; 5 m</td>
+                                <td>> 5 m</td>
                                 <td>1.0 m/s</td>
                                 <td>1.0 m/s</td>
                             </tr>
@@ -1329,12 +1175,12 @@
                                 <td>0.5 m/s</td>
                             </tr>
                             <tr>
-                                <td>&gt; 2 m up to 5 m</td>
+                                <td>> 2 m up to 5 m</td>
                                 <td>1.0 m/s</td>
                                 <td>0.5 m/s</td>
                             </tr>
                             <tr>
-                                <td>&gt; 5 m</td>
+                                <td>> 5 m</td>
                                 <td>2.0 m/s</td>
                                 <td>1.0 m/s</td>
                             </tr>
@@ -1478,7 +1324,7 @@
                         <li>I.S. 3216:2014 - Code of Practice for Bulk storage of liquefied petroleum gas (LPG)</li>
                         <li>I.S. EN 12186:2014 - Gas infrastructure – gas pressure regulating stations</li>
                         <li>IGEM/TD/13 Ed 3 - Pressure regulating and exceeding 7 bar pipeline installations</li>
-                        <li>UKLPG CoP 1 pt 1 &amp; pt 4 - Bulk LPG storage at fixed installations</li>
+                        <li>UKLPG CoP 1 pt 1 & pt 4 - Bulk LPG storage at fixed installations</li>
                         <li>BS 5925:1991 - Ventilation principles and designing for natural ventilation</li>
                     </ul>
                 </div>
@@ -1496,7 +1342,6 @@
                 btnCalc: 'Calculate',
                 btnOutdoor: 'Calculate Outdoor Scenario',
                 btnEnclosed: 'Calculate Enclosed Scenario',
-                download: 'Download Calculator',
                 insTitle: 'Instructions',
                 insContent: `
                     <p>This professional calculator assists in hazardous area classification and ventilation analysis according to I.S. EN IEC 60079-10-1 and related standards.</p>
@@ -1767,7 +1612,6 @@
                 btnCalc: 'Розрахувати',
                 btnOutdoor: 'Розрахувати сценарій на відкритому повітрі',
                 btnEnclosed: 'Розрахувати сценарій у приміщенні',
-                download: 'Завантажити калькулятор',
                 insTitle: 'Інструкція',
                 insContent: `
                     <p>Цей професійний калькулятор допомагає у класифікації небезпечних зон та аналізі вентиляції згідно I.S. EN IEC 60079-10-1 та пов'язаних стандартів.</p>
@@ -2042,7 +1886,6 @@
             // Update main texts
             document.getElementById('t_title').textContent = L.title;
             document.getElementById('t_sub').textContent = L.sub;
-            document.getElementById('downloadBtn').textContent = L.download;
             
             // Update tabs
             const tabs = [
@@ -2081,21 +1924,7 @@
         document.getElementById('btnEN').addEventListener('click', () => setLang('EN'));
         document.getElementById('btnUA').addEventListener('click', () => setLang('UA'));
 
-        // Download functionality
-        document.getElementById('downloadBtn').addEventListener('click', function() {
-            const element = document.documentElement.outerHTML;
-            const blob = new Blob([element], {type: 'text/html'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'hac_ventilation_calculator.html';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        });
-
-        // Calculation functions (unchanged from previous implementation)
+        // Calculation functions
         function toNum(v) {
             return v == null ? null : parseFloat(String(v).trim().replace(',', '.'));
         }
@@ -2126,7 +1955,7 @@
             return v;
         }
 
-        // ИСПРАВЛЕННАЯ ФУНКЦИЯ РАСЧЕТА КРИТИЧЕСКОГО ДАВЛЕНИЯ
+        // CORRECTED CRITICAL PRESSURE CALCULATION FUNCTION
         function calculateCriticalPressure(Pa, gamma) {
             return Pa * Math.pow((gamma + 1) / 2, gamma / (gamma - 1));
         }
@@ -2163,7 +1992,7 @@
             return mdot / (rho_g * LFL);
         }
 
-        // ИСПРАВЛЕННЫЕ ФУНКЦИИ ДЛЯ РАСЧЕТА ВЕНТИЛЯЦИИ
+        // CORRECTED VENTILATION CALCULATION FUNCTIONS
         function calculateEffectiveVentilationArea(A1, A2) {
             if (A1 === 0 || A2 === 0) return 0;
             return Math.sqrt((Math.pow(A1, 2) * Math.pow(A2, 2)) / (Math.pow(A1, 2) + Math.pow(A2, 2)));
@@ -2188,7 +2017,7 @@
             return Qa / V0;
         }
 
-        // Determine zone type according to Table D.1
+        // DETERMINE ZONE TYPE ACCORDING TO TABLE D.1
         function determineZoneType(releaseGrade, ventilationAvailability, dilutionLevel) {
             if (releaseGrade === 'continuous') {
                 if (dilutionLevel === 'High' && ventilationAvailability === 'Good') return 'Zone 0 NE';
@@ -2268,7 +2097,6 @@
             // Get release types
             const releaseType_upstream = document.getElementById('out_release_type_upstream').value;
             const releaseType_downstream = document.getElementById('out_release_type_downstream').value;
-            const ventilationAvailability = 'Good';
             
             // Determine flow types
             const flowType_upstream = P0_upstream > P_crit ? 'Choked' : 'Subsonic';
@@ -2385,39 +2213,131 @@
                     <div class="grid">
                         <div>
                             <div class="section-title">${L ? 'Upstream Classification' : 'Класифікація до регулятора'}</div>
+                            
+                            <!-- Добавлен выбор типа выброса -->
                             <div class="input">
-                                <label>${L ? 'Dilution Level' : 'Рівень розведення'}</label>
+                                <label for="out_release_curve_upstream" class="tooltip">Release Curve Type
+                                    <span class="tooltiptext">
+                                        <strong>Release Curve Type</strong><br>
+                                        Classification of release momentum for extent determination:<br>
+                                        • <strong>Unimpeded jet:</strong> High velocity release discharged freely to atmosphere<br>
+                                        • <strong>Diffusive jet:</strong> Low velocity release, or jet that loses momentum<br>
+                                        • <strong>Heavy gas:</strong> Liquid release with pooling and dense gas spreading
+                                    </span>
+                                </label>
+                                <select id="out_release_curve_upstream">
+                                    <option value="diffusive">Diffusive jet</option>
+                                    <option value="unimpeded">Unimpeded jet</option>
+                                    <option value="heavy">Heavy gas</option>
+                                </select>
+                            </div>
+                            
+                            <div class="input">
+                                <label for="out_final_ventilation_upstream" class="tooltip">Ventilation Availability
+                                    <span class="tooltiptext">${L ? 
+                                        'Classification of ventilation availability according to IEC 60079-10-1 C.3.7.1' :
+                                        'Класифікація доступності вентиляції згідно IEC 60079-10-1 C.3.7.1'}</span>
+                                </label>
+                                <select id="out_final_ventilation_upstream">
+                                    <option value="Good">Good</option>
+                                    <option value="Fair" selected>Fair</option>
+                                    <option value="Poor">Poor</option>
+                                </select>
+                            </div>
+                            
+                            <div class="input">
+                                <label for="out_final_dilution_upstream" class="tooltip">Dilution Level
+                                    <span class="tooltiptext">${L ?
+                                        'Effectiveness of ventilation in dispersing flammable release' :
+                                        'Ефективність вентиляції у розсіюванні займистого викиду'}</span>
+                                </label>
                                 <select id="out_final_dilution_upstream">
                                     <option value="High">High</option>
                                     <option value="Medium" selected>Medium</option>
                                     <option value="Low">Low</option>
                                 </select>
                             </div>
+                            
                             <div class="input">
-                                <label>${L ? 'Zone Extent (m)' : 'Протяжність зони (м)'}</label>
+                                <label for="out_final_extent_upstream" class="tooltip">Zone Extent (m)
+                                    <span class="tooltiptext">${L ?
+                                        'Distance from release source determined from Figure D.1 based on Qc and release type' :
+                                        'Відстань від джерела викиду, визначена з Рисунку D.1 на основі Qc та типу викиду'}</span>
+                                </label>
                                 <input type="number" step="any" id="out_final_extent_upstream" value="1.0">
                             </div>
+                            
                             <div class="row">
-                                <span>${L ? 'Upstream Zone Type' : 'Тип зони до регулятора'}</span>
+                                <span class="tooltip">${L ? 'Zone Type' : 'Тип зони'}
+                                    <span class="tooltiptext">${L ?
+                                        'Determined from Table D.1 based on grade of release, ventilation availability and dilution level' :
+                                        'Визначається з Таблиці D.1 на основі типу викиду, доступності вентиляції та рівня розведення'}</span>
+                                </span>
                                 <span class="val" id="out_final_zone_upstream">---</span>
                             </div>
                         </div>
                         <div>
                             <div class="section-title">${L ? 'Downstream Classification' : 'Класифікація після регулятора'}</div>
+                            
+                            <!-- Добавлен выбор типа выброса -->
                             <div class="input">
-                                <label>${L ? 'Dilution Level' : 'Рівень розведення'}</label>
+                                <label for="out_release_curve_downstream" class="tooltip">Release Curve Type
+                                    <span class="tooltiptext">
+                                        <strong>Release Curve Type</strong><br>
+                                        Classification of release momentum for extent determination:<br>
+                                        • <strong>Unimpeded jet:</strong> High velocity release discharged freely to atmosphere<br>
+                                        • <strong>Diffusive jet:</strong> Low velocity release, or jet that loses momentum<br>
+                                        • <strong>Heavy gas:</strong> Liquid release with pooling and dense gas spreading
+                                    </span>
+                                </label>
+                                <select id="out_release_curve_downstream">
+                                    <option value="diffusive">Diffusive jet</option>
+                                    <option value="unimpeded">Unimpeded jet</option>
+                                    <option value="heavy">Heavy gas</option>
+                                </select>
+                            </div>
+                            
+                            <div class="input">
+                                <label for="out_final_ventilation_downstream" class="tooltip">Ventilation Availability
+                                    <span class="tooltiptext">${L ? 
+                                        'Classification of ventilation availability according to IEC 60079-10-1 C.3.7.1' :
+                                        'Класифікація доступності вентиляції згідно IEC 60079-10-1 C.3.7.1'}</span>
+                                </label>
+                                <select id="out_final_ventilation_downstream">
+                                    <option value="Good">Good</option>
+                                    <option value="Fair" selected>Fair</option>
+                                    <option value="Poor">Poor</option>
+                                </select>
+                            </div>
+                            
+                            <div class="input">
+                                <label for="out_final_dilution_downstream" class="tooltip">Dilution Level
+                                    <span class="tooltiptext">${L ?
+                                        'Effectiveness of ventilation in dispersing flammable release' :
+                                        'Ефективність вентиляції у розсіюванні займистого викиду'}</span>
+                                </label>
                                 <select id="out_final_dilution_downstream">
                                     <option value="High">High</option>
                                     <option value="Medium" selected>Medium</option>
                                     <option value="Low">Low</option>
                                 </select>
                             </div>
+                            
                             <div class="input">
-                                <label>${L ? 'Zone Extent (m)' : 'Протяжність зони (м)'}</label>
+                                <label for="out_final_extent_downstream" class="tooltip">Zone Extent (m)
+                                    <span class="tooltiptext">${L ?
+                                        'Distance from release source determined from Figure D.1 based on Qc and release type' :
+                                        'Відстань від джерела викиду, визначена з Рисунку D.1 на основі Qc та типу викиду'}</span>
+                                </label>
                                 <input type="number" step="any" id="out_final_extent_downstream" value="1.0">
                             </div>
+                            
                             <div class="row">
-                                <span>${L ? 'Downstream Zone Type' : 'Тип зони після регулятора'}</span>
+                                <span class="tooltip">${L ? 'Zone Type' : 'Тип зони'}
+                                    <span class="tooltiptext">${L ?
+                                        'Determined from Table D.1 based on grade of release, ventilation availability and dilution level' :
+                                        'Визначається з Таблиці D.1 на основі типу викиду, доступності вентиляції та рівня розведення'}</span>
+                                </span>
                                 <span class="val" id="out_final_zone_downstream">---</span>
                             </div>
                         </div>
@@ -2427,13 +2347,16 @@
 
             // Function to update final classification
             function updateFinalClassification() {
+                const ventilation_upstream = document.getElementById('out_final_ventilation_upstream').value;
+                const ventilation_downstream = document.getElementById('out_final_ventilation_downstream').value;
                 const dilution_upstream = document.getElementById('out_final_dilution_upstream').value;
                 const dilution_downstream = document.getElementById('out_final_dilution_downstream').value;
                 const extent_upstream = toNum(document.getElementById('out_final_extent_upstream').value);
                 const extent_downstream = toNum(document.getElementById('out_final_extent_downstream').value);
 
-                const zoneType_upstream = determineZoneType(releaseType_upstream, ventilationAvailability, dilution_upstream);
-                const zoneType_downstream = determineZoneType(releaseType_downstream, ventilationAvailability, dilution_downstream);
+                // Автоматическое определение типа зоны по Table D.1
+                const zoneType_upstream = determineZoneType(releaseType_upstream, ventilation_upstream, dilution_upstream);
+                const zoneType_downstream = determineZoneType(releaseType_downstream, ventilation_downstream, dilution_downstream);
 
                 document.getElementById('out_final_zone_upstream').textContent = `${zoneType_upstream} (${fmt(extent_upstream, 2)} m)`;
                 document.getElementById('out_final_zone_downstream').textContent = `${zoneType_downstream} (${fmt(extent_downstream, 2)} m)`;
@@ -2441,6 +2364,8 @@
 
             // Initialize and add event listeners
             updateFinalClassification();
+            document.getElementById('out_final_ventilation_upstream').addEventListener('change', updateFinalClassification);
+            document.getElementById('out_final_ventilation_downstream').addEventListener('change', updateFinalClassification);
             document.getElementById('out_final_dilution_upstream').addEventListener('change', updateFinalClassification);
             document.getElementById('out_final_dilution_downstream').addEventListener('change', updateFinalClassification);
             document.getElementById('out_final_extent_upstream').addEventListener('input', updateFinalClassification);
@@ -2523,9 +2448,6 @@
             // Determine dilution level based on background concentration
             const Xcrit = 0.25 * LFL;
             const dilutionLevel = Xb <= Xcrit ? 'Medium' : 'Low';
-            
-            // Determine ventilation availability
-            const ventilationAvailability = 'Fair';
             
             // Display results
             const el = document.getElementById('resEnclosed');
@@ -2643,21 +2565,59 @@
                     
                     <div class="grid">
                         <div>
+                            <!-- Добавлен выбор типа выброса -->
                             <div class="input">
-                                <label>${L_lang ? 'Ventilation Availability' : 'Доступність вентиляції'}</label>
+                                <label for="enc_release_curve" class="tooltip">Release Curve Type
+                                    <span class="tooltiptext">
+                                        <strong>Release Curve Type</strong><br>
+                                        Classification of release momentum for extent determination:<br>
+                                        • <strong>Unimpeded jet:</strong> High velocity release discharged freely to atmosphere<br>
+                                        • <strong>Diffusive jet:</strong> Low velocity release, or jet that loses momentum<br>
+                                        • <strong>Heavy gas:</strong> Liquid release with pooling and dense gas spreading
+                                    </span>
+                                </label>
+                                <select id="enc_release_curve">
+                                    <option value="diffusive">Diffusive jet</option>
+                                    <option value="unimpeded">Unimpeded jet</option>
+                                    <option value="heavy">Heavy gas</option>
+                                </select>
+                            </div>
+                            
+                            <div class="input">
+                                <label for="enc_final_ventilation" class="tooltip">Ventilation Availability
+                                    <span class="tooltiptext">${L_lang ? 
+                                        'Classification of ventilation availability according to IEC 60079-10-1 C.3.7.1' :
+                                        'Класифікація доступності вентиляції згідно IEC 60079-10-1 C.3.7.1'}</span>
+                                </label>
                                 <select id="enc_final_ventilation">
                                     <option value="Good">Good</option>
                                     <option value="Fair" selected>Fair</option>
                                     <option value="Poor">Poor</option>
                                 </select>
                             </div>
+                            
                             <div class="input">
-                                <label>${L_lang ? 'Zone Extent (m)' : 'Протяжність зони (м)'}</label>
+                                <label for="enc_final_extent" class="tooltip">Zone Extent (m)
+                                    <span class="tooltiptext">${L_lang ?
+                                        'Distance from release source determined from Figure D.1 based on Qc and release type' :
+                                        'Відстань від джерела викиду, визначена з Рисунку D.1 на основі Qc та типу викиду'}</span>
+                                </label>
                                 <input type="number" step="any" id="enc_final_extent" value="1.0">
                             </div>
+                            
                             <div class="row">
-                                <span>${L_lang ? 'Zone Type' : 'Тип зони'}</span>
+                                <span class="tooltip">${L_lang ? 'Zone Type' : 'Тип зони'}
+                                    <span class="tooltiptext">${L_lang ?
+                                        'Determined from Table D.1 based on grade of release, ventilation availability and dilution level' :
+                                        'Визначається з Таблиці D.1 на основі типу викиду, доступності вентиляції та рівня розведення'}</span>
+                                </span>
                                 <span class="val" id="enc_final_zone">---</span>
+                            </div>
+                            
+                            <!-- Отображение автоматически определенного уровня разбавления -->
+                            <div class="row">
+                                <span>${L_lang ? 'Calculated Dilution Level' : 'Розрахований рівень розведення'}</span>
+                                <span class="val">${dilutionLevel} (Xb = ${fmt(Xb, 4)} vs Xcrit = ${fmt(Xcrit, 4)})</span>
                             </div>
                         </div>
                     </div>
@@ -2669,6 +2629,7 @@
                 const ventilation = document.getElementById('enc_final_ventilation').value;
                 const extent = toNum(document.getElementById('enc_final_extent').value);
 
+                // Автоматическое определение типа зоны по Table D.1 с использованием рассчитанного dilutionLevel
                 const zoneType = determineZoneType(releaseType, ventilation, dilutionLevel);
 
                 document.getElementById('enc_final_zone').textContent = `${zoneType} (${fmt(extent, 2)} m)`;
@@ -2696,5 +2657,5 @@
         // Initialize
         setLang('EN');
     </script>
-
-</body></html>
+</body>
+</html>
