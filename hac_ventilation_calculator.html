@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
+<html lang="uk"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HAC & Ventilation Calculator - Professional Edition</title>
+    <title>HAC &amp; Ventilation Calculator - Professional Edition</title>
     <style>
-        /* Стили остаются без изменений */
         :root {
             --ink: #e5e7eb;
             --muted: #94a3b8;
@@ -177,6 +174,23 @@
         .input label {
             color: var(--muted);
             font-size: 0.92rem;
+            position: relative;
+            cursor: help;
+        }
+
+        .input label::after {
+            content: '?';
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            background: var(--muted);
+            color: var(--background);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 16px;
+            font-size: 12px;
+            margin-left: 5px;
+            font-weight: bold;
         }
 
         .input input, .input select {
@@ -351,6 +365,73 @@
             border: 1px solid var(--brand);
         }
 
+        /* Tooltip styles */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 300px;
+            background-color: var(--code);
+            color: var(--ink);
+            text-align: left;
+            border-radius: 6px;
+            border: 1px solid var(--muted);
+            padding: 12px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -150px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: var(--muted) transparent transparent transparent;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Table styles */
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.9rem;
+        }
+
+        .param-table th, .param-table td {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            text-align: left;
+        }
+
+        .param-table th {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--brand);
+            font-weight: 600;
+        }
+
+        .param-table tr:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
         @media (max-width: 768px) {
             .grid {
                 grid-template-columns: 1fr;
@@ -370,6 +451,11 @@
                 position: relative;
                 right: 0;
                 margin-top: 10px;
+            }
+            
+            .tooltip .tooltiptext {
+                width: 250px;
+                margin-left: -125px;
             }
         }
         
@@ -398,7 +484,7 @@
 <body>
     <div class="wrap">
         <header>
-            <h1 id="t_title">HAC & Ventilation Calculator</h1>
+            <h1 id="t_title">HAC &amp; Ventilation Calculator</h1>
             <p class="hint" id="t_sub">Professional calculator for hazardous area classification and ventilation analysis according to I.S. EN IEC 60079-10-1</p>
             
             <div class="lang">
@@ -410,48 +496,113 @@
         </header>
 
         <div class="tabs">
-            <div class="tab active" data-id="outdoor">Outdoor Scenario</div>
-            <div class="tab" data-id="enclosed">Enclosed Scenario</div>
+            <div class="tab" data-id="outdoor">Outdoor Scenario</div>
+            <div class="tab active" data-id="enclosed">Enclosed Scenario</div>
             <div class="tab" data-id="help">Instructions</div>
         </div>
 
         <!-- Outdoor Scenario -->
-        <div class="content active" id="outdoor">
-            <!-- Содержимое Outdoor Scenario без изменений -->
+        <div class="content" id="outdoor">
             <div class="card">
                 <h3>Gas Properties</h3>
                 <div class="input">
-                    <label for="out_M">Molar Mass M (g/mol)</label>
+                    <label for="out_M" class="tooltip">Molar Mass M (g/mol)
+                        <span class="tooltiptext">
+                            <strong>Molar Mass (M)</strong><br>
+                            Molecular weight of the gas in grams per mole.<br>
+                            <em>Typical values:</em><br>
+                            • Propane: 44.097 g/mol<br>
+                            • Butane: 58.12 g/mol<br>
+                            • Methane: 16.04 g/mol<br>
+                            Use gas-specific value from safety data sheets.
+                        </span>
+                    </label>
                     <input type="number" id="out_M" step="any" value="44.097">
                     <span class="u">g/mol</span>
                 </div>
                 <div class="input">
-                    <label for="out_gamma">Specific Heat Ratio γ</label>
+                    <label for="out_gamma" class="tooltip">Specific Heat Ratio γ
+                        <span class="tooltiptext">
+                            <strong>Specific Heat Ratio (γ)</strong><br>
+                            Ratio of specific heats (Cp/Cv) for the gas.<br>
+                            <em>Typical values:</em><br>
+                            • Propane: 1.13<br>
+                            • Butane: 1.10<br>
+                            • Methane: 1.31<br>
+                            • Air: 1.40<br>
+                            Affects critical pressure and flow calculations.
+                        </span>
+                    </label>
                     <input type="number" id="out_gamma" step="any" value="1.13">
                     <span class="u">-</span>
                 </div>
                 <div class="input">
-                    <label for="out_LFL">Lower Flammable Limit LFL</label>
+                    <label for="out_LFL" class="tooltip">Lower Flammable Limit LFL
+                        <span class="tooltiptext">
+                            <strong>Lower Flammable Limit (LFL)</strong><br>
+                            Minimum concentration of gas in air that can ignite.<br>
+                            Enter as volume fraction (0.017 for 1.7%).<br>
+                            <em>Typical values:</em><br>
+                            • Propane: 0.021 (2.1%)<br>
+                            • Butane: 0.018 (1.8%)<br>
+                            • Methane: 0.050 (5.0%)<br>
+                            Use gas-specific value from safety data sheets.
+                        </span>
+                    </label>
                     <input type="number" id="out_LFL" step="any" value="0.017">
                     <span class="u">vol/vol</span>
                 </div>
                 <div class="input">
-                    <label for="out_T">Temperature T</label>
+                    <label for="out_T" class="tooltip">Temperature T
+                        <span class="tooltiptext">
+                            <strong>Temperature (T)</strong><br>
+                            Gas temperature in Kelvin.<br>
+                            <em>Standard conditions:</em> 293.15 K (20°C)<br>
+                            For different conditions, use actual gas temperature.<br>
+                            Affects gas density and release rate calculations.
+                        </span>
+                    </label>
                     <input type="number" id="out_T" step="any" value="293.15">
                     <span class="u">K</span>
                 </div>
                 <div class="input">
-                    <label for="out_Pa">Atmospheric Pressure P<sub>a</sub></label>
+                    <label for="out_Pa" class="tooltip">Atmospheric Pressure P<sub>a</sub>
+                        <span class="tooltiptext">
+                            <strong>Atmospheric Pressure (P<sub>a</sub>)</strong><br>
+                            Ambient atmospheric pressure in Pascals.<br>
+                            <em>Standard conditions:</em> 101325 Pa (1.01325 bar)<br>
+                            For different elevations, adjust accordingly:<br>
+                            • Sea level: 101325 Pa<br>
+                            • 1000m elevation: ~90000 Pa<br>
+                            Affects critical pressure calculation.
+                        </span>
+                    </label>
                     <input type="number" id="out_Pa" step="any" value="101325">
                     <span class="u">Pa</span>
                 </div>
                 <div class="input">
-                    <label for="out_R">Gas Constant R</label>
+                    <label for="out_R" class="tooltip">Gas Constant R
+                        <span class="tooltiptext">
+                            <strong>Universal Gas Constant (R)</strong><br>
+                            Universal gas constant in J/(kmol·K).<br>
+                            <em>Standard value:</em> 8314.5 J/(kmol·K)<br>
+                            Used in gas density and release rate calculations.<br>
+                            Typically kept constant for all calculations.
+                        </span>
+                    </label>
                     <input type="number" id="out_R" step="any" value="8314.5">
                     <span class="u">J/kmol·K</span>
                 </div>
                 <div class="input">
-                    <label for="out_Z">Compressibility Factor Z</label>
+                    <label for="out_Z" class="tooltip">Compressibility Factor Z
+                        <span class="tooltiptext">
+                            <strong>Compressibility Factor (Z)</strong><br>
+                            Factor accounting for non-ideal gas behavior.<br>
+                            <em>For ideal gases:</em> 1.0<br>
+                            For real gases at high pressure, use appropriate value.<br>
+                            For LPG at moderate pressures, 1.0 is typically used.
+                        </span>
+                    </label>
                     <input type="number" id="out_Z" step="any" value="1.0">
                     <span class="u">-</span>
                 </div>
@@ -461,22 +612,64 @@
                 <div class="card">
                     <h3>Upstream Release (Before Regulator)</h3>
                     <div class="input">
-                        <label for="out_S_upstream">Hole Area S</label>
+                        <label for="out_S_upstream" class="tooltip">Hole Area S
+                            <span class="tooltiptext">
+                                <strong>Hole Area (S)</strong><br>
+                                Effective leak area in square millimeters.<br>
+                                <em>Typical values (IEC 60079-10-1 Table B.1):</em><br>
+                                • Small bore connections: 0.25 mm²<br>
+                                • Flanges: 0.25-2.5 mm²<br>
+                                • Valve stems: 0.025-0.25 mm²<br>
+                                • Relief valves: 10% of orifice area<br>
+                                Use appropriate value for release type.
+                            </span>
+                        </label>
                         <input type="number" id="out_S_upstream" step="any" value="0.25">
                         <span class="u">mm²</span>
                     </div>
                     <div class="input">
-                        <label for="out_Cd_upstream">Discharge Coefficient C<sub>d</sub></label>
+                        <label for="out_Cd_upstream" class="tooltip">Discharge Coefficient C<sub>d</sub>
+                            <span class="tooltiptext">
+                                <strong>Discharge Coefficient (C<sub>d</sub>)</strong><br>
+                                Efficiency factor for flow through orifice.<br>
+                                <em>Typical values:</em><br>
+                                • Sharp-edged orifice: 0.62<br>
+                                • Rounded orifice: 0.97-0.99<br>
+                                • Relief valves: 0.99<br>
+                                • Ventilation openings: 0.75<br>
+                                Depends on orifice geometry.
+                            </span>
+                        </label>
                         <input type="number" id="out_Cd_upstream" step="any" value="0.99">
                         <span class="u">-</span>
                     </div>
                     <div class="input">
-                        <label for="out_p_upstream">Upstream Pressure P₀</label>
+                        <label for="out_p_upstream" class="tooltip">Upstream Pressure P₀
+                            <span class="tooltiptext">
+                                <strong>Upstream Pressure (P₀)</strong><br>
+                                Pressure upstream of release point in bar absolute.<br>
+                                <em>Typical LPG system pressures:</em><br>
+                                • Storage vessels: 5-15 bar<br>
+                                • 1st stage regulators: 1.5-4 bar<br>
+                                • 2nd stage regulators: 0.037 bar<br>
+                                Use actual system operating pressure.
+                            </span>
+                        </label>
                         <input type="number" id="out_p_upstream" step="any" value="9.0">
                         <span class="u">bar abs</span>
                     </div>
                     <div class="input">
-                        <label for="out_release_type_upstream">Release Type</label>
+                        <label for="out_release_type_upstream" class="tooltip">Release Type
+                            <span class="tooltiptext">
+                                <strong>Release Type</strong><br>
+                                Classification of release frequency:<br>
+                                • <strong>Primary:</strong> Expected during normal operation<br>
+                                &nbsp;&nbsp;(e.g., relief valve operation)<br>
+                                • <strong>Secondary:</strong> Not expected in normal operation<br>
+                                &nbsp;&nbsp;(e.g., flange leaks, seal failures)<br>
+                                Affects zone classification per Table D.1.
+                            </span>
+                        </label>
                         <select id="out_release_type_upstream">
                             <option value="primary">Primary</option>
                             <option value="secondary">Secondary</option>
@@ -487,22 +680,64 @@
                 <div class="card">
                     <h3>Downstream Release (After Regulator)</h3>
                     <div class="input">
-                        <label for="out_S_downstream">Hole Area S</label>
+                        <label for="out_S_downstream" class="tooltip">Hole Area S
+                            <span class="tooltiptext">
+                                <strong>Hole Area (S)</strong><br>
+                                Effective leak area in square millimeters.<br>
+                                <em>Typical values (IEC 60079-10-1 Table B.1):</em><br>
+                                • Small bore connections: 0.25 mm²<br>
+                                • Flanges: 0.25-2.5 mm²<br>
+                                • Valve stems: 0.025-0.25 mm²<br>
+                                • Relief valves: 10% of orifice area<br>
+                                Use appropriate value for release type.
+                            </span>
+                        </label>
                         <input type="number" id="out_S_downstream" step="any" value="0.25">
                         <span class="u">mm²</span>
                     </div>
                     <div class="input">
-                        <label for="out_Cd_downstream">Discharge Coefficient C<sub>d</sub></label>
+                        <label for="out_Cd_downstream" class="tooltip">Discharge Coefficient C<sub>d</sub>
+                            <span class="tooltiptext">
+                                <strong>Discharge Coefficient (C<sub>d</sub>)</strong><br>
+                                Efficiency factor for flow through orifice.<br>
+                                <em>Typical values:</em><br>
+                                • Sharp-edged orifice: 0.62<br>
+                                • Rounded orifice: 0.97-0.99<br>
+                                • Relief valves: 0.99<br>
+                                • Ventilation openings: 0.75<br>
+                                Depends on orifice geometry.
+                            </span>
+                        </label>
                         <input type="number" id="out_Cd_downstream" step="any" value="0.99">
                         <span class="u">-</span>
                     </div>
                     <div class="input">
-                        <label for="out_p_downstream">Downstream Pressure P₀</label>
+                        <label for="out_p_downstream" class="tooltip">Downstream Pressure P₀
+                            <span class="tooltiptext">
+                                <strong>Downstream Pressure (P₀)</strong><br>
+                                Pressure downstream of regulator in bar absolute.<br>
+                                <em>Typical LPG system pressures:</em><br>
+                                • 1st stage regulators: 1.5-4 bar<br>
+                                • 2nd stage regulators: 0.037 bar<br>
+                                • Appliance inlets: 0.025-0.037 bar<br>
+                                Use actual system operating pressure.
+                            </span>
+                        </label>
                         <input type="number" id="out_p_downstream" step="any" value="1.5">
                         <span class="u">bar abs</span>
                     </div>
                     <div class="input">
-                        <label for="out_release_type_downstream">Release Type</label>
+                        <label for="out_release_type_downstream" class="tooltip">Release Type
+                            <span class="tooltiptext">
+                                <strong>Release Type</strong><br>
+                                Classification of release frequency:<br>
+                                • <strong>Primary:</strong> Expected during normal operation<br>
+                                &nbsp;&nbsp;(e.g., relief valve operation)<br>
+                                • <strong>Secondary:</strong> Not expected in normal operation<br>
+                                &nbsp;&nbsp;(e.g., flange leaks, seal failures)<br>
+                                Affects zone classification per Table D.1.
+                            </span>
+                        </label>
                         <select id="out_release_type_downstream">
                             <option value="primary">Primary</option>
                             <option value="secondary">Secondary</option>
@@ -519,41 +754,107 @@
         </div>
 
         <!-- Enclosed Scenario -->
-        <div class="content" id="enclosed">
+        <div class="content active" id="enclosed">
             <div class="card">
                 <h3>Gas Properties</h3>
                 <div class="input">
-                    <label for="enc_M">Molar Mass M (g/mol)</label>
+                    <label for="enc_M" class="tooltip">Molar Mass M (g/mol)
+                        <span class="tooltiptext">
+                            <strong>Molar Mass (M)</strong><br>
+                            Molecular weight of the gas in grams per mole.<br>
+                            <em>Typical values:</em><br>
+                            • Propane: 44.097 g/mol<br>
+                            • Butane: 58.12 g/mol<br>
+                            • Methane: 16.04 g/mol<br>
+                            Use gas-specific value from safety data sheets.
+                        </span>
+                    </label>
                     <input type="number" id="enc_M" step="any" value="44.097">
                     <span class="u">g/mol</span>
                 </div>
                 <div class="input">
-                    <label for="enc_gamma">Specific Heat Ratio γ</label>
+                    <label for="enc_gamma" class="tooltip">Specific Heat Ratio γ
+                        <span class="tooltiptext">
+                            <strong>Specific Heat Ratio (γ)</strong><br>
+                            Ratio of specific heats (Cp/Cv) for the gas.<br>
+                            <em>Typical values:</em><br>
+                            • Propane: 1.13<br>
+                            • Butane: 1.10<br>
+                            • Methane: 1.31<br>
+                            • Air: 1.40<br>
+                            Affects critical pressure and flow calculations.
+                        </span>
+                    </label>
                     <input type="number" id="enc_gamma" step="any" value="1.13">
                     <span class="u">-</span>
                 </div>
                 <div class="input">
-                    <label for="enc_LFL">Lower Flammable Limit LFL</label>
+                    <label for="enc_LFL" class="tooltip">Lower Flammable Limit LFL
+                        <span class="tooltiptext">
+                            <strong>Lower Flammable Limit (LFL)</strong><br>
+                            Minimum concentration of gas in air that can ignite.<br>
+                            Enter as volume fraction (0.017 for 1.7%).<br>
+                            <em>Typical values:</em><br>
+                            • Propane: 0.021 (2.1%)<br>
+                            • Butane: 0.018 (1.8%)<br>
+                            • Methane: 0.050 (5.0%)<br>
+                            Use gas-specific value from safety data sheets.
+                        </span>
+                    </label>
                     <input type="number" id="enc_LFL" step="any" value="0.017">
                     <span class="u">vol/vol</span>
                 </div>
                 <div class="input">
-                    <label for="enc_T">Temperature T</label>
+                    <label for="enc_T" class="tooltip">Temperature T
+                        <span class="tooltiptext">
+                            <strong>Temperature (T)</strong><br>
+                            Gas temperature in Kelvin.<br>
+                            <em>Standard conditions:</em> 293.15 K (20°C)<br>
+                            For different conditions, use actual gas temperature.<br>
+                            Affects gas density and release rate calculations.
+                        </span>
+                    </label>
                     <input type="number" id="enc_T" step="any" value="293.15">
                     <span class="u">K</span>
                 </div>
                 <div class="input">
-                    <label for="enc_Pa">Atmospheric Pressure P<sub>a</sub></label>
+                    <label for="enc_Pa" class="tooltip">Atmospheric Pressure P<sub>a</sub>
+                        <span class="tooltiptext">
+                            <strong>Atmospheric Pressure (P<sub>a</sub>)</strong><br>
+                            Ambient atmospheric pressure in Pascals.<br>
+                            <em>Standard conditions:</em> 101325 Pa (1.01325 bar)<br>
+                            For different elevations, adjust accordingly:<br>
+                            • Sea level: 101325 Pa<br>
+                            • 1000m elevation: ~90000 Pa<br>
+                            Affects critical pressure calculation.
+                        </span>
+                    </label>
                     <input type="number" id="enc_Pa" step="any" value="101325">
                     <span class="u">Pa</span>
                 </div>
                 <div class="input">
-                    <label for="enc_R">Gas Constant R</label>
+                    <label for="enc_R" class="tooltip">Gas Constant R
+                        <span class="tooltiptext">
+                            <strong>Universal Gas Constant (R)</strong><br>
+                            Universal gas constant in J/(kmol·K).<br>
+                            <em>Standard value:</em> 8314.5 J/(kmol·K)<br>
+                            Used in gas density and release rate calculations.<br>
+                            Typically kept constant for all calculations.
+                        </span>
+                    </label>
                     <input type="number" id="enc_R" step="any" value="8314.5">
                     <span class="u">J/kmol·K</span>
                 </div>
                 <div class="input">
-                    <label for="enc_Z">Compressibility Factor Z</label>
+                    <label for="enc_Z" class="tooltip">Compressibility Factor Z
+                        <span class="tooltiptext">
+                            <strong>Compressibility Factor (Z)</strong><br>
+                            Factor accounting for non-ideal gas behavior.<br>
+                            <em>For ideal gases:</em> 1.0<br>
+                            For real gases at high pressure, use appropriate value.<br>
+                            For LPG at moderate pressures, 1.0 is typically used.
+                        </span>
+                    </label>
                     <input type="number" id="enc_Z" step="any" value="1.0">
                     <span class="u">-</span>
                 </div>
@@ -562,25 +863,67 @@
             <div class="card">
                 <h3>Release Parameters</h3>
                 <div class="input">
-                    <label for="enc_S">Hole Area S</label>
+                    <label for="enc_S" class="tooltip">Hole Area S
+                        <span class="tooltiptext">
+                            <strong>Hole Area (S)</strong><br>
+                            Effective leak area in square millimeters.<br>
+                            <em>Typical values (IEC 60079-10-1 Table B.1):</em><br>
+                            • Small bore connections: 0.25 mm²<br>
+                            • Flanges: 0.25-2.5 mm²<br>
+                            • Valve stems: 0.025-0.25 mm²<br>
+                            • Relief valves: 10% of orifice area<br>
+                            Use appropriate value for release type.
+                        </span>
+                    </label>
                     <input type="number" id="enc_S" step="any" value="0.25">
                     <span class="u">mm²</span>
                 </div>
                 <div class="input">
-                    <label for="enc_Cd">Discharge Coefficient C<sub>d</sub></label>
+                    <label for="enc_Cd" class="tooltip">Discharge Coefficient C<sub>d</sub>
+                        <span class="tooltiptext">
+                            <strong>Discharge Coefficient (C<sub>d</sub>)</strong><br>
+                            Efficiency factor for flow through orifice.<br>
+                            <em>Typical values:</em><br>
+                            • Sharp-edged orifice: 0.62<br>
+                            • Rounded orifice: 0.97-0.99<br>
+                            • Relief valves: 0.99<br>
+                            • Ventilation openings: 0.75<br>
+                            Depends on orifice geometry.
+                        </span>
+                    </label>
                     <input type="number" id="enc_Cd" step="any" value="0.99">
                     <span class="u">-</span>
                 </div>
                 <div class="input">
-                    <label for="enc_p">Upstream Pressure P₀</label>
+                    <label for="enc_p" class="tooltip">Upstream Pressure P₀
+                        <span class="tooltiptext">
+                            <strong>Upstream Pressure (P₀)</strong><br>
+                            Pressure upstream of release point in bar absolute.<br>
+                            <em>Typical LPG system pressures:</em><br>
+                            • Storage vessels: 5-15 bar<br>
+                            • 1st stage regulators: 1.5-4 bar<br>
+                            • 2nd stage regulators: 0.037 bar<br>
+                            Use actual system operating pressure.
+                        </span>
+                    </label>
                     <input type="number" id="enc_p" step="any" value="1.5">
                     <span class="u">bar abs</span>
                 </div>
                 <div class="input">
-                    <label for="enc_release_type">Release Type</label>
+                    <label for="enc_release_type" class="tooltip">Release Type
+                        <span class="tooltiptext">
+                            <strong>Release Type</strong><br>
+                            Classification of release frequency:<br>
+                            • <strong>Primary:</strong> Expected during normal operation<br>
+                            &nbsp;&nbsp;(e.g., relief valve operation)<br>
+                            • <strong>Secondary:</strong> Not expected in normal operation<br>
+                            &nbsp;&nbsp;(e.g., flange leaks, seal failures)<br>
+                            Affects zone classification per Table D.1.
+                        </span>
+                    </label>
                     <select id="enc_release_type">
                         <option value="primary">Primary</option>
-                        <option value="secondary" selected>Secondary</option>
+                        <option value="secondary" selected="">Secondary</option>
                     </select>
                 </div>
             </div>
@@ -589,23 +932,55 @@
                 <div class="card">
                     <h3>Room Parameters</h3>
                     <div class="input">
-                        <label for="enc_length">Length L</label>
+                        <label for="enc_length" class="tooltip">Length L
+                            <span class="tooltiptext">
+                                <strong>Room Length (L)</strong><br>
+                                Length of the enclosed space in meters.<br>
+                                Measure internal dimensions of the room/enclosure.<br>
+                                Used to calculate ventilation velocity and room volume.<br>
+                                For irregular shapes, use equivalent rectangular dimensions.
+                            </span>
+                        </label>
                         <input type="number" id="enc_length" step="any" value="2.0">
                         <span class="u">m</span>
                     </div>
                     <div class="input">
-                        <label for="enc_width">Width W</label>
+                        <label for="enc_width" class="tooltip">Width W
+                            <span class="tooltiptext">
+                                <strong>Room Width (W)</strong><br>
+                                Width of the enclosed space in meters.<br>
+                                Measure internal dimensions of the room/enclosure.<br>
+                                Used to calculate room volume.<br>
+                                For irregular shapes, use equivalent rectangular dimensions.
+                            </span>
+                        </label>
                         <input type="number" id="enc_width" step="any" value="1.5">
                         <span class="u">m</span>
                     </div>
                     <div class="input">
-                        <label for="enc_height">Height H</label>
+                        <label for="enc_height" class="tooltip">Height H
+                            <span class="tooltiptext">
+                                <strong>Room Height (H)</strong><br>
+                                Height of the enclosed space in meters.<br>
+                                Measure internal dimensions of the room/enclosure.<br>
+                                Used to calculate ventilation velocity and room volume.<br>
+                                For irregular shapes, use average height.
+                            </span>
+                        </label>
                         <input type="number" id="enc_height" step="any" value="2.2">
                         <span class="u">m</span>
                     </div>
                     <div class="input">
-                        <label for="enc_volume">Volume V₀</label>
-                        <input type="number" id="enc_volume" step="any" value="6.6" readonly>
+                        <label for="enc_volume" class="tooltip">Volume V₀
+                            <span class="tooltiptext">
+                                <strong>Room Volume (V₀)</strong><br>
+                                Total volume of the enclosed space in cubic meters.<br>
+                                Automatically calculated as L × W × H.<br>
+                                Used to calculate air change rate.<br>
+                                For complex geometries, calculate manually.
+                            </span>
+                        </label>
+                        <input type="number" id="enc_volume" step="any" value="6.6" readonly="">
                         <span class="u">m³</span>
                     </div>
                 </div>
@@ -613,32 +988,94 @@
                 <div class="card">
                     <h3>Ventilation Parameters</h3>
                     <div class="input">
-                        <label for="enc_A1">Upwind Opening Area A₁</label>
+                        <label for="enc_A1" class="tooltip">Upwind Opening Area A₁
+                            <span class="tooltiptext">
+                                <strong>Upwind Opening Area (A₁)</strong><br>
+                                Effective area of upwind ventilation openings in m².<br>
+                                Openings on side facing prevailing wind (air inlets).<br>
+                                <em>Minimum requirements:</em><br>
+                                • I.S. EN 12186: 1% of floor area<br>
+                                • IGEM/TD/13: 2% of floor area<br>
+                                Calculate net free area considering grilles/louvers.
+                            </span>
+                        </label>
                         <input type="number" id="enc_A1" step="any" value="0.02">
                         <span class="u">m²</span>
                     </div>
                     <div class="input">
-                        <label for="enc_A2">Downwind Opening Area A₂</label>
+                        <label for="enc_A2" class="tooltip">Downwind Opening Area A₂
+                            <span class="tooltiptext">
+                                <strong>Downwind Opening Area (A₂)</strong><br>
+                                Effective area of downwind ventilation openings in m².<br>
+                                Openings on opposite side (air outlets).<br>
+                                <em>Minimum requirements:</em><br>
+                                • I.S. EN 12186: 1% of floor area<br>
+                                • IGEM/TD/13: 2% of floor area<br>
+                                Calculate net free area considering grilles/louvers.
+                            </span>
+                        </label>
                         <input type="number" id="enc_A2" step="any" value="0.02">
                         <span class="u">m²</span>
                     </div>
                     <div class="input">
-                        <label for="enc_Cd_vent">Ventilation C<sub>d</sub></label>
+                        <label for="enc_Cd_vent" class="tooltip">Ventilation C<sub>d</sub>
+                            <span class="tooltiptext">
+                                <strong>Ventilation Discharge Coefficient (C<sub>d</sub>)</strong><br>
+                                Efficiency factor for flow through ventilation openings.<br>
+                                <em>Typical values:</em><br>
+                                • Regular vents/grilles: 0.99<br>
+                                • Irregular openings: 0.75<br>
+                                • Louvers: 0.6-0.8<br>
+                                Depends on opening geometry and obstructions.
+                            </span>
+                        </label>
                         <input type="number" id="enc_Cd_vent" step="any" value="0.75">
                         <span class="u">-</span>
                     </div>
                     <div class="input">
-                        <label for="enc_deltaCp">Pressure Coeff. ΔC<sub>p</sub></label>
+                        <label for="enc_deltaCp" class="tooltip">Pressure Coeff. ΔC<sub>p</sub>
+                            <span class="tooltiptext">
+                                <strong>Pressure Coefficient Difference (ΔC<sub>p</sub>)</strong><br>
+                                Difference between windward and leeward pressure coefficients.<br>
+                                <em>Typical values (BS 5925):</em><br>
+                                • Exposed buildings: 0.7-1.0<br>
+                                • Meter boxes on facades: 0.25<br>
+                                • Below-ground chambers: 0.10<br>
+                                • Sheltered buildings: 0.1-0.3<br>
+                                Depends on building exposure and geometry.
+                            </span>
+                        </label>
                         <input type="number" id="enc_deltaCp" step="any" value="0.25">
                         <span class="u">-</span>
                     </div>
                     <div class="input">
-                        <label for="enc_wind_speed">Wind Speed u<sub>w</sub></label>
+                        <label for="enc_wind_speed" class="tooltip">Wind Speed u<sub>w</sub>
+                            <span class="tooltiptext">
+                                <strong>Wind Speed (u<sub>w</sub>)</strong><br>
+                                Representative outdoor wind speed in m/s.<br>
+                                <em>IEC 60079-10-1 Table C.1 values:</em><br>
+                                • Heavy gases, unobstructed, ≤2m: 0.3 m/s<br>
+                                • Heavy gases, obstructed, ≤2m: 0.15 m/s<br>
+                                • Light gases, unobstructed, ≤2m: 0.5 m/s<br>
+                                Use appropriate value for site conditions.
+                            </span>
+                        </label>
                         <input type="number" id="enc_wind_speed" step="any" value="1.0">
                         <span class="u">m/s</span>
                     </div>
                     <div class="input">
-                        <label for="enc_f">Ventilation Inefficiency f</label>
+                        <label for="enc_f" class="tooltip">Ventilation Inefficiency f
+                            <span class="tooltiptext">
+                                <strong>Ventilation Inefficiency Factor (f)</strong><br>
+                                Accounts for non-uniform mixing in enclosure.<br>
+                                <em>Typical values:</em><br>
+                                • Uniform mixing: 1.0<br>
+                                • Meter boxes: 2.0<br>
+                                • Below-ground chambers: 5.0<br>
+                                • Very poor mixing: 3.0-5.0<br>
+                                Higher values for restricted airflow areas.
+                            </span>
+                        </label>
                         <input type="number" id="enc_f" step="any" value="2.0">
                         <span class="u">-</span>
                     </div>
@@ -648,7 +1085,136 @@
             <button class="btn" id="btnEnclosed">Calculate Enclosed Scenario</button>
 
             <div class="results" id="resEnclosed">
-                <p>Results will appear here after calculation...</p>
+                <div class="section-title">Detailed Calculation Results</div>
+                
+                <div class="section-title">Critical Pressure Analysis</div>
+                <div class="calculation-steps">
+                    <p><strong>Critical pressure formula (IEC 60079-10-1:2015):</strong></p>
+                    <p class="formula">P<sub>crit</sub> = P<sub>a</sub> × [(γ+1)/2]<sup>γ/(γ-1)</sup></p>
+                    
+                    <p><strong>Calculation:</strong></p>
+                    <p class="formula">
+                        P<sub>crit</sub> = 101325 × [(1.13+1)/2]<sup>1.13/(1.13-1)</sup> = <strong>175165.2 Pa (1.752 bar abs)</strong>
+                    </p>
+                </div>
+                
+                <div class="section-title">Gas Properties</div>
+                <div class="row">
+                    <span>Gas density ρ<sub>g</sub></span>
+                    <span class="val">1.833157 kg/m³</span>
+                </div>
+                
+                <div class="section-title">Release Calculations</div>
+                <div class="row">
+                    <span>Upstream pressure P₀</span>
+                    <span class="val">150000 Pa (1.5 bar abs)</span>
+                </div>
+                <div class="flow-info subsonic">
+                    <div class="row">
+                        <span>Flow type</span>
+                        <span class="val">Subsonic</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <span>Mass flow rate ṁ</span>
+                    <span class="val">9.7741172085 × 10^-5 kg/s</span>
+                </div>
+                <div class="row">
+                    <span>Q<sub>g</sub> (gas volumetric flow)</span>
+                    <span class="val">5.3318499854 × 10^-5 m³/s</span>
+                </div>
+                <div class="row">
+                    <span>Q<sub>c</sub> (release characteristic)</span>
+                    <span class="val">0.0031363823 m³/s</span>
+                </div>
+                
+                <div class="section-title">Ventilation Analysis</div>
+                <div class="calculation-steps">
+                    <p><strong>Air flow rate calculation:</strong></p>
+                    <p class="formula">Q<sub>a</sub> = C<sub>d</sub> × A<sub>e</sub> × u<sub>w</sub> × √ΔC<sub>p</sub></p>
+                    <p class="formula">
+                        Q<sub>a</sub> = 0.75 × 0.014142 × 1 × √0.25<br>
+                        = 0.75 × 0.014142 × 1 × 0.5<br>
+                        = <strong>0.005303 m³/s</strong>
+                    </p>
+                </div>
+                <div class="row">
+                    <span>Effective ventilation area A<sub>e</sub></span>
+                    <span class="val">0.014142 m²</span>
+                </div>
+                <div class="row">
+                    <span>Wind speed u<sub>w</sub></span>
+                    <span class="val">1 m/s</span>
+                </div>
+                <div class="row">
+                    <span>Air flow rate Q<sub>a</sub></span>
+                    <span class="val">0.005303 m³/s</span>
+                </div>
+                
+                <div class="calculation-steps">
+                    <p><strong>Ventilation velocity calculation:</strong></p>
+                    <p class="formula">u<sub>w</sub>(indoor) = Q<sub>a</sub> / (L × H)</p>
+                    <p class="formula">
+                        u<sub>w</sub> = 0.005303 / (2 × 2.2)<br>
+                        = 0.005303 / 4.4<br>
+                        = <strong>0.001205 m/s</strong>
+                    </p>
+                </div>
+                <div class="row">
+                    <span>Ventilation velocity u<sub>w</sub></span>
+                    <span class="val">0.001205 m/s</span>
+                </div>
+                
+                <div class="calculation-steps">
+                    <p><strong>Air change rate calculation:</strong></p>
+                    <p class="formula">C = Q<sub>a</sub> / V<sub>0</sub></p>
+                    <p class="formula">
+                        C = 0.005303 / 6.6<br>
+                        = <strong>0.000804 s⁻¹ (2.89 h⁻¹)</strong>
+                    </p>
+                </div>
+                <div class="row">
+                    <span>Air change rate C</span>
+                    <span class="val">0.000804 s⁻¹ (2.89 h⁻¹)</span>
+                </div>
+                
+                <div class="row">
+                    <span>Background concentration X<sub>b</sub></span>
+                    <span class="val">0.019908 vol/vol</span>
+                </div>
+                <div class="row">
+                    <span>Critical concentration X<sub>crit</sub></span>
+                    <span class="val">0.00425 vol/vol</span>
+                </div>
+                <div class="row">
+                    <span>Dilution level</span>
+                    <span class="val">Low ⚠️</span>
+                </div>
+                
+                <div class="final-classification">
+                    <div class="section-title">Final Zone Classification</div>
+                    
+                    <div class="grid">
+                        <div>
+                            <div class="input">
+                                <label>Ventilation Availability</label>
+                                <select id="enc_final_ventilation">
+                                    <option value="Good">Good</option>
+                                    <option value="Fair" selected="">Fair</option>
+                                    <option value="Poor">Poor</option>
+                                </select>
+                            </div>
+                            <div class="input">
+                                <label>Zone Extent (m)</label>
+                                <input type="number" step="any" id="enc_final_extent" value="1.0">
+                            </div>
+                            <div class="row">
+                                <span>Zone Type</span>
+                                <span class="val" id="enc_final_zone">Zone 1 and even Zone 0 (1 m)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -676,6 +1242,235 @@
                             <li><strong>Air flow rate</strong>: Q<sub>a</sub> = C<sub>d</sub> × A<sub>e</sub> × u<sub>w</sub> × √ΔC<sub>p</sub></li>
                         </ol>
                     </div>
+
+                    <div class="section-title">Reference Values and Standards</div>
+                    
+                    <h4>Gas Properties (Reference: UKLPG CoP 1)</h4>
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Gas Property</th>
+                                <th>Commercial Propane</th>
+                                <th>Commercial Butane</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Molar mass (g/mol)</td>
+                                <td>44.097</td>
+                                <td>58.12</td>
+                            </tr>
+                            <tr>
+                                <td>Density of gas (air=1)</td>
+                                <td>1.5</td>
+                                <td>2.0</td>
+                            </tr>
+                            <tr>
+                                <td>Specific heat ratio</td>
+                                <td>1.13</td>
+                                <td>1.10</td>
+                            </tr>
+                            <tr>
+                                <td>Vapour pressure @ 20°C (bar)</td>
+                                <td>9</td>
+                                <td>2.5</td>
+                            </tr>
+                            <tr>
+                                <td>Lower Flammable Limit (vol%)</td>
+                                <td>2.1%</td>
+                                <td>1.8%</td>
+                            </tr>
+                            <tr>
+                                <td>Upper Flammable Limit (vol%)</td>
+                                <td>10.9%</td>
+                                <td>9.0%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Outdoor Ventilation Velocities (IEC 60079-10-1 Table C.1)</h4>
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Elevation from ground</th>
+                                <th>Unobstructed areas</th>
+                                <th>Obstructed areas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Heavier than air gases</strong></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>≤ 2 m</td>
+                                <td>0.3 m/s</td>
+                                <td>0.15 m/s</td>
+                            </tr>
+                            <tr>
+                                <td>&gt; 2 m up to 5 m</td>
+                                <td>0.6 m/s</td>
+                                <td>0.3 m/s</td>
+                            </tr>
+                            <tr>
+                                <td>&gt; 5 m</td>
+                                <td>1.0 m/s</td>
+                                <td>1.0 m/s</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Lighter than air gases</strong></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>≤ 2 m</td>
+                                <td>0.5 m/s</td>
+                                <td>0.5 m/s</td>
+                            </tr>
+                            <tr>
+                                <td>&gt; 2 m up to 5 m</td>
+                                <td>1.0 m/s</td>
+                                <td>0.5 m/s</td>
+                            </tr>
+                            <tr>
+                                <td>&gt; 5 m</td>
+                                <td>2.0 m/s</td>
+                                <td>1.0 m/s</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Hole Sizing (IEC 60079-10-1 Table B.1)</h4>
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Component Type</th>
+                                <th>Representative Area (mm²)</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Small bore connections</td>
+                                <td>0.25</td>
+                                <td>Threaded joints, fittings</td>
+                            </tr>
+                            <tr>
+                                <td>Flanges</td>
+                                <td>0.25-2.5</td>
+                                <td>Depending on size and type</td>
+                            </tr>
+                            <tr>
+                                <td>Valve stems</td>
+                                <td>0.025-0.25</td>
+                                <td>For pressures ≤ 100 mbar: 0.025 mm²</td>
+                            </tr>
+                            <tr>
+                                <td>Relief valves</td>
+                                <td>10% of orifice area</td>
+                                <td>Malfunction condition</td>
+                            </tr>
+                            <tr>
+                                <td>Diaphragm failures</td>
+                                <td>0.25</td>
+                                <td>Pinholes or porosity</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Discharge Coefficients (IEC 60079-10-1)</h4>
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Component Type</th>
+                                <th>C<sub>d</sub> Value</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Calibrated orifices</td>
+                                <td>0.99</td>
+                                <td>Relief valves, defined geometries</td>
+                            </tr>
+                            <tr>
+                                <td>Irregular openings</td>
+                                <td>0.75</td>
+                                <td>Minimum safe approximation</td>
+                            </tr>
+                            <tr>
+                                <td>Sharp-edged orifices</td>
+                                <td>0.62</td>
+                                <td>Theoretical value</td>
+                            </tr>
+                            <tr>
+                                <td>Ventilation openings</td>
+                                <td>0.75</td>
+                                <td>Flow characteristics of irregular openings</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Ventilation Parameters</h4>
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Typical Values</th>
+                                <th>Application</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Pressure coefficient ΔC<sub>p</sub></td>
+                                <td>0.10 - 1.0</td>
+                                <td>0.25 for meter boxes, 0.10 for below-ground chambers</td>
+                            </tr>
+                            <tr>
+                                <td>Ventilation inefficiency f</td>
+                                <td>1.0 - 5.0</td>
+                                <td>2.0 for meter boxes, 5.0 for below-ground chambers</td>
+                            </tr>
+                            <tr>
+                                <td>Minimum ventilation area</td>
+                                <td>1-3% of floor area</td>
+                                <td>I.S. EN 12186: 1%, IGEM/TD/13: 2-3%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Zone Classification (IEC 60079-10-1 Table D.1)</h4>
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Release Grade</th>
+                                <th>High Dilution</th>
+                                <th>Medium Dilution</th>
+                                <th>Low Dilution</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Continuous</strong></td>
+                                <td>Zone 0 NE</td>
+                                <td>Zone 0</td>
+                                <td>Zone 0</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Primary</strong></td>
+                                <td>Non-hazardous (Zone 1 NE)</td>
+                                <td>Zone 1</td>
+                                <td>Zone 1 or Zone 0</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Secondary</strong></td>
+                                <td>Non-hazardous (Zone 2 NE)</td>
+                                <td>Zone 2</td>
+                                <td>Zone 1 and even Zone 0</td>
+                            </tr>
+                        </tbody>
+                    </table>
                     
                     <div class="section-title">References</div>
                     <ul>
@@ -683,7 +1478,8 @@
                         <li>I.S. 3216:2014 - Code of Practice for Bulk storage of liquefied petroleum gas (LPG)</li>
                         <li>I.S. EN 12186:2014 - Gas infrastructure – gas pressure regulating stations</li>
                         <li>IGEM/TD/13 Ed 3 - Pressure regulating and exceeding 7 bar pipeline installations</li>
-                        <li>UKLPG CoP 1 pt 1 & pt 4 - Bulk LPG storage at fixed installations</li>
+                        <li>UKLPG CoP 1 pt 1 &amp; pt 4 - Bulk LPG storage at fixed installations</li>
+                        <li>BS 5925:1991 - Ventilation principles and designing for natural ventilation</li>
                     </ul>
                 </div>
             </div>
@@ -722,6 +1518,235 @@
                             <li><strong>Air flow rate</strong>: Q<sub>a</sub> = C<sub>d</sub> × A<sub>e</sub> × u<sub>w</sub> × √ΔC<sub>p</sub></li>
                         </ol>
                     </div>
+
+                    <div class="section-title">Reference Values and Standards</div>
+                    
+                    <h4>Gas Properties (Reference: UKLPG CoP 1)</h4>
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Gas Property</th>
+                                <th>Commercial Propane</th>
+                                <th>Commercial Butane</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Molar mass (g/mol)</td>
+                                <td>44.097</td>
+                                <td>58.12</td>
+                            </tr>
+                            <tr>
+                                <td>Density of gas (air=1)</td>
+                                <td>1.5</td>
+                                <td>2.0</td>
+                            </tr>
+                            <tr>
+                                <td>Specific heat ratio</td>
+                                <td>1.13</td>
+                                <td>1.10</td>
+                            </tr>
+                            <tr>
+                                <td>Vapour pressure @ 20°C (bar)</td>
+                                <td>9</td>
+                                <td>2.5</td>
+                            </tr>
+                            <tr>
+                                <td>Lower Flammable Limit (vol%)</td>
+                                <td>2.1%</td>
+                                <td>1.8%</td>
+                            </tr>
+                            <tr>
+                                <td>Upper Flammable Limit (vol%)</td>
+                                <td>10.9%</td>
+                                <td>9.0%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Outdoor Ventilation Velocities (IEC 60079-10-1 Table C.1)</h4>
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Elevation from ground</th>
+                                <th>Unobstructed areas</th>
+                                <th>Obstructed areas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Heavier than air gases</strong></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>≤ 2 m</td>
+                                <td>0.3 m/s</td>
+                                <td>0.15 m/s</td>
+                            </tr>
+                            <tr>
+                                <td>> 2 m up to 5 m</td>
+                                <td>0.6 m/s</td>
+                                <td>0.3 m/s</td>
+                            </tr>
+                            <tr>
+                                <td>> 5 m</td>
+                                <td>1.0 m/s</td>
+                                <td>1.0 m/s</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Lighter than air gases</strong></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>≤ 2 m</td>
+                                <td>0.5 m/s</td>
+                                <td>0.5 m/s</td>
+                            </tr>
+                            <tr>
+                                <td>> 2 m up to 5 m</td>
+                                <td>1.0 m/s</td>
+                                <td>0.5 m/s</td>
+                            </tr>
+                            <tr>
+                                <td>> 5 m</td>
+                                <td>2.0 m/s</td>
+                                <td>1.0 m/s</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Hole Sizing (IEC 60079-10-1 Table B.1)</h4>
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Component Type</th>
+                                <th>Representative Area (mm²)</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Small bore connections</td>
+                                <td>0.25</td>
+                                <td>Threaded joints, fittings</td>
+                            </tr>
+                            <tr>
+                                <td>Flanges</td>
+                                <td>0.25-2.5</td>
+                                <td>Depending on size and type</td>
+                            </tr>
+                            <tr>
+                                <td>Valve stems</td>
+                                <td>0.025-0.25</td>
+                                <td>For pressures ≤ 100 mbar: 0.025 mm²</td>
+                            </tr>
+                            <tr>
+                                <td>Relief valves</td>
+                                <td>10% of orifice area</td>
+                                <td>Malfunction condition</td>
+                            </tr>
+                            <tr>
+                                <td>Diaphragm failures</td>
+                                <td>0.25</td>
+                                <td>Pinholes or porosity</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Discharge Coefficients (IEC 60079-10-1)</h4>
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Component Type</th>
+                                <th>C<sub>d</sub> Value</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Calibrated orifices</td>
+                                <td>0.99</td>
+                                <td>Relief valves, defined geometries</td>
+                            </tr>
+                            <tr>
+                                <td>Irregular openings</td>
+                                <td>0.75</td>
+                                <td>Minimum safe approximation</td>
+                            </tr>
+                            <tr>
+                                <td>Sharp-edged orifices</td>
+                                <td>0.62</td>
+                                <td>Theoretical value</td>
+                            </tr>
+                            <tr>
+                                <td>Ventilation openings</td>
+                                <td>0.75</td>
+                                <td>Flow characteristics of irregular openings</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Ventilation Parameters</h4>
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Typical Values</th>
+                                <th>Application</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Pressure coefficient ΔC<sub>p</sub></td>
+                                <td>0.10 - 1.0</td>
+                                <td>0.25 for meter boxes, 0.10 for below-ground chambers</td>
+                            </tr>
+                            <tr>
+                                <td>Ventilation inefficiency f</td>
+                                <td>1.0 - 5.0</td>
+                                <td>2.0 for meter boxes, 5.0 for below-ground chambers</td>
+                            </tr>
+                            <tr>
+                                <td>Minimum ventilation area</td>
+                                <td>1-3% of floor area</td>
+                                <td>I.S. EN 12186: 1%, IGEM/TD/13: 2-3%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Zone Classification (IEC 60079-10-1 Table D.1)</h4>
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Release Grade</th>
+                                <th>High Dilution</th>
+                                <th>Medium Dilution</th>
+                                <th>Low Dilution</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Continuous</strong></td>
+                                <td>Zone 0 NE</td>
+                                <td>Zone 0</td>
+                                <td>Zone 0</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Primary</strong></td>
+                                <td>Non-hazardous (Zone 1 NE)</td>
+                                <td>Zone 1</td>
+                                <td>Zone 1 or Zone 0</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Secondary</strong></td>
+                                <td>Non-hazardous (Zone 2 NE)</td>
+                                <td>Zone 2</td>
+                                <td>Zone 1 and even Zone 0</td>
+                            </tr>
+                        </tbody>
+                    </table>
                     
                     <div class="section-title">References</div>
                     <ul>
@@ -730,6 +1755,7 @@
                         <li>I.S. EN 12186:2014 - Gas infrastructure – gas pressure regulating stations</li>
                         <li>IGEM/TD/13 Ed 3 - Pressure regulating and exceeding 7 bar pipeline installations</li>
                         <li>UKLPG CoP 1 pt 1 & pt 4 - Bulk LPG storage at fixed installations</li>
+                        <li>BS 5925:1991 - Ventilation principles and designing for natural ventilation</li>
                     </ul>
                 `
             },
@@ -763,6 +1789,235 @@
                             <li><strong>Витрата повітря</strong>: Q<sub>a</sub> = C<sub>d</sub> × A<sub>e</sub> × u<sub>w</sub> × √ΔC<sub>p</sub></li>
                         </ol>
                     </div>
+
+                    <div class="section-title">Довідкові значення та стандарти</div>
+                    
+                    <h4>Властивості газів (Джерело: UKLPG CoP 1)</h4>
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Властивість газу</th>
+                                <th>Комерційний пропан</th>
+                                <th>Комерційний бутан</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Молярна маса (г/моль)</td>
+                                <td>44.097</td>
+                                <td>58.12</td>
+                            </tr>
+                            <tr>
+                                <td>Щільність газу (повітря=1)</td>
+                                <td>1.5</td>
+                                <td>2.0</td>
+                            </tr>
+                            <tr>
+                                <td>Показник адіабати</td>
+                                <td>1.13</td>
+                                <td>1.10</td>
+                            </tr>
+                            <tr>
+                                <td>Тиск пари @ 20°C (бар)</td>
+                                <td>9</td>
+                                <td>2.5</td>
+                            </tr>
+                            <tr>
+                                <td>Нижча межа займистості (об.%)</td>
+                                <td>2.1%</td>
+                                <td>1.8%</td>
+                            </tr>
+                            <tr>
+                                <td>Верхня межа займистості (об.%)</td>
+                                <td>10.9%</td>
+                                <td>9.0%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Швидкості вентиляції на відкритому повітрі (IEC 60079-10-1 Таблиця C.1)</h4>
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Висота над землею</th>
+                                <th>Незагороджені зони</th>
+                                <th>Загороджені зони</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Важчі за повітря гази</strong></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>≤ 2 м</td>
+                                <td>0.3 м/с</td>
+                                <td>0.15 м/с</td>
+                            </tr>
+                            <tr>
+                                <td>> 2 м до 5 м</td>
+                                <td>0.6 м/с</td>
+                                <td>0.3 м/с</td>
+                            </tr>
+                            <tr>
+                                <td>> 5 м</td>
+                                <td>1.0 м/с</td>
+                                <td>1.0 м/с</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Легші за повітря гази</strong></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>≤ 2 м</td>
+                                <td>0.5 м/с</td>
+                                <td>0.5 м/с</td>
+                            </tr>
+                            <tr>
+                                <td>> 2 м до 5 м</td>
+                                <td>1.0 м/с</td>
+                                <td>0.5 м/с</td>
+                            </tr>
+                            <tr>
+                                <td>> 5 м</td>
+                                <td>2.0 м/с</td>
+                                <td>1.0 м/с</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Розміри отворів (IEC 60079-10-1 Таблиця B.1)</h4>
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Тип компонента</th>
+                                <th>Представницька площа (мм²)</th>
+                                <th>Примітки</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Малі з'єднання</td>
+                                <td>0.25</td>
+                                <td>Різьбові з'єднання, фітинги</td>
+                            </tr>
+                            <tr>
+                                <td>Фланці</td>
+                                <td>0.25-2.5</td>
+                                <td>Залежно від розміру та типу</td>
+                            </tr>
+                            <tr>
+                                <td>Штоки клапанів</td>
+                                <td>0.025-0.25</td>
+                                <td>Для тисків ≤ 100 мбар: 0.025 мм²</td>
+                            </tr>
+                            <tr>
+                                <td>Предохранителі</td>
+                                <td>10% площі отвору</td>
+                                <td>Умова непрацездатності</td>
+                            </tr>
+                            <tr>
+                                <td>Відмови діафрагми</td>
+                                <td>0.25</td>
+                                <td>Пінхоли або пористість</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Коефіцієнти витрати (IEC 60079-10-1)</h4>
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Тип компонента</th>
+                                <th>Значення C<sub>d</sub></th>
+                                <th>Примітки</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Калібровані отвори</td>
+                                <td>0.99</td>
+                                <td>Предохранителі, визначені геометрії</td>
+                            </tr>
+                            <tr>
+                                <td>Нерегулярні отвори</td>
+                                <td>0.75</td>
+                                <td>Мінімальне безпечне наближення</td>
+                            </tr>
+                            <tr>
+                                <td>Гострокраї отвори</td>
+                                <td>0.62</td>
+                                <td>Теоретичне значення</td>
+                            </tr>
+                            <tr>
+                                <td>Вентиляційні отвори</td>
+                                <td>0.75</td>
+                                <td>Характеристики потоку нерегулярних отворів</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Параметри вентиляції</h4>
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Параметр</th>
+                                <th>Типові значення</th>
+                                <th>Застосування</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Коефіцієнт тиску ΔC<sub>p</sub></td>
+                                <td>0.10 - 1.0</td>
+                                <td>0.25 для лічильників, 0.10 для підземних камер</td>
+                            </tr>
+                            <tr>
+                                <td>Ноефективність вентиляції f</td>
+                                <td>1.0 - 5.0</td>
+                                <td>2.0 для лічильників, 5.0 для підземних камер</td>
+                            </tr>
+                            <tr>
+                                <td>Мінімальна площа вентиляції</td>
+                                <td>1-3% площі підлоги</td>
+                                <td>I.S. EN 12186: 1%, IGEM/TD/13: 2-3%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Класифікація зон (IEC 60079-10-1 Таблиця D.1)</h4>
+                    <table class="param-table">
+                        <thead>
+                            <tr>
+                                <th>Тип викиду</th>
+                                <th>Високе розведення</th>
+                                <th>Середнє розведення</th>
+                                <th>Низьке розведення</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Безперервний</strong></td>
+                                <td>Зона 0 NE</td>
+                                <td>Зона 0</td>
+                                <td>Зона 0</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Первинний</strong></td>
+                                <td>Небезпечна (Зона 1 NE)</td>
+                                <td>Зона 1</td>
+                                <td>Зона 1 або Зона 0</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Вторинний</strong></td>
+                                <td>Небезпечна (Зона 2 NE)</td>
+                                <td>Зона 2</td>
+                                <td>Зона 1 і навіть Зона 0</td>
+                            </tr>
+                        </tbody>
+                    </table>
                     
                     <div class="section-title">Посилання</div>
                     <ul>
@@ -771,6 +2026,7 @@
                         <li>I.S. EN 12186:2014 - Газова інфраструктура – станції регулювання тиску газу</li>
                         <li>IGEM/TD/13 Ed 3 - Установки регулювання тиску та трубопроводи з тиском понад 7 бар</li>
                         <li>UKLPG CoP 1 pt 1 & pt 4 - Зберігання LPG на стаціонарних установках</li>
+                        <li>BS 5925:1991 - Принципи вентиляції та проектування природної вентиляції</li>
                     </ul>
                 `
             }
@@ -839,7 +2095,7 @@
             URL.revokeObjectURL(url);
         });
 
-        // Calculation functions
+        // Calculation functions (unchanged from previous implementation)
         function toNum(v) {
             return v == null ? null : parseFloat(String(v).trim().replace(',', '.'));
         }
@@ -848,7 +2104,6 @@
             if (x == null || isNaN(x)) return '---';
             if (x === 0) return '0';
             
-            // For very small numbers, use exponential notation without 'e'
             if (Math.abs(x) < 0.0001) {
                 const parts = x.toExponential(d).split('e');
                 const coefficient = parseFloat(parts[0]).toFixed(d);
@@ -856,9 +2111,7 @@
                 return `${coefficient} × 10^${exponent}`;
             }
             
-            // For normal numbers, use fixed notation
             let fixed = x.toFixed(d);
-            // Remove trailing zeros and decimal point if needed
             fixed = fixed.replace(/\.?0+$/, '');
             if (fixed.endsWith('.')) fixed = fixed.slice(0, -1);
             return fixed;
@@ -874,28 +2127,16 @@
         }
 
         // ИСПРАВЛЕННАЯ ФУНКЦИЯ РАСЧЕТА КРИТИЧЕСКОГО ДАВЛЕНИЯ
-        /**
-         * Расчет критического давления по формуле из IEC 60079-10-1:2015
-         * Правильная формула: Pc = Pa × [(γ+1)/2]^(γ/(γ-1))
-         */
         function calculateCriticalPressure(Pa, gamma) {
             return Pa * Math.pow((gamma + 1) / 2, gamma / (gamma - 1));
         }
 
-        /**
-         * Расчет массового расхода для сверхзвукового потока
-         * Формула: ṁ = C_d × S × P₀ × √[γ/(R×T₀/M)] × [2/(γ+1)]^((γ+1)/(2(γ-1)))
-         */
         function calculateChokedMassFlow(Cd, S, P0, gamma, M, R, T) {
-            const R_specific = R / M;  // Удельная газовая постоянная [J/(kg·K)]
+            const R_specific = R / M;
             const critical_flow_factor = Math.pow(2/(gamma+1), (gamma+1)/(2*(gamma-1)));
             return Cd * S * P0 * Math.sqrt(gamma / (R_specific * T)) * critical_flow_factor;
         }
 
-        /**
-         * Расчет массового расхода для дозвукового потока
-         * Формула: ṁ = C_d × S × P₀ × √[2γ/((γ-1)R×T₀/M) × ((P_a/P₀)^(2/γ) - (P_a/P₀)^((γ+1)/γ))]
-         */
         function calculateSubsonicMassFlow(Cd, S, P0, Pa, gamma, M, R, T) {
             const R_specific = R / M;
             const pressure_ratio = Pa / P0;
@@ -904,86 +2145,50 @@
             return Cd * S * P0 * term;
         }
 
-        /**
-         * Основная функция расчета массового расхода
-         * Определяет тип потока и использует соответствующую формулу
-         */
         function calculateMassReleaseRate(Cd, S, P0, Pa, gamma, M, R, T, Z) {
             const P_crit = calculateCriticalPressure(Pa, gamma);
             
-            // Определение типа потока
             if (P0 > P_crit) {
-                // Сверхзвуковой поток (P₀ > P_crit)
                 return calculateChokedMassFlow(Cd, S, P0, gamma, M, R, T);
             } else {
-                // Дозвуковой поток (P₀ <= P_crit)
                 return calculateSubsonicMassFlow(Cd, S, P0, Pa, gamma, M, R, T);
             }
         }
 
-        /**
-         * Расчет плотности газа
-         * Формула: ρ = (Pₐ × M) / (R × T)
-         */
         function calculateGasDensity(Pa, M, R, T) {
             return (Pa * M) / (R * T);
         }
 
-        /**
-         * Расчет объемной характеристики выброса
-         * Формула: Q_c = ṁ / (ρ_g × LFL)
-         */
         function calculateVolumetricReleaseCharacteristic(mdot, rho_g, LFL) {
             return mdot / (rho_g * LFL);
         }
 
         // ИСПРАВЛЕННЫЕ ФУНКЦИИ ДЛЯ РАСЧЕТА ВЕНТИЛЯЦИИ
-
-        /**
-         * Расчет эффективной площади вентиляции
-         * Формула: A_e = √( (A₁² × A₂²) / (A₁² + A₂²) )
-         */
         function calculateEffectiveVentilationArea(A1, A2) {
             if (A1 === 0 || A2 === 0) return 0;
             return Math.sqrt((Math.pow(A1, 2) * Math.pow(A2, 2)) / (Math.pow(A1, 2) + Math.pow(A2, 2)));
         }
 
-        /**
-         * ПРАВИЛЬНЫЙ расчет расхода воздуха
-         * Формула: Q_a = C_d × A_e × u_w × √ΔC_p
-         */
         function calculateAirFlowRate(Cd, Ae, windSpeed, deltaCp) {
             return Cd * Ae * windSpeed * Math.sqrt(deltaCp);
         }
 
-        /**
-         * Расчет скорости вентиляции в помещении
-         * Формула: u_w(indoor) = Q_a / (L × H)
-         */
         function calculateVentilationVelocity(Qa, L, H) {
             if (L === 0 || H === 0) return 0;
             return Qa / (L * H);
         }
 
-        /**
-         * Расчет фоновой концентрации
-         * Формула: X_b = min[(f × Q_g) / Q_2, 1.0]
-         */
         function calculateBackgroundConcentration(f, Qg, Q2) {
             if (Q2 === 0) return 1.0;
             return Math.min((f * Qg) / Q2, 1.0);
         }
 
-        /**
-         * ПРАВИЛЬНЫЙ расчет частоты воздухообмена
-         * Формула: C = Q_a / V_0
-         */
         function calculateAirChangeRate(Qa, V0) {
             if (V0 === 0) return 0;
             return Qa / V0;
         }
 
-        // Determine zone type according to Table D.1 (точное соответствие)
+        // Determine zone type according to Table D.1
         function determineZoneType(releaseGrade, ventilationAvailability, dilutionLevel) {
             if (releaseGrade === 'continuous') {
                 if (dilutionLevel === 'High' && ventilationAvailability === 'Good') return 'Zone 0 NE';
@@ -1049,7 +2254,7 @@
             // Calculate gas density
             const rho_g = calculateGasDensity(Pa, M, R, T);
             
-            // Calculate critical pressures - ИСПРАВЛЕННАЯ ФОРМУЛА
+            // Calculate critical pressures
             const P_crit = calculateCriticalPressure(Pa, gamma);
             
             // Calculate mass release rates
@@ -1304,7 +2509,7 @@
             const Qg = mdot / rho_g;
             const Qc = calculateVolumetricReleaseCharacteristic(mdot, rho_g, LFL);
             
-            // Calculate ventilation parameters - ИСПРАВЛЕННЫЕ ФОРМУЛЫ
+            // Calculate ventilation parameters
             const Ae = calculateEffectiveVentilationArea(A1, A2);
             const Qa = calculateAirFlowRate(Cd_vent, Ae, windSpeed, deltaCp);
             const uw = calculateVentilationVelocity(Qa, L, H);
@@ -1319,7 +2524,7 @@
             const Xcrit = 0.25 * LFL;
             const dilutionLevel = Xb <= Xcrit ? 'Medium' : 'Low';
             
-            // Determine ventilation availability (typically 'Fair' for enclosed spaces)
+            // Determine ventilation availability
             const ventilationAvailability = 'Fair';
             
             // Display results
@@ -1491,5 +2696,5 @@
         // Initialize
         setLang('EN');
     </script>
-</body>
-</html>
+
+</body></html>
